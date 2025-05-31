@@ -1,27 +1,36 @@
-import express from 'express';
-import dotenv from 'dotenv';
+import express from "express";
+import dotenv from "dotenv";
+import morgan from "morgan";
+import cors from "cors";
 
-// Load environment variables
-dotenv.config();
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/users.js";
+import errorHandler from "./middleware/errorHandler.js";
+import hotelRoutes from "./routes/hotels.js";
+import vehicleRoutes from "./routes/vehicles.js";
 
-// Create Express app
+dotenv.config(); // load .env
+connectDB(); // connect to MongoDB
+
 const app = express();
 
-// Basic middleware
-app.use(express.json());
+app.use(express.json()); // parse JSON
+app.use(cors()); // enable CORS
+app.use(morgan("dev")); // request logging
 
-// Simple root route
-app.get('/', (req, res) => {
-    res.send('Backend is running successfully!');
-});
+// mount our auth & user routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+//hotel routs
+app.use("/api/hotels", hotelRoutes);
+//vehicle routs
+app.use("/api/vehicles", vehicleRoutes);
 
-// Port configuration
-const PORT = process.env.PORT || 5001;
+// global error handler (after routes)
+app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Visit: http://localhost:${PORT}`);
-});
-
-export default app;
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+);
