@@ -4,11 +4,15 @@ import Hero from '../LandingPage/Hero.tsx';
 import Category from '../LandingPage/Category.tsx';
 import Footer from '../Footer/footer.tsx';
 import TopSelling from '../LandingPage/topSelling.tsx';
+import Login from '../Login/login.tsx';
+
 const router = () => {
   return (
     <Router>
         <Routes>
             <Route path="/" element={<><NavBar/><Hero/><Category/><TopSelling/><Footer/></>} />
+          
+            <Route path="/login" element={<><Login/></>} />
         </Routes>
     </Router>
   )
