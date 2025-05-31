@@ -10,8 +10,7 @@ const NavBar = () => {
     { label: <a href="/">Destination</a>, key: 'destination' },
     { label: <a href="/about">Hotels</a>, key: 'hotels' },
     { label: <a href="/booking">Booking</a>, key: 'booking' },
-    { label: <a href="/login">Login</a>, key: 'login' },
-    { label: <a href="/signup"><Button >Sign Up</Button></a>, key: 'signup' },
+    { label: <a href="/Travel">Travel</a>, key: 'travel' },
   ];
 
   const languageMenu = { 
@@ -23,7 +22,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-transparent ">
+    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white shadow-lg backgroun-transparent">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and Title */}
         <div className="flex items-center">
@@ -32,12 +31,14 @@ const NavBar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex lg:space-x-20 xl:space-x-28 md:space-x-5 items-center">
+        <ul className="hidden md:flex lg:space-x-5 xl:space-x-20 md:space-x-2 items-center">
           {menuItems.map(item => (
             <li key={item.key} className="hover:text-orange-500">
               {item.label}
             </li>
           ))}
+          <li className='space-x-3'><a href="/login"><Button type='primary' style={{width:80}}>Login</Button></a>
+          <a href="/signup"><Button type='primary' style={{background:'#faad14'}}>Sign Up</Button></a></li>
 
           <li>
             <Dropdown menu={languageMenu} trigger={['click']}>
