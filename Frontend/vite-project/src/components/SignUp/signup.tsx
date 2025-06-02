@@ -1,23 +1,25 @@
-// src/pages/LoginPage.tsx
 import React, { useState } from "react";
 import type { FormEvent, ChangeEvent } from "react";
-import { useNavigate } from "react-router-dom"; // or your router hook of choice
-import { loginApi } from "../../api/auth"; // ← import the login function
+import { useNavigate } from "react-router-dom"; // adjust if needed
+import { registerApi } from "../../api/auth"; // import your API helper
 
-interface LoginFormData {
+interface RegisterFormData {
+  name: string;
   email: string;
   password: string;
   rememberMe: boolean;
 }
 
 interface ValidationErrors {
+  name?: string;
   email?: string;
   password?: string;
 }
 
-const LoginPage: React.FC = () => {
-  // (A) State for form data, loading, errors
-  const [formData, setFormData] = useState<LoginFormData>({
+const SignupPage: React.FC = () => {
+  // Form data state
+  const [formData, setFormData] = useState<RegisterFormData>({
+    name: "",
     email: "",
     password: "",
     rememberMe: false,
@@ -25,14 +27,15 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const navigate = useNavigate(); // (B) react-router hook, adjust if you use a different router
+  const navigate = useNavigate();
 
-  // (C) Email regex & password strength remain the same
+  // Email validation function
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
+  // Password strength checker (for border color styling)
   const getPasswordStrength = (password: string): number => {
     let strength = 0;
     if (password.length >= 8) strength++;
@@ -42,7 +45,8 @@ const LoginPage: React.FC = () => {
     return strength;
   };
 
-  const getInputBorderColor = (field: keyof LoginFormData): string => {
+  // Returns border color class based on validation
+  const getInputBorderColor = (field: keyof RegisterFormData): string => {
     if (field === "email") {
       if (!formData.email) return "border-gray-200";
       return validateEmail(formData.email)
@@ -60,53 +64,42 @@ const LoginPage: React.FC = () => {
       ];
       return colors[Math.min(strength, 3)];
     }
+    if (field === "name") {
+      // Simple validation: show red border if error on name
+      return errors.name ? "border-red-400" : "border-gray-200";
+    }
     return "border-gray-200";
   };
 
-  // (D) Handle input changes as before
+  // Update form data on input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-
-    // Clear errors on the fly
     if (errors[name as keyof ValidationErrors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
+  // Toggle password visibility
   const togglePassword = (): void => {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSocialLogin = (
-    provider: "google" | "microsoft" | "facebook"
-  ): void => {
-    alert(
-      `Redirecting to ${
-        provider.charAt(0).toUpperCase() + provider.slice(1)
-      } login...`
-    );
-  };
-
-  // (E) Replace handleSubmit with real API call and handle backend errors
+  // Handle form submit
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    // 1) Client-side validation
+    // Client-side validation
     const newErrors: ValidationErrors = {};
-
+    if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email";
     }
-
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
@@ -118,54 +111,57 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    // 2) If no errors, call backend
     setIsLoading(true);
+
     try {
-      // call the login API from src/api/auth.ts
-      const { token, user, message } = await loginApi({
+      // Call backend register API
+      const { token, user, message } = await registerApi({
+        name: formData.name,
         email: formData.email,
         password: formData.password,
+        role: "tourist", // optional; your backend can assign default role if omitted
       });
 
-      // 3) On success, store token & user info as needed
+      // Save token & user info to localStorage (or use context/redux)
       localStorage.setItem("authToken", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // 4) Optionally, if rememberMe is checked
-      if (formData.rememberMe) {
-        localStorage.setItem("rememberMe", "true");
-      } else {
-        localStorage.removeItem("rememberMe");
-      }
+      console.log(message); // Show success message
 
-      console.log("Login successful for user:", user);
-      console.log(message); // “Login successful” from your backend
-
-      // 5) Redirect to dashboard or homepage
-      navigate("/dashboard"); // ← update path as needed
+      // Redirect after signup success
+      navigate("/login"); // or '/dashboard' if you want auto-login
     } catch (error: any) {
-      // 6) Handle failure: show backend’s error message below the password field
-      console.error("Login error:", error);
+      // Handle errors from backend
       const backendMessage =
-        error.response?.data?.message || "Login failed. Please try again.";
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
 
-      // Set backend error under password (or you could distribute differently)
-      setErrors({ password: backendMessage });
+      // Set backend message as general form error under password (or you can customize)
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        password: backendMessage,
+      }));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // (F) Render JSX as before, but wire <form onSubmit={handleSubmit}>
+  function handleSocialLogin(arg0: string): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center p-20">
+    <div className="bg-white min-h-screen flex items-center justify-center p-5">
+      {/* Background Pattern */}
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-sky-400/20 via-transparent to-blue-600/20"></div>
       </div>
 
+      {/* Main Container */}
       <div className="bg-white rounded-3xl shadow-2xl shadow-sky-400/10 w-full max-w-5xl grid lg:grid-cols-2 min-h-[600px] overflow-hidden border border-sky-400/10 relative z-10">
-        {/* Welcome Section (unchanged) */}
+        {/* Welcome Section */}
         <div className="bg-gradient-to-br from-sky-400 to-blue-600 flex flex-col justify-center items-center p-8 lg:p-12 text-center relative overflow-hidden">
+          {/* Floating Animation Background */}
           <div className="absolute inset-0 opacity-10">
             <div
               className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full animate-bounce"
@@ -186,6 +182,7 @@ const LoginPage: React.FC = () => {
           </div>
 
           <div className="relative z-10">
+            {/* Welcome Icon */}
             <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-8 mx-auto">
               <svg
                 className="w-10 h-10 text-white"
@@ -203,28 +200,51 @@ const LoginPage: React.FC = () => {
             </div>
 
             <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight">
-              Welcome Back!
+              Join us today!
             </h1>
             <p className="text-white/90 text-lg leading-relaxed max-w-sm">
-              We’re excited to see you again. Enter your credentials to access
-              your account and continue your journey.
+              Create your account to start your journey and enjoy a seamless
+              experience
             </p>
           </div>
         </div>
 
-        {/* Form Section (with <form> wrapper) */}
-        <div className="p-8 lg:p-12 shadow-2xl border-b-amber-50 h-160 flex flex-col justify-center">
-          {/* Form Header */}
+        {/* Form Section */}
+        <div className="p-8 lg:p-12 flex flex-col justify-center">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-800 mb-3">Log In</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-3">Sign Up</h2>
             <p className="text-gray-600">
-              Please enter your details to continue
+              Please enter your details to Register
             </p>
           </div>
 
-          {/* Wrap in <form> so that onSubmit fires on “Enter” or button click */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
+            {/* Full Name */}
+            <div className="space-y-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 border-2 ${getInputBorderColor(
+                  "name"
+                )} rounded-xl focus:border-sky-400 focus:ring-0 focus:outline-none transition-all duration-300 hover:border-gray-300 focus:shadow-lg focus:shadow-sky-400/10 focus:-translate-y-1`}
+                placeholder="Enter your full name"
+                required
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
+            </div>
+
+            {/* Email */}
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -249,7 +269,7 @@ const LoginPage: React.FC = () => {
               )}
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div className="space-y-2">
               <label
                 htmlFor="password"
@@ -312,7 +332,7 @@ const LoginPage: React.FC = () => {
               )}
             </div>
 
-            {/* Form Options */}
+            {/* Remember Me */}
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -324,15 +344,9 @@ const LoginPage: React.FC = () => {
                 />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <a
-                href="#"
-                className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200"
-              >
-                Forgot Password?
-              </a>
             </div>
 
-            {/* Login Button */}
+            {/* Submit button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -364,21 +378,19 @@ const LoginPage: React.FC = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Signing In...
+                  Signing up...
                 </div>
               ) : (
-                "Sign In"
+                "Sign Up"
               )}
             </button>
           </form>
-
           {/* Divider */}
           <div className="flex items-center my-8">
             <div className="flex-1 border-t border-gray-200"></div>
             <span className="px-4 text-gray-500 text-sm">or continue with</span>
             <div className="flex-1 border-t border-gray-200"></div>
           </div>
-
           {/* Social Login */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             <button
@@ -420,16 +432,9 @@ const LoginPage: React.FC = () => {
               </span>
             </button>
           </div>
-
           {/* Sign Up Link */}
-          <div className="text-center text-gray-600">
-            Don’t have an account?
-            <a
-              href="/register"
-              className="text-sky-400 hover:text-blue-600 font-semibold transition-colors duration-200 hover:underline ml-1"
-            >
-              Sign up here
-            </a>
+          <div className="text-center text-gray-600 bolter">
+            Enjoy your first booking with us....!
           </div>
         </div>
       </div>
@@ -437,4 +442,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;
