@@ -52,7 +52,7 @@ interface ForgotPasswordData {
   email: string;
 }
 export async function forgotPasswordApi(data: ForgotPasswordData) {
-  return await api.post('/api/auth/forgotPassword', data);
+  return await api.post('/api/auth/forgot-password', data);
 }
 
 interface ResetPasswordData {

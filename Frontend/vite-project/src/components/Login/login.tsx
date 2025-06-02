@@ -325,7 +325,7 @@ const LoginPage: React.FC = () => {
                 <span className="text-gray-600">Remember me</span>
               </label>
               <a
-                href="#"
+                href="/forgot-password"
                 className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200"
               >
                 Forgot Password?
@@ -367,7 +367,7 @@ const LoginPage: React.FC = () => {
                   Signing In...
                 </div>
               ) : (
-                "Sign In"
+                "Log In"
               )}
             </button>
           </form>

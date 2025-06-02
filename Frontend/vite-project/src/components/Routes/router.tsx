@@ -7,6 +7,7 @@ import TopSelling from "../LandingPage/topSelling.tsx";
 import Login from "../Login/login.tsx";
 import DashBoard from "../Dashboard/dashBoard.tsx";
 import Signup from "../SignUp/signup.tsx";
+import ForgotPasswordPage from "../Login/ForgotPassword.tsx";
 const router = () => {
   return (
     <Router>
@@ -45,6 +46,14 @@ const router = () => {
           element={
             <>
               <Signup />
+            </>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <>
+              <ForgotPasswordPage />
             </>
           }
         />
