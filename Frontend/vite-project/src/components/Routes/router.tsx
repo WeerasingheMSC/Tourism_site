@@ -8,6 +8,9 @@ import Login from "../Login/login.tsx";
 import DashBoard from "../Dashboard/dashBoard.tsx";
 import Signup from "../SignUp/signup.tsx";
 import ForgotPasswordPage from "../Login/ForgotPassword.tsx";
+import AdminDash from "../Dashboard/AdminDashbord.tsx";
+import HotelOwner from "../Dashboard/HotelOwner.tsx";
+import TransportDash from "../Dashboard/TransportOwner.tsx";
 const router = () => {
   return (
     <Router>
@@ -54,6 +57,30 @@ const router = () => {
           element={
             <>
               <ForgotPasswordPage />
+            </>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <>
+              <AdminDash />
+            </>
+          }
+        />
+        <Route
+          path="/hotel-owner-dashboard"
+          element={
+            <>
+              <HotelOwner />
+            </>
+          }
+        />
+        <Route
+          path="/transport-owner-dashboard"
+          element={
+            <>
+              <TransportDash />
             </>
           }
         />

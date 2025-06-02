@@ -141,8 +141,18 @@ const LoginPage: React.FC = () => {
       console.log("Login successful for user:", user);
       console.log(message); // “Login successful” from your backend
 
-      // 5) Redirect to dashboard or homepage
-      navigate("/dashboard"); // ← update path as needed
+      // 5) Redirect to related dashboard based on user.role
+      // Assuming your user object has a 'role' property that can be 'admin', 'seller', 'buyer', etc.
+      if (user.role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.role === "hotel-owner") {
+        navigate("/hotel-owner-dashboard");
+      } else if (user.role === "transport-owner") {
+        navigate("/transport-owner-dashboard");
+      } else {
+        // fallback or default dashboard
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       // 6) Handle failure: show backend’s error message below the password field
       console.error("Login error:", error);
