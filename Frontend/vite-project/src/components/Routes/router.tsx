@@ -6,6 +6,7 @@ import Footer from '../Footer/footer.tsx';
 import TopSelling from '../LandingPage/topSelling.tsx';
 import Login from '../Login/login.tsx';
 import Signup from '../SingUp/signup.tsx';
+import ForgotPasswordPage from '../Login/ForgotPassword.tsx';
 
 const router = () => {
   return (
@@ -15,6 +16,9 @@ const router = () => {
           
             <Route path="/login" element={<><Login/></>} />
             <Route path="/register" element={<><Signup/></>} />
+            <Route path="/forgot-password" element={<><ForgotPasswordPage/></>} />
+
+            {/* Add more routes as needed */}
         </Routes>
     </Router>
   )

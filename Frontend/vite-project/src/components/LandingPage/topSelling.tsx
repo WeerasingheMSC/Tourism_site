@@ -1,5 +1,4 @@
 // src/components/TopSelling.jsx
-import React from 'react';
 import { Row, Col, Card } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import Silver from '../../assets/Sri-Lanka-tourism.jpg';
