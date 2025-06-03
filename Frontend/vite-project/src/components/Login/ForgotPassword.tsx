@@ -103,7 +103,7 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Check Your Email</h1>
           <p className="text-gray-600 mb-6 leading-relaxed">
-            We've sent a password reset link to <strong>{formData.email}</strong>
+            We've sent a password one time password to <strong>{formData.email}</strong>
           </p>
           <p className="text-sm text-gray-500 mb-8">
             If you don't see the email, check your spam folder or try again.
@@ -158,7 +158,7 @@ const ForgotPasswordPage: React.FC = () => {
         <div className="p-8 lg:p-12 flex flex-col justify-center">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-gray-800 mb-3">Forgot Password?</h2>
-            <p className="text-gray-600">Enter your email address and we'll send you a reset link</p>
+            <p className="text-gray-600">Enter your email address and we'll send you a one time password</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -209,7 +209,7 @@ const ForgotPasswordPage: React.FC = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Sending Reset Link...
+                  Sending OTP...
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
