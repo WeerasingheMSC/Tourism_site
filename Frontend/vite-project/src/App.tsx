@@ -1,8 +1,14 @@
-import "./App.css"
-import Router from "./components/Routes/router.tsx"
-const App = () => {
+import './App.css'
+import Router from '../src/components/Routes/router.tsx'
+
+function App() {
+
   return (
-    <Router />
+    <>
+      <div>
+        <Router />
+      </div>
+    </>
   )
 }
 
