@@ -61,7 +61,7 @@ interface ResetPasswordData {
   newPassword: string;
 }
 export async function resetPasswordApi(data: ResetPasswordData) {
-  return await api.post('/api/auth/resetPassword', data);
+  return await api.post('/api/auth/reset-password', data);
 }
 
 // (6) Export the raw Axios instance in case you want to set default headers later

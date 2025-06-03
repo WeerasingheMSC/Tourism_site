@@ -14,6 +14,7 @@ import AdminDash from "../Dashboard/AdminDashbord.tsx";
 import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
+import Resetpassword from "../Login/ResetPassword.tsx";
 const router = () => {
   return (
     <Router>
@@ -60,6 +61,14 @@ const router = () => {
           element={
             <>
               <ForgotPasswordPage />
+            </>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <>
+              <Resetpassword />
             </>
           }
         />
