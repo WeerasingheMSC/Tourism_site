@@ -14,6 +14,7 @@ import AdminDash from "../Dashboard/AdminDashbord.tsx";
 import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
+import HotelListPage from "../Hotels/HotelListPage.tsx";
 const router = () => {
   return (
     <Router>
@@ -108,6 +109,16 @@ const router = () => {
           element={
             <>
               <SignupTransport />
+            </>
+          }
+        />
+        <Route
+          path="/hotels"
+          element={
+            <>
+              <NavBar />
+              <HotelListPage />
+              <Footer />
             </>
           }
         />
