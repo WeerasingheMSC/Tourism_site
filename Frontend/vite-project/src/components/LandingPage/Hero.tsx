@@ -6,8 +6,8 @@ import Plane from '../../assets/Plane.png'
 
 const Hero = () => {
   return (
-    <div className='pb-1'>
-      <div className='relative bg-gray-200 lg:bg-white overflow-hidden box-border border-gray-300 rounded-lg shadow-lg lg:border-none lg:shadow-none'>
+    <div className='pb-1 '>
+      <div className='relative lg:var(--color-Pink) overflow-hidden box-border border-gray-300 rounded-lg shadow-lg lg:border-none lg:shadow-none'>
         {/* Desktop Images - Keep original positioning for lg and xl */}
         <img src={Decore} alt="" className='absolute right-0 hidden lg:flex'/>
         <img src={Traveller} alt="" className='absolute right-0 w-160 h-auto mt-25 mr-35 lg:flex z-40 hidden' />
