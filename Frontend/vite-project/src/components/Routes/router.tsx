@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "../Navbar/NavBar.tsx";
+import NavBarUpdated from "../Navbar/UpdatedNavBar.tsx";
 import Hero from "../LandingPage/Hero.tsx";
 import Category from "../LandingPage/Category.tsx";
 import Footer from "../Footer/footer.tsx";
@@ -14,6 +15,10 @@ import AdminDash from "../Dashboard/AdminDashbord.tsx";
 import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
+import TravelPackagesPage from "../Packages/Packages.tsx";
+import UpdatedFooter from "../Packages/updatedFooter.tsx";
+import IndividualPackage from "../IndividualPackage/[id]/IndividualPackage.tsx";
+
 const router = () => {
   return (
     <Router>
@@ -108,6 +113,26 @@ const router = () => {
           element={
             <>
               <SignupTransport />
+            </>
+          }
+        />
+        <Route
+          path="/packages"
+          element={
+            <>
+              <NavBarUpdated />
+              <TravelPackagesPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/packages/:id"
+          element={
+            <>
+              <NavBarUpdated />
+              <IndividualPackage />
+              <UpdatedFooter />
             </>
           }
         />
