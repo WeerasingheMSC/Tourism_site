@@ -1,0 +1,59 @@
+.title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.subtext {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.uploadBox {
+  border: 1.5px dashed #d1d5db;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.addBtn {
+  background-color: white;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  background-color: #eff6ff;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.backBtn {
+  padding: 0.5rem 1.25rem;
+  border: 1.5px solid #2563eb;
+  color: #2563eb;
+  background-color: white;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.nextBtn {
+  padding: 0.5rem 1.25rem;
+  background-color: #d1d5db;
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: not-allowed;
+}
