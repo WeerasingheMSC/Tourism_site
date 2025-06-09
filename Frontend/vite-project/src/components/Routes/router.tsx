@@ -18,6 +18,7 @@ import SignupLanding from "../SignUp/SignRole.tsx";
 import TravelPackagesPage from "../Packages/Packages.tsx";
 import UpdatedFooter from "../Packages/updatedFooter.tsx";
 import IndividualPackage from "../IndividualPackage/[id]/IndividualPackage.tsx";
+import AddPackagesForm from "../AddPackage/PackageDetailsForm.tsx";
 
 const router = () => {
   return (
@@ -132,6 +133,16 @@ const router = () => {
             <>
               <NavBarUpdated />
               <IndividualPackage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/addpackage"
+          element={
+            <>
+              <NavBarUpdated />
+              <AddPackagesForm />
               <UpdatedFooter />
             </>
           }
