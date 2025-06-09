@@ -15,6 +15,7 @@ import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
 import HotelListPage from "../Hotels/HotelListPage.tsx";
+import AddPackagePage from "../AddPackage/AddPackagePage.tsx";
 const router = () => {
   return (
     <Router>
@@ -118,6 +119,16 @@ const router = () => {
             <>
               <NavBar />
               <HotelListPage />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/add-package"
+          element={
+            <>
+              <NavBar />
+              <AddPackagePage />
               <Footer />
             </>
           }
