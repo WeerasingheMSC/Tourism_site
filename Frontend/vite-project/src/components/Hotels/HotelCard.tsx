@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./HotelCard.module.css";
 
 type HotelProps = {
   name: string;
@@ -19,8 +20,7 @@ const HotelCard: React.FC<HotelProps> = ({
 }) => {
   return (
     <div
-      className="rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl bg-white 
-                 animate-fade-slide-up"
+      className={`rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl bg-white ${styles.card}`}
     >
       <img src={imageUrl} alt={name} className="h-48 w-full object-cover" />
       <div className="p-4">
