@@ -14,6 +14,7 @@ import AdminDash from "../Dashboard/AdminDashbord.tsx";
 import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
+import Footernew from "../FooterNew/footernew.tsx";
 //import CutomizedPackge from '../Customised/personal.tsx';
 //import PackageDetails from '../Customised/package.tsx'; // Changed to uppercase
 import CustomPackageForm from "../Customised/CustomPackageForm";
@@ -31,7 +32,7 @@ const router = () => {
               <Hero />
               <Category />
               <TopSelling />
-              <Footer />
+              <Footernew />
             </>
           }
         />
