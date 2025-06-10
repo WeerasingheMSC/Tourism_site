@@ -120,7 +120,7 @@ const SignupPage: React.FC = () => {
         email: formData.email,
         password: formData.password,
         role: "tourist", // optional; your backend can assign default role if omitted
-      });
+      }) as { token: string; user: any; message: string };
 
       // Save token & user info to localStorage (or use context/redux)
       localStorage.setItem("authToken", token);

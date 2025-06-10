@@ -5,7 +5,7 @@ import axios from 'axios';
 // (1) Create an Axios instance with a base URL 
 //     Adjust the baseURL to match where your backend is running.
 const api = axios.create({
-  baseURL: import.meta.env.REACT_APP_API_BASE_URL || 'http://localhost:5000', 
+  baseURL: import.meta.env.REACT_APP_API_BASE_URL || 'http://localhost:5001', 
   headers: {
     'Content-Type': 'application/json',
   },
