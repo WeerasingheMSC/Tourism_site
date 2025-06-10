@@ -15,6 +15,8 @@ import AdminDash from "../Dashboard/AdminDashbord.tsx";
 import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
+import StepSelect from "../LandingPage/StepsSelect.tsx";
+import Testonomial from "../LandingPage/Testonomial.tsx";
 const router = () => {
   return (
     <Router>
@@ -27,6 +29,8 @@ const router = () => {
               <Hero />
               <Category />
               <TopSelling />
+              <StepSelect />
+              <Testonomial />
               <Footer />
             </>
           }

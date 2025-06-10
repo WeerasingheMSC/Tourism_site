@@ -61,10 +61,10 @@ const TopSelling = () => {
                     />
                   </div>
                 }
-                className="rounded-lg shadow-md border border-gray-100 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                className="rounded-lg shadow-md border border-gray-100 transition-transform duration-300 hover:scale-105 hover:shadow-xl  hover:border-cyan-500 hover:border-2"
                 style={{ 
                   maxWidth: '320px', 
-                  width: '100%' 
+                  width: '100%',
                 }}
                 bodyStyle={{ 
                   padding: '16px' 
