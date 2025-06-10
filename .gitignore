@@ -1,3 +1,5 @@
-node_modules
-
-/Backend/config
+node_modules
+
+/Backend/config
+config.bat
+.env
