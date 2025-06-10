@@ -1,6 +1,7 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "../Navbar/NavBar.tsx";
+import NavBarUpdated from "../Navbar/UpdatedNavBar.tsx";
 import Hero from "../LandingPage/Hero.tsx";
 import Category from "../LandingPage/Category.tsx";
 import Footer from "../Footer/footer.tsx";
@@ -20,6 +21,10 @@ import Testonomial from "../LandingPage/Testonomial.tsx";
 import Footernew from "../FooterNew/footernew.tsx";
 import CustomPackageForm from "../Customised/CustomPackageForm";
 import Herooo from "../Customised/Herooo.tsx"; 
+import TravelPackagesPage from "../Packages/Packages.tsx";
+import UpdatedFooter from "../Packages/updatedFooter.tsx";
+import IndividualPackage from "../IndividualPackage/[id]/IndividualPackage.tsx";
+import AddPackagesForm from "../AddPackage/PackageDetailsForm.tsx";
 const router = () => {
   return (
     <Router>
@@ -125,9 +130,39 @@ const router = () => {
           path="/CustomPackageForm"
           element={
             <>
-            <NavBar />
+              <NavBar />
               <Herooo />
-              <Footernew/>
+              <Footernew />
+            </>
+          }
+        />
+        <Route
+          path="/packages"
+          element={
+            <>
+              <NavBarUpdated />
+              <TravelPackagesPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/packages/:id"
+          element={
+            <>
+              <NavBarUpdated />
+              <IndividualPackage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/addpackage"
+          element={
+            <>
+              <NavBarUpdated />
+              <AddPackagesForm />
+              <UpdatedFooter />
             </>
           }
         />
