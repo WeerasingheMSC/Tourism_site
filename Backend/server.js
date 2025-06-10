@@ -9,6 +9,7 @@ import userRoutes from "./routes/users.js";
 import errorHandler from "./middleware/errorHandler.js";
 import hotelRoutes from "./routes/hotels.js";
 import vehicleRoutes from "./routes/vehicles.js";
+import PackageRoutes from "./routes/packages.js";
 
 dotenv.config(); // load .env
 connectDB(); // connect to MongoDB
@@ -26,6 +27,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/hotels", hotelRoutes);
 //vehicle routs
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/packages",PackageRoutes);
 
 // global error handler (after routes)
 app.use(errorHandler);

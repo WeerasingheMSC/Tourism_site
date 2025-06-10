@@ -12,7 +12,7 @@ const NavBarUpdated = () => {
   ];
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-transparent">
+    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and Title */}
         <div className="flex items-center">
@@ -23,7 +23,7 @@ const NavBarUpdated = () => {
         {/* Desktop Menu */}
         <ul className="hidden md:flex lg:space-x-5 xl:space-x-10 md:space-x-2 items-center text-white">
           {menuItems.map(item => (
-            <li key={item.key} className="hover:text-orange-500">
+            <li key={item.key} className="hover:text-orange-500 text-black">
               {item.label}
             </li>
           ))}

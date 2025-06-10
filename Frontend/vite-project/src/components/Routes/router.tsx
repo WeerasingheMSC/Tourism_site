@@ -130,12 +130,11 @@ const router = () => {
           path="/CustomPackageForm"
           element={
             <>
-              <NavBar />
+            <NavBar />
               <Herooo />
-              <Footernew />
-            </>
-          }
-        />
+              <Footernew/>
+              </>}
+              />
         <Route
           path="/packages"
           element={
