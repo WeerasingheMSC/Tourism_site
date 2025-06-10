@@ -15,8 +15,17 @@ import AdminDash from "../Dashboard/AdminDashbord.tsx";
 import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
+
 import StepSelect from "../LandingPage/StepsSelect.tsx";
 import Testonomial from "../LandingPage/Testonomial.tsx";
+
+import Footernew from "../FooterNew/footernew.tsx";
+//import CutomizedPackge from '../Customised/personal.tsx';
+//import PackageDetails from '../Customised/package.tsx'; // Changed to uppercase
+import CustomPackageForm from "../Customised/CustomPackageForm";
+import Herooo from "../Customised/Herooo.tsx"; // Assuming hero1 is a component for the customized package form
+//import Heroi from "../Customised/Heroi.tsx"; // Assuming Heroi is a component for the customized package form
+
 const router = () => {
   return (
     <Router>
@@ -31,7 +40,8 @@ const router = () => {
               <TopSelling />
               <StepSelect />
               <Testonomial />
-              <Footer />
+              <Footernew />
+
             </>
           }
         />
@@ -39,6 +49,7 @@ const router = () => {
           path="/login"
           element={
             <>
+          
               <Login />
             </>
           }
@@ -113,6 +124,16 @@ const router = () => {
           element={
             <>
               <SignupTransport />
+            </>
+          }
+        />
+         <Route
+          path="/CustomPackageForm"
+          element={
+            <>
+            <NavBar />
+              <Herooo />
+          
             </>
           }
         />

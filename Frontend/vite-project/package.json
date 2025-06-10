@@ -10,18 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.0.0",
     "@syncfusion/ej2-base": "^29.2.4",
     "@syncfusion/ej2-react-richtexteditor": "^29.2.5",
     "@tailwindcss/vite": "^4.1.8",
     "@types/react-router-dom": "^5.3.3",
-    "antd": "^5.25.3",
+    "antd": "^5.25.4",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "lucide-react": "^0.511.0",
     "nodemon": "^3.1.10",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.1",
+    "react-router-dom": "^7.6.2",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
