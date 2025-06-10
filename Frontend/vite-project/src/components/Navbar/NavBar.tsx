@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../../assets/logo.jpeg';
 import { Button, Dropdown, Drawer,Space } from 'antd';
 import { DownOutlined, MenuOutlined } from '@ant-design/icons';
 
 const NavBar = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowNav(window.scrollY < 10); // Show only at the very top
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const menuItems = [
     { label: <a href="/">Destination</a>, key: 'destination' },
@@ -22,7 +31,11 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white shadow-lg background-transparent">
+    <nav
+      className={`p-3 fixed top-0 left-0 w-full z-50 background-transparent transition-transform duration-300 ${
+        showNav ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and Title */}
         <div className="flex items-center">

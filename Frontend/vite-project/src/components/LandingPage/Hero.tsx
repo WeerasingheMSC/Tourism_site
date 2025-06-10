@@ -7,7 +7,7 @@ import Plane from '../../assets/Plane.png'
 const Hero = () => {
   return (
     <div className='pb-1'>
-      <div className='relative bg-gray-200 lg:bg-white overflow-hidden box-border border-gray-300 rounded-lg shadow-lg lg:border-none lg:shadow-none'>
+      <div className='relative bg-gray-200 lg:bg-white box-border border-gray-300 rounded-lg shadow-lg lg:border-none lg:shadow-none'>
         {/* Desktop Images - Keep original positioning for lg and xl */}
         <img src={Decore} alt="" className='absolute right-0 hidden lg:flex'/>
         <img src={Traveller} alt="" className='absolute right-0 w-160 h-auto mt-25 mr-35 lg:flex z-40 hidden' />
@@ -23,60 +23,48 @@ const Hero = () => {
         {/* Content Container */}
         <div className='relative z-10 px-4 sm:px-6 md:px-8 lg:pl-24 pt-20 sm:pt-28 md:pt-32 lg:pt-40 pb-20'>
           {/* Subtitle */}
-          <p className='text-orange-600 text-xs sm:text-sm md:text-base lg:text-lg 
-                        font-extrabold font-popins text-center lg:text-start 
-                        mb-4 sm:mb-6 md:mb-8'>
-            BEST DESTINATION AROUND SRI LANKA
+          <p className="text-orange-600 text-sm sm:text-base lg:text-lg font-extrabold mb-4 text-left tracking-wide">
+            BEST DESTINATIONS AROUND SRILANKA
           </p>
-          
+
           {/* Main Title */}
-          <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl 
-                         font-extrabold mt-4 sm:mt-6 md:mt-8 text-center lg:text-start 
-                         leading-tight sm:leading-tight md:leading-tight lg:leading-tight
-                         max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:w-110
-                         mx-auto lg:mx-0' 
-              style={{fontFamily:"sans-serif"}}>
-            Travel, enjoy and live a new and full life
+          <h1
+            className="text-[#23263A] text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-left mb-4"
+            style={{ fontFamily: 'sans-serif' }}
+          >
+            Travel,{' '}
+            <span className="relative inline-block">
+              <span className="font-extrabold underline decoration-[#1AB3FF] decoration-8 underline-offset-[10px]">
+                enjoy
+              </span>
+              <span className="font-extrabold"> and</span>
+            </span>
+            <br />
+            live a new and full life
           </h1>
-          
+
           {/* Description */}
-          <p className='max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:w-110 
-                        text-sm sm:text-base md:text-lg 
-                        text-center lg:text-start 
-                        font-sans mt-4 sm:mt-6 md:mt-8 
-                        mx-auto lg:mx-0 
-                        leading-relaxed text-gray-700'>
-            Built Wicket longer admire do barton vanity itself do in it. Preferred to sportsmen it engrossed listening. Park gate sell they west hard for the.
+          <p className="text-gray-700 text-base sm:text-lg font-sans text-left max-w-xl mb-6">
+            Built Wicket longer admire do barton vanity itself do in it.<br />
+            Preferred to sportsmen it engrossed listening. Park gate sell they west hard for the.
           </p>
-          
+
           {/* Buttons */}
-          <div className='mt-8 sm:mt-10 md:mt-12 
-                          flex flex-col sm:flex-row 
-                          items-center lg:items-start 
-                          justify-center lg:justify-start 
-                          gap-4 sm:gap-2 md:gap-4'>
-            <Button 
-              type='primary' 
-              className='w-42'
-              style={{
-                height: 40,
-                minWidth: 140,
-                fontSize: '14px',
-                background: '#0288D1'
-              }}
-              size='large'>
-              Find Out More
+          <div className="flex gap-4 mt-2">
+            <Button
+              type="primary"
+              className="!bg-[#1AB3FF] !text-white !font-semibold !rounded-lg !px-8 !py-2 !text-base"
+              style={{ border: 'none' }}
+              size="large"
+            >
+              Find out More
             </Button>
-            <Button 
-              className='w-full sm:w-auto'
-              style={{
-                height: 40,
-                width: 'auto',
-                minWidth: 160,
-                fontSize: '14px'
-              }}
-              size='large'>
-              Customize your plane
+            <Button
+              className="!border-[#1AB3FF] !text-[#1AB3FF] !font-semibold !rounded-lg !px-8 !py-2 !text-base !bg-transparent"
+              style={{ borderWidth: 2 }}
+              size="large"
+            >
+              Customized your plan
             </Button>
           </div>
         </div>
