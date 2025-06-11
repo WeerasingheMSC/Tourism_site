@@ -95,3 +95,44 @@ export const approveRejectTourRequest = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * @desc    Admin view one custom tour request’s full details
+ * @route   GET /requests/:id
+ * @access  Admin only
+ */
+export const getRequestById = async (req, res, next) => {
+  try {
+    // 🔄 1) Grab the ID from the URL params
+    const { id } = req.params;
+
+    // 🔄 2) Fetch that single request document
+    const request = await CustomTourRequest.findById(id);
+
+    // 🔄 3) If not found, return 404
+    if (!request) {
+      return res.status(404).json({ message: "Tour request not found" });
+    }
+
+    // 🔄 4) Otherwise, send it back as JSON
+    res.json(request);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @desc    Admin view all custom tour requests
+ * @route   GET /noStatusRequests
+ * @access  Admin only
+ */
+export const getAllRequestsNoStatus = async (req, res, next) => {
+  try {
+    const requests = await CustomTourRequest.find();
+
+    res.json(requests);
+  } catch (err) {
+    next(err);
+  }
+};
+

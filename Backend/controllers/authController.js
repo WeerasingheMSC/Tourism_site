@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/emailService.js";
 import { generateOTP } from "../utils/otp.js";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /**
  * @desc    Register a new user
@@ -143,6 +146,81 @@ export const resetPassword = async (req, res, next) => {
     await user.save();
 
     res.json({ message: "Password reset successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @desc    Sign in or up via Google auth-code
+ * @route   POST /api/auth/google
+ * @access  Public
+ */
+export const googleSignIn = async (req, res, next) => {
+  try {
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ message: "No Google auth code provided" });
+    }
+
+    // 1) Exchange auth code for tokens
+    const { tokens } = await googleClient.getToken(code);
+    const idToken = tokens.id_token;
+    if (!idToken) {
+      return res
+        .status(400)
+        .json({ message: "Failed to retrieve ID token from Google" });
+    }
+
+    // 2) Verify the ID token
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture: photo } = payload;
+
+    // 3) Find or create user
+    let user = await User.findOne({ googleId });
+    if (!user) {
+      user = await User.findOne({ email });
+    }
+
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        provider: "google",
+        googleId,
+        photo,
+        password: bcrypt.hashSync(googleId, 10),
+        role: "tourist",
+      });
+    } else if (user.provider !== "google") {
+      return res
+        .status(400)
+        .json({ message: "Email already registered with local account" });
+    }
+
+    // 4) Issue your JWT
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // 5) Send response
+    res.json({
+      message: "Google sign-in successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        photo: user.photo,
+      },
+    });
   } catch (err) {
     next(err);
   }

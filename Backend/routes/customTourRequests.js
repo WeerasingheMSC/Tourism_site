@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 
-import { submitTourRequest, getAllRequests, approveRejectTourRequest } from '../controllers/customTourRequestController.js';
+import { submitTourRequest, getAllRequests, approveRejectTourRequest,getRequestById,getAllRequestsNoStatus } from '../controllers/customTourRequestController.js';
 import auth from '../middleware/auth.js';
 import { authorizeRoles } from '../middleware/roles.js';
 
@@ -34,6 +34,21 @@ router.get(
   authorizeRoles('admin'),
   getAllRequests
 );
+// Admin: View all pending tour requests
+router.get(
+  '/noStatusRequests',
+  auth,
+  authorizeRoles('admin'),
+  getAllRequestsNoStatus
+);
+
+// 🔄 Admin: View one custom tour request by ID
+router.get(
+  '/requests/:id',
+  auth,
+  authorizeRoles('admin'),
+  getRequestById
+);
 
 // Admin: Approve or reject a custom tour request
 router.put(
@@ -48,5 +63,7 @@ router.put(
     approveRejectTourRequest(req, res, next);
   }
 );
+
+
 
 export default router;
