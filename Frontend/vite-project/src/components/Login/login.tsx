@@ -144,14 +144,14 @@ const LoginPage: React.FC = () => {
       // 5) Redirect to related dashboard based on user.role
       // Assuming your user object has a 'role' property that can be 'admin', 'seller', 'buyer', etc.
       if (user.role === "admin") {
-        navigate("/admin-dashboard");
+        navigate("/admin/dashboard");
       } else if (user.role === "hotel-owner") {
         navigate("/hotel-owner-dashboard");
       } else if (user.role === "transport-owner") {
         navigate("/transport-owner-dashboard");
       } else {
         // fallback or default dashboard
-        navigate("/dashboard");
+        navigate("/");
       }
     } catch (error: any) {
       // 6) Handle failure: show backend’s error message below the password field

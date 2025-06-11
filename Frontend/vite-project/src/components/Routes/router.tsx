@@ -1,9 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "../Navbar/NavBar.tsx";
 import Hero from "../LandingPage/Hero.tsx";
-import Category from "../LandingPage/Category.tsx";
-import Footer from "../Footer/footer.tsx";
-import TopSelling from "../LandingPage/topSelling.tsx";
 import Login from "../Login/login.tsx";
 import DashBoard from "../Dashboard/dashBoard.tsx";
 import SignupHotel from "../SignUp/signupH.tsx";
@@ -15,6 +12,19 @@ import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
 import Resetpassword from "../Login/ResetPassword.tsx";
+import NavBarUpdated from "../Navbar/UpdatedNavBar.tsx";
+import Herooo from "../Customised/Herooo.tsx"; 
+import TravelPackagesPage from "../Packages/Packages.tsx";
+import UpdatedFooter from "../Packages/updatedFooter.tsx";
+import IndividualPackage from "../IndividualPackage/[id]/IndividualPackage.tsx";
+import AddPackagesForm from "../AddPackage/PackageDetailsForm.tsx";
+import AdminDashboardPage from "../Admin/AdminDashboardPage.tsx";
+import Decore from "../Packages/Decore.tsx";
+import AdminCustomizedPlansAllPage from "../Admin/AdminCustomizedPlansAllPage.tsx";
+import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx";
+import EditPackagesForm from "../Admin/EditPackages.tsx";
+import TravelBookingSite from "../LandingPage/LandingPage.tsx";
+
 const router = () => {
   return (
     <Router>
@@ -25,9 +35,8 @@ const router = () => {
             <>
               <NavBar />
               <Hero />
-              <Category />
-              <TopSelling />
-              <Footer />
+              <TravelBookingSite />
+              <UpdatedFooter />
             </>
           }
         />
@@ -44,7 +53,7 @@ const router = () => {
           element={
             <>
               <DashBoard />
-              <Footer />
+              
             </>
           }
         />
@@ -117,6 +126,89 @@ const router = () => {
           element={
             <>
               <SignupTransport />
+            </>
+          }
+        />
+        <Route
+          path="/CustomPackageForm"
+          element={
+            <>
+            <NavBar />
+              <Herooo />
+          
+            </>
+          }
+        />
+         <Route
+          path="/packages"
+          element={
+            <>
+              <NavBarUpdated />
+              <TravelPackagesPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/packages/:id"
+          element={
+            <>
+              <NavBarUpdated />
+              <IndividualPackage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/addpackage"
+          element={
+            <>
+              <NavBarUpdated />
+              <AddPackagesForm />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/admin/editpackage"
+          element={
+            <>
+              <NavBarUpdated />
+              <EditPackagesForm />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <>
+              <NavBarUpdated />
+              <Decore />
+              <AdminDashboardPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/admin/customized-plans"  
+          element={
+            <>
+              <NavBarUpdated />
+              <Decore />
+              <AdminCustomizedPlansAllPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/admin/customized-plans-details/:id"  
+          element={
+            <>
+              <NavBarUpdated />
+              <Decore />
+              <AdminCustomizedPlanDetails />
+              <UpdatedFooter />
             </>
           }
         />
