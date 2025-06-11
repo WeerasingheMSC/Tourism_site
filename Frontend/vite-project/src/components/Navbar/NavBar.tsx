@@ -38,7 +38,7 @@ const NavBar = () => {
             </li>
           ))}
           <li className='space-x-3'><a href="/login"><Button type='primary' style={{width:80}}>Login</Button></a>
-          <a href="/signup"><Button type='primary' style={{background:'#faad14'}}>Sign Up</Button></a></li>
+          <a href="/register"><Button type='primary' style={{background:'#faad14'}}>Sign Up</Button></a></li>
 
           <li>
             <Dropdown menu={languageMenu} trigger={['click']}>

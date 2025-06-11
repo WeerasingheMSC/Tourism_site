@@ -75,4 +75,15 @@ router.post(
   }
 );
 
+router.post(
+  '/google',
+  body('idToken').notEmpty().withMessage('idToken is required'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    googleSignIn(req, res, next);
+  }
+);
+
 export default router;

@@ -1,5 +1,5 @@
 // src/pages/ForgotPasswordPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { forgotPasswordApi } from '../../api/auth';  // Your API call import
@@ -18,7 +18,17 @@ const ForgotPasswordPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEmailSent, setIsEmailSent] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [backendError, setBackendError] = useState<string | null>(null); // <-- New state for backend errors
+  const [backendError, setBackendError] = useState<string | null>(null);
+
+  // Automatically redirect to ResetPasswordPage after showing the success message
+  useEffect(() => {
+    if (isEmailSent) {
+      const timer = setTimeout(() => {
+        navigate('/reset-password');
+      }, 5000); // 2 seconds delay
+      return () => clearTimeout(timer);
+    }
+  }, [isEmailSent, navigate]);
 
   // Email validation regex
   const validateEmail = (email: string): boolean => {
@@ -41,7 +51,7 @@ const ForgotPasswordPage: React.FC = () => {
       setErrors(prev => ({ ...prev, email: undefined }));
     }
     if (backendError) {
-      setBackendError(null); // Clear backend error when user types again
+      setBackendError(null);
     }
   };
 
@@ -58,8 +68,7 @@ const ForgotPasswordPage: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-
-    setBackendError(null); // Clear backend error on new submit
+    setBackendError(null);
 
     const newErrors: ValidationErrors = {};
     if (!formData.email) {
@@ -82,7 +91,7 @@ const ForgotPasswordPage: React.FC = () => {
     } catch (error: any) {
       console.error('Password reset error:', error);
       const message = error.response?.data?.message || 'Failed to send reset email. Please try again.';
-      setBackendError(message); // Show backend error inline
+      setBackendError(message);
     } finally {
       setIsLoading(false);
     }
@@ -103,26 +112,11 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Check Your Email</h1>
           <p className="text-gray-600 mb-6 leading-relaxed">
-            We've sent a password one time password to <strong>{formData.email}</strong>
+            We've sent a one-time password to <strong>{formData.email}</strong>
           </p>
           <p className="text-sm text-gray-500 mb-8">
-            If you don't see the email, check your spam folder or try again.
+            Redirecting to Reset Password page...
           </p>
-
-          <div className="space-y-4">
-            <button
-              onClick={() => setIsEmailSent(false)}
-              className="w-full bg-gradient-to-r from-sky-400 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-sky-400/30 hover:-translate-y-1"
-            >
-              Send Again
-            </button>
-            <button
-              onClick={handleBackToLogin}
-              className="w-full py-3 px-6 text-sky-600 font-semibold hover:text-blue-600 transition-colors duration-200"
-            >
-              Back to Login
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -158,7 +152,7 @@ const ForgotPasswordPage: React.FC = () => {
         <div className="p-8 lg:p-12 flex flex-col justify-center">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-gray-800 mb-3">Forgot Password?</h2>
-            <p className="text-gray-600">Enter your email address and we'll send you a one time password</p>
+            <p className="text-gray-600">Enter your email address and we'll send you a one-time password</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -200,7 +200,7 @@ const SignupPage: React.FC = () => {
             </div>
 
             <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight">
-              Join us today!
+              Adventure Awaits Start Your Journey with Us!
             </h1>
             <p className="text-white/90 text-lg leading-relaxed max-w-sm">
               Create your account to start your journey and enjoy a seamless
