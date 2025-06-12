@@ -13,7 +13,7 @@ import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
 import Resetpassword from "../Login/ResetPassword.tsx";
 import NavBarUpdated from "../Navbar/UpdatedNavBar.tsx";
-import Herooo from "../Customised/Herooo.tsx"; 
+import Herooo from "../Customised/Herooo.tsx";
 import TravelPackagesPage from "../Packages/Packages.tsx";
 import UpdatedFooter from "../Packages/updatedFooter.tsx";
 import IndividualPackage from "../IndividualPackage/[id]/IndividualPackage.tsx";
@@ -24,6 +24,7 @@ import AdminCustomizedPlansAllPage from "../Admin/AdminCustomizedPlansAllPage.ts
 import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx";
 import EditPackagesForm from "../Admin/EditPackages.tsx";
 import TravelBookingSite from "../LandingPage/LandingPage.tsx";
+import BookingPage from "../Booking/BookingPage.tsx";
 
 const router = () => {
   return (
@@ -53,7 +54,6 @@ const router = () => {
           element={
             <>
               <DashBoard />
-              
             </>
           }
         />
@@ -133,13 +133,12 @@ const router = () => {
           path="/CustomPackageForm"
           element={
             <>
-            <NavBar />
+              <NavBar />
               <Herooo />
-          
             </>
           }
         />
-         <Route
+        <Route
           path="/packages"
           element={
             <>
@@ -191,7 +190,7 @@ const router = () => {
           }
         />
         <Route
-          path="/admin/customized-plans"  
+          path="/admin/customized-plans"
           element={
             <>
               <NavBarUpdated />
@@ -202,7 +201,17 @@ const router = () => {
           }
         />
         <Route
-          path="/admin/customized-plans-details/:id"  
+          path="/booking"
+          element={
+            <>
+              <NavBarUpdated />
+              <BookingPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/admin/customized-plans-details/:id"
           element={
             <>
               <NavBarUpdated />
