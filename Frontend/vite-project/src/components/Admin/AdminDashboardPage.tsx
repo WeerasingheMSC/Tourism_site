@@ -1,6 +1,7 @@
 import React from 'react';
 import AddedTable from './AddedTable';
 import CustomizeTable from '../Admin/CustomizeTable';
+import AdminBookingTable from '../Admin/AdminBookingTable';
 
 const AdminDashboardPage: React.FC = () => {
   return (
@@ -38,14 +39,21 @@ const AdminDashboardPage: React.FC = () => {
 
         {/* All Packages Section */}
         <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">All packages</h2>
-        <p className="text-gray-500 mb-4">view and edit all packages here</p>
+        <p className="text-gray-500 mb-4">View and edit all packages here</p>
         <div className="rounded-2xl border border-gray-300 overflow-hidden mb-12 bg-white">
           <AddedTable />
         </div>
 
+        {/* All Booking Section */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">All Bookings</h2>
+        <p className="text-gray-500 mb-4">View and edit all Booking here</p>
+        <div className="rounded-2xl border border-gray-300 overflow-hidden mb-12 bg-white">
+          <AdminBookingTable />
+        </div>
+
         {/* Customized Plans Section */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Customised plans</h2>
-        <p className="text-gray-500 mb-4">tourist customised plan proposals</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Pending Customised Plans</h2>
+        <p className="text-gray-500 mb-4">Tourist customised plan proposals</p>
         <div className="rounded-2xl border border-gray-300 overflow-hidden bg-white">
           <CustomizeTable />
         </div>

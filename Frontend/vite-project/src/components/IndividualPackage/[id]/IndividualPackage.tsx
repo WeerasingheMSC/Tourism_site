@@ -4,6 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 // 🔄 1) Import your API helper to fetch a single package by ID
 import { getPackageById } from "../../../api/packages"; // :contentReference[oaicite:0]{index=0}
 import Decore from "../../Packages/Decore";
+// 🔄 Add this alongside your other imports
+import { addBooking } from "../../../api/bookings";
 
 interface DailyPlan {
   day: number;
@@ -35,6 +37,13 @@ const IndividualPackage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 🔄 Booking modal & form state
+  const [showModal, setShowModal] = useState(false);
+  const [countryCode, setCountryCode] = useState("+1");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
+
   // 🔄 3) Fetch package data on mount (and whenever `id` changes)
   useEffect(() => {
     if (!id) {
@@ -56,8 +65,12 @@ const IndividualPackage: React.FC = () => {
           packageIcon: data.packageIcon,
           packagePhotos: data.packagePhotos,
           dailyPlans: data.dailyPlans,
-          includedItems: data.includedItems.map((item: string) => ({ label: item })),
-          notIncludedItems: data.notIncludedItems.map((item: string) => ({ label: item })),
+          includedItems: data.includedItems.map((item: string) => ({
+            label: item,
+          })),
+          notIncludedItems: data.notIncludedItems.map((item: string) => ({
+            label: item,
+          })),
         });
         // 🔄 3.2) Initialize the main image
         setMainImage(data.packagePhotos[0] || data.packageIcon);
@@ -86,6 +99,39 @@ const IndividualPackage: React.FC = () => {
       </div>
     );
   }
+
+  // 🔄 Open the booking modal
+  const onReserveClick = () => {
+    setBookingError(null);
+    setShowModal(true);
+  };
+
+  // 🔄 Cancel & reset modal
+  const onCancel = () => {
+    setShowModal(false);
+    setPhoneNumber("");
+    setCountryCode("+1");
+  };
+
+  // 🔄 Confirm & send booking
+  const onConfirmBooking = () => {
+    setBookingError(null);
+    const fullNumber = countryCode + phoneNumber;
+    if (!/^\d{6,15}$/.test(phoneNumber)) {
+      setBookingError("Please enter a valid phone number (6–15 digits)");
+      return;
+    }
+    setBookingLoading(true);
+    addBooking({ packageId: id!, whatsappNumber: fullNumber })
+      .then(() => {
+        setShowModal(false);
+        navigate("/booking");
+      })
+      .catch((err) => {
+        setBookingError(err.response?.data?.message || err.message);
+      })
+      .finally(() => setBookingLoading(false));
+  };
 
   return (
     <div className="min-h-screen relative bg-gray-50">
@@ -141,7 +187,7 @@ const IndividualPackage: React.FC = () => {
 
             <div className="space-y-4 mb-6">
               <div>
-                <span className="text-gray-600 font-medium">Duration:</span>
+                <span className="text-gray-600 font-medium">Duration: {pkg.dailyPlans.length}</span>
                 <span className="ml-2 text-gray-900">
                   {/* if you have duration in data, replace here */}
                 </span>
@@ -157,20 +203,85 @@ const IndividualPackage: React.FC = () => {
                 </span>
               </div>
               <div>
-                <span className="text-gray-600 font-medium">Starting Price:</span>
+                <span className="text-gray-600 font-medium">
+                  Starting Price:
+                </span>
                 <span className="ml-2 text-blue-600 font-bold text-xl">
-                  {pkg.startingPrice}
+                  {pkg.startingPrice}$ Per Person
                 </span>
               </div>
             </div>
 
             <p className="text-gray-700 mb-6">{pkg.description}</p>
 
-            <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+            <button
+              onClick={onReserveClick}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
               Reserve Now
             </button>
           </div>
         </div>
+
+        {showModal && (
+          <div className="fixed inset-0 bg-white/30 backdrop-blur rounded-2xl p-6 border border-blue-400 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-80">
+              <h2 className="text-xl font-bold mb-4">Enter WhatsApp Number</h2>
+
+              {/* Country code */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Country Code
+                </label>
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="mt-1 block w-full border-gray-300 rounded-md"
+                >
+                  <option value="+1">+1 (USA)</option>
+                  <option value="+44">+44 (UK)</option>
+                  <option value="+94">+94 (Sri Lanka)</option>
+                </select>
+              </div>
+
+              {/* Local number */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="712345678"
+                  className="mt-1 block w-full border-gray-300 rounded-md"
+                />
+              </div>
+
+              {/* Validation error */}
+              {bookingError && (
+                <p className="text-red-500 text-sm mb-2">{bookingError}</p>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={onCancel}
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onConfirmBooking}
+                  disabled={bookingLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  {bookingLoading ? "Booking..." : "Confirm"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ─── Agenda Section ───────────────────────────── */}
         <div className="mt-12 rounded-2xl">
@@ -196,13 +307,13 @@ const IndividualPackage: React.FC = () => {
                 </div>
                 <div className="w-1/2 pl-6">
                   <ul className="space-y-2 text-gray-700">
-                    {Array.isArray(day.description)
-                      ? day.description.map((item: string, i: number) => (
-                          <li key={i}>{item}</li>
-                        ))
-                      : day.description
-                      ? <li>{day.description}</li>
-                      : null}
+                    {Array.isArray(day.description) ? (
+                      day.description.map((item: string, i: number) => (
+                        <li key={i}>{item}</li>
+                      ))
+                    ) : day.description ? (
+                      <li>{day.description}</li>
+                    ) : null}
                   </ul>
                 </div>
               </div>
@@ -221,9 +332,7 @@ const IndividualPackage: React.FC = () => {
               {/* 🔄 Map real includedItems */}
               {pkg.includedItems.map((inc, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <span className="font-medium text-gray-900">
-                    {inc.label}
-                  </span>
+                  <span className="font-medium text-gray-900">{inc.label}</span>
                   {inc.detail && (
                     <span className="text-gray-600"> {inc.detail}</span>
                   )}

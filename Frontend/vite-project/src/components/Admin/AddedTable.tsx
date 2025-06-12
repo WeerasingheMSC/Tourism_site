@@ -189,7 +189,9 @@ const AddedTable: React.FC = () => {
                 </td>
                 {/* View button (you can hook this up with navigate or Link) */}
                 <td className="px-6 py-4">
-                  <button className="text-blue-500 hover:text-blue-700 transition-colors p-1">
+                  <button 
+                  onClick={() => navigate(`/packages/${pkg._id}`)}
+                  className="text-blue-500 hover:text-blue-700 transition-colors p-1">
                     <svg
                       className="w-5 h-5"
                       fill="none"
