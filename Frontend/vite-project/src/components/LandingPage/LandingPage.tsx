@@ -8,24 +8,7 @@ import flightIcon from '../../assets/flight.png';
 import travelIllustration from '../../assets/travelillustration.png';
 import hotelIcon from '../../assets/hotel.png';
 import settingsIcon from '../../assets/settings.png';
-import facebookIcon from '../../assets/icons/facebookicon.png';
-import pinterestIcon from '../../assets/icons/printeresticon.png';
-import whatsappIcon from '../../assets/icons/whatsappicon.png';
-import instagramIcon from '../../assets/icons/instaicon.png';
-import tiktokIcon from '../../assets/icons/tiktokicon.png';
 import badgeIcon from '../../assets/badge.png'; // Add a badge/star icon for the featured package
-
-interface PackageCardProps {
-  icon: string;
-  title: string;
-  subtitle: string;
-  tags: string[];
-  price: string;
-  duration: string;
-  bgColor?: string;
-  borderColor?: string; // add this
-  scale?: string;       // add this
-}
 
 
 interface ServiceCardProps {
