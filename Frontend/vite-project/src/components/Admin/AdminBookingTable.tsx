@@ -104,10 +104,17 @@ const AdminBookingTable: React.FC = () => {
                     {b._id}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.userId.name} ({b.userId.email})
+                    {/* 
+                      If userId is null, show “Unknown User” 
+                    */}
+                    {b.userId?.name ?? "Unknown User"}
+                    {b.userId?.email ? ` (${b.userId.email})` : ""}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.packageId.name}
+                    {/* 
+                      If packageId is null, show “Unknown Package” 
+                    */}
+                    {b.packageId?.name ?? "Unknown Package"}
                   </td>
                   <td className="px-6 py-4">
                     <select
@@ -131,27 +138,28 @@ const AdminBookingTable: React.FC = () => {
                     {new Date(b.createdAt).toLocaleDateString()}
                   </td>
                   {/* View button (you can hook this up with navigate or Link) */}
-                <td className="px-6 py-4">
-                  <button 
-                  onClick={() => navigate(`/packages/${b.packageId._id}`)}
-                  className="text-blue-500 hover:text-blue-700 transition-colors p-1">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => navigate(`/packages/${b.packageId._id}`)}
+                      className="text-blue-500 hover:text-blue-700 transition-colors p-1"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 
                            0 002 2h10a2 2 0 002-2v-4M14 
                            4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </button>
-                </td>
+                        />
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

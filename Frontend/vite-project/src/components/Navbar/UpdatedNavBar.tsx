@@ -1,25 +1,77 @@
-import React, { useState } from 'react';
-import logo from '../../assets/logo.jpeg';
-import { Button, Drawer } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+// src/components/AuthNavBar.tsx
 
-const NavBarUpdated = () => {
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const navigate = useNavigate();  // 🔄 useNavigate hook for redirection
+import React, { useState } from "react";
+import logo from "../../assets/logo.jpeg"; // same logo
+import { Button, Dropdown, Drawer, Space, Avatar } from "antd"; // add Avatar
+import {
+  DownOutlined,
+  MenuOutlined,
+  LogoutOutlined,
+  BookOutlined,
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
+const AuthNavBar: React.FC = () => {
+  const [drawerVisible, setDrawerVisible] = useState(false); // mobile drawer state
+  const navigate = useNavigate(); // for navigation
+
+  // --- Main menu links (same as in NavBar.tsx) ---
   const menuItems = [
-    { label: <a href="/CustomPackageForm">Customize your plan</a>, key: 'destination' },
-    { label: <a href="/packages">Packages</a>, key: 'hotels' },
+    { label: <a href="/">Home</a>, key: "home" },
+    { label: <a href="/packages">Packages</a>, key: "packages" },
+    {
+      label: <a href="/CustomPackageForm">Customize Package</a>,
+      key: "custom-package",
+    },
   ];
 
+  // --- Language switcher (same as before) ---
+  const languageMenu = {
+    items: [
+      { label: "English", key: "1" },
+      { label: "Sinhala", key: "2" },
+      { label: "Tamil", key: "3" },
+    ],
+  };
+
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+
+  // --- Profile dropdown menu: My Bookings & Logout ---
+  const profileMenu = {
+    items: [
+      {
+        key: "my-bookings",
+        icon: <BookOutlined />,
+        label: <span onClick={() => navigate("/booking")}>My Bookings</span>,
+      },
+      {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: (
+          <span
+            onClick={() => {
+              // TODO: your real logout logic here (e.g., clear tokens)
+              localStorage.removeItem("authToken");
+              localStorage.removeItem("user");
+              navigate("/");
+              window.location.reload();
+            }}
+          >
+            Logout
+          </span>
+        ),
+      },
+    ],
+  };
+
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-transparent">
+    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white shadow-lg backgroun-transparent">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo and Title with click-to-home */}
+        {/* Logo & title (clickable) */}
         <div
+          onClick={() => navigate("/")}
           className="flex items-center cursor-pointer"
-          onClick={() => navigate('/')}  // 🔄 redirect to home on click
         >
           <img src={logo} alt="Logo" className="h-13 rounded-b-full pr-2" />
           <div className="text-blue-600 text-lg font-bold mt-1">
@@ -27,39 +79,51 @@ const NavBarUpdated = () => {
           </div>
         </div>
 
-        {/* Desktop Menu */}
-        <ul className="hidden md:flex lg:space-x-5 xl:space-x-10 md:space-x-2 items-center text-white">
-          {menuItems.map(item => (
+        {/* Desktop menu */}
+        <ul className="hidden md:flex lg:space-x-5 xl:space-x-20 md:space-x-2 items-center">
+          {/* site links */}
+          {menuItems.map((item) => (
             <li key={item.key} className="hover:text-orange-500">
               {item.label}
             </li>
           ))}
-          {/* Profile Picture */}
+
+          {/* language switcher */}
           <li>
-            <img
-              src="https://randomuser.me/api/portraits/men/32.jpg"
-              alt="Profile"
-              className="w-15 h-15 rounded-full object-cover border-2 border-blue-400"
-            />
+            <Dropdown menu={languageMenu} trigger={["click"]}>
+              <Space>
+                En <DownOutlined />
+              </Space>
+            </Dropdown>
+          </li>
+
+          {/* profile picture in a pure CSS rounded frame (no Avatar) */}
+          <li className="ml-4">
+            <Dropdown menu={profileMenu} trigger={["click"]}>
+              {/* container ensures a perfect circle, with a light border */}
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold cursor-pointer border-2 border-black">
+                {user.name?.charAt(0).toUpperCase() || "?"}
+              </div>
+            </Dropdown>
           </li>
         </ul>
 
-        {/* Mobile Hamburger */}
-        <div className='md:hidden flex'>
+        {/* Mobile hamburger icon */}
+        <div className="md:hidden flex">
           <Button
-            className="flex md:hidden mt-2"
+            className="mt-2"
             type="text"
-            icon={<MenuOutlined style={{ fontSize: '24px', color: '#1890ff' }} />}
+            icon={
+              <MenuOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+            }
             onClick={() => setDrawerVisible(true)}
           />
         </div>
-        {/* Mobile Drawer Menu */}
+
+        {/* Mobile drawer */}
         <Drawer
           title={
-            <div
-              className="flex items-center cursor-pointer"
-              onClick={() => { navigate('/'); setDrawerVisible(false); }}  // 🔄 redirect home and close drawer
-            >
+            <div className="flex items-center">
               <img src={logo} alt="Logo" className="h-10 rounded-b-full pr-2" />
               <span className="text-blue-600 text-lg font-bold">
                 Travel Booking Sri Lanka
@@ -72,11 +136,46 @@ const NavBarUpdated = () => {
           bodyStyle={{ padding: 0 }}
         >
           <ul className="flex flex-col p-4 space-y-4">
-            {menuItems.map(item => (
-              <li key={item.key} className="hover:text- text-lg">
+            {/* site links */}
+            {menuItems.map((item) => (
+              <li key={item.key} className="hover:text-orange-500 text-lg">
                 {item.label}
               </li>
             ))}
+
+            {/* language chooser */}
+            <li>
+              <Dropdown menu={languageMenu} trigger={["click"]}>
+                <Button block>Language</Button>
+              </Dropdown>
+            </li>
+
+            {/* mobile: My Bookings */}
+            <li>
+              <Button
+                block
+                icon={<BookOutlined />}
+                onClick={() => navigate("bookings")}
+              >
+                My Bookings
+              </Button>
+            </li>
+
+            {/* mobile: Logout */}
+            <li>
+              <Button
+                block
+                danger
+                icon={<LogoutOutlined />}
+                onClick={() => {
+                  localStorage.removeItem("authToken");
+                  navigate("/");
+                  window.location.reload();
+                }}
+              >
+                Logout
+              </Button>
+            </li>
           </ul>
         </Drawer>
       </div>
@@ -84,4 +183,4 @@ const NavBarUpdated = () => {
   );
 };
 
-export default NavBarUpdated;
+export default AuthNavBar;

@@ -49,7 +49,16 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 );
 
 const TravelBookingSite: React.FC = () => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+
+  const handleCustomizeClick = () => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      navigate("/CustomPackageForm");
+    } else {
+      navigate("/login");
+    }
+  };
   const packages = [
     {
       icon: beachIcon,
@@ -187,13 +196,13 @@ const TravelBookingSite: React.FC = () => {
                 </p>
                 <div className="flex gap-4">
                   <button
-                    onClick={() => Navigate("/packages")}
+                    onClick={() => navigate("/packages")}
                     className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-600"
                   >
                     All packages
                   </button>
                   <button
-                    onClick={() => Navigate("/CustomPackageForm")}
+                    onClick={handleCustomizeClick}
                     className="border border-blue-500 text-blue-500 px-6 py-3 rounded-lg font-medium hover:bg-blue-50"
                   >
                     Customized your plan
