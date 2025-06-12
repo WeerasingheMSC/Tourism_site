@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ScrollToTop } from "../../components/ScrollToTop.tsx";
+
+import MainNav from "../Navbar/MainNav.tsx";
 import NavBar from "../Navbar/NavBar.tsx";
 import Hero from "../LandingPage/Hero.tsx";
 import Login from "../Login/login.tsx";
@@ -29,12 +32,13 @@ import BookingPage from "../Booking/BookingPage.tsx";
 const router = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route
           path="/"
           element={
             <>
-              <NavBar />
+              <MainNav />
               <Hero />
               <TravelBookingSite />
               <UpdatedFooter />
@@ -133,7 +137,7 @@ const router = () => {
           path="/CustomPackageForm"
           element={
             <>
-              <NavBar />
+              <MainNav />
               <Herooo />
             </>
           }
@@ -142,7 +146,7 @@ const router = () => {
           path="/packages"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <TravelPackagesPage />
               <UpdatedFooter />
             </>
@@ -152,7 +156,7 @@ const router = () => {
           path="/packages/:id"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <IndividualPackage />
               <UpdatedFooter />
             </>
@@ -162,7 +166,7 @@ const router = () => {
           path="/addpackage"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <AddPackagesForm />
               <UpdatedFooter />
             </>
@@ -172,7 +176,7 @@ const router = () => {
           path="/admin/editpackage"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <EditPackagesForm />
               <UpdatedFooter />
             </>
@@ -182,7 +186,7 @@ const router = () => {
           path="/admin/dashboard"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <Decore />
               <AdminDashboardPage />
               <UpdatedFooter />
@@ -193,7 +197,7 @@ const router = () => {
           path="/admin/customized-plans"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <Decore />
               <AdminCustomizedPlansAllPage />
               <UpdatedFooter />
@@ -204,7 +208,7 @@ const router = () => {
           path="/booking"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <BookingPage />
               <UpdatedFooter />
             </>
@@ -214,7 +218,7 @@ const router = () => {
           path="/admin/customized-plans-details/:id"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <Decore />
               <AdminCustomizedPlanDetails />
               <UpdatedFooter />

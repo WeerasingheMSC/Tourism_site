@@ -105,6 +105,14 @@ const IndividualPackage: React.FC = () => {
     setBookingError(null);
     setShowModal(true);
   };
+  const handleCustomizeClick = () => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      onReserveClick();
+    } else {
+      navigate("/login");
+    }
+  };
 
   // 🔄 Cancel & reset modal
   const onCancel = () => {
@@ -187,7 +195,9 @@ const IndividualPackage: React.FC = () => {
 
             <div className="space-y-4 mb-6">
               <div>
-                <span className="text-gray-600 font-medium">Duration: {pkg.dailyPlans.length}</span>
+                <span className="text-gray-600 font-medium">
+                  Duration: {pkg.dailyPlans.length}
+                </span>
                 <span className="ml-2 text-gray-900">
                   {/* if you have duration in data, replace here */}
                 </span>
@@ -215,7 +225,7 @@ const IndividualPackage: React.FC = () => {
             <p className="text-gray-700 mb-6">{pkg.description}</p>
 
             <button
-              onClick={onReserveClick}
+              onClick={handleCustomizeClick}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
               Reserve Now

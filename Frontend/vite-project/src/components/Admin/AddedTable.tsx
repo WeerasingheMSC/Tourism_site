@@ -129,7 +129,7 @@ const AddedTable: React.FC = () => {
                 <td className="px-6 py-4 text-sm text-gray-600">{pkg.theme}</td>
                 {/* Price */}
                 <td className="px-6 py-4 text-sm text-gray-900 font-semibold">
-                  {pkg.startingPrice}
+                  {pkg.startingPrice}$ <span>Per person</span>
                 </td>
                 {/* Days = number of entries in dailyPlans */}
                 <td className="px-6 py-4 text-sm text-gray-900 text-center">

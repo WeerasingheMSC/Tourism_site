@@ -7,8 +7,17 @@ import Plane from "../../assets/Plane.png";
 import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
-  // 🔄 1) Move useNavigate inside the component
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
+
+  // 👇 guard for Customize Package: if not logged in, go to /login
+  const handleCustomizeClick = () => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      navigate("/CustomPackageForm");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="pb-1">
@@ -106,7 +115,7 @@ const Hero: React.FC = () => {
             </Button>
             {/* 🔄 2) Redirect to home (/) on click */}
             <Button
-              onClick={() => navigate("/CustomPackageForm")}
+              onClick={handleCustomizeClick}
               className="w-full sm:w-auto"
               style={{
                 height: 40,
