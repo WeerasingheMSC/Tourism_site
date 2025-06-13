@@ -7,7 +7,7 @@ interface BookingData {
   packageId: {
     _id: ReactNode;
     name: string;
-  };
+  } | null;
   status: string;
   whatsappNumber: string;
   createdAt: string;
@@ -87,10 +87,10 @@ const BookingTable: React.FC = () => {
                     {b._id}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.packageId._id}
+                    {b.packageId?._id}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.packageId.name}
+                    {b.packageId?.name}
                   </td>
                   <td className="px-6 py-4">
                     <span
@@ -110,7 +110,7 @@ const BookingTable: React.FC = () => {
                   {/* View button (you can hook this up with navigate or Link) */}
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => navigate(`/packages/${b.packageId._id}`)}
+                      onClick={() => navigate(`/packages/${b.packageId?._id}`)}
                       className="text-blue-500 hover:text-blue-700 transition-colors p-1"
                     >
                       <svg

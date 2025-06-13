@@ -157,13 +157,13 @@ const IndividualPackage: React.FC = () => {
               />
             </div>
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="z-200 grid grid-cols-4 gap-4">
               {/* 🔄 Map real photos */}
               {(pkg.packagePhotos || []).map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setMainImage(img)}
-                  className={`focus:outline-none border-2 rounded-xl overflow-hidden transition-all duration-200 ${
+                  className={`z-20 focus:outline-none border-2 rounded-xl overflow-hidden transition-all duration-200 ${
                     mainImage === img
                       ? "border-blue-600"
                       : "border-transparent hover:border-blue-300"
