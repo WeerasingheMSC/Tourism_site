@@ -37,13 +37,12 @@ const NavBar = () => {
   const languageMenu = {
     items: [
       { label: "English", key: "1" },
-      { label: "Sinhala", key: "2" },
-      { label: "Tamil", key: "3" },
+      
     ],
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white shadow-lg backgroun-transparent">
+    <nav className="z-100 p-3 fixed top-0 left-0 w-full bg-white shadow-lg backgroun-transparent">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and Title */}
         <div

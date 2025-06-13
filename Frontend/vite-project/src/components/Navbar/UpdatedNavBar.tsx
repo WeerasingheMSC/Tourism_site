@@ -29,8 +29,7 @@ const AuthNavBar: React.FC = () => {
   const languageMenu = {
     items: [
       { label: "English", key: "1" },
-      { label: "Sinhala", key: "2" },
-      { label: "Tamil", key: "3" },
+      
     ],
   };
 
@@ -66,7 +65,7 @@ const AuthNavBar: React.FC = () => {
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white shadow-lg backgroun-transparent">
+    <nav className="p-3 fixed top-0 left-0 w-full z-100 bg-white shadow-lg backgroun-transparent">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo & title (clickable) */}
         <div
@@ -101,7 +100,7 @@ const AuthNavBar: React.FC = () => {
           <li className="ml-4">
             <Dropdown menu={profileMenu} trigger={["click"]}>
               {/* container ensures a perfect circle, with a light border */}
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold cursor-pointer border-2 border-black">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-400 text-white text-lg font-semibold cursor-pointer border-2 border-blue-800">
                 {user.name?.charAt(0).toUpperCase() || "?"}
               </div>
             </Dropdown>

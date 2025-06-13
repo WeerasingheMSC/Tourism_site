@@ -782,7 +782,7 @@ const CustomPackageForm: React.FC = () => {
   return (
     <div className="min-h-screen p-4 bg-white">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-8">
+        <div className="bg-white/10 backdrop-blur-lg border border-white/40 shadow-2xl rounded-xl p-4 sm:p-8">
           {step === 1 && (
             <StepPersonalDetails
               data={personal}
