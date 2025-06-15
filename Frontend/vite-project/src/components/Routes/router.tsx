@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ScrollToTop } from "../../components/ScrollToTop.tsx";
 
 import MainNav from "../Navbar/MainNav.tsx";
-import NavBar from "../Navbar/NavBar.tsx";
 import Hero from "../LandingPage/Hero.tsx";
 import Login from "../Login/login.tsx";
 import DashBoard from "../Dashboard/dashBoard.tsx";
@@ -15,7 +14,6 @@ import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
 import Resetpassword from "../Login/ResetPassword.tsx";
-import NavBarUpdated from "../Navbar/UpdatedNavBar.tsx";
 import Herooo from "../Customised/Herooo.tsx";
 import TravelPackagesPage from "../Packages/Packages.tsx";
 import UpdatedFooter from "../Packages/updatedFooter.tsx";
@@ -28,6 +26,7 @@ import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx"
 import EditPackagesForm from "../Admin/EditPackages.tsx";
 import TravelBookingSite from "../LandingPage/LandingPage.tsx";
 import BookingPage from "../Booking/BookingPage.tsx";
+import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route component
 
 const router = () => {
   return (
@@ -165,43 +164,45 @@ const router = () => {
         <Route
           path="/addpackage"
           element={
-            <>
+            <ProtectedRoute>
               <MainNav />
               <AddPackagesForm />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
+        
         <Route
           path="/admin/editpackage"
           element={
-            <>
+            <ProtectedRoute>
               <MainNav />
               <EditPackagesForm />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/dashboard"
           element={
-            <>
+            <ProtectedRoute>
+              
               <MainNav />
               <Decore />
               <AdminDashboardPage />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/customized-plans"
           element={
-            <>
+            <ProtectedRoute>
               <MainNav />
               <Decore />
               <AdminCustomizedPlansAllPage />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
@@ -217,12 +218,12 @@ const router = () => {
         <Route
           path="/admin/customized-plans-details/:id"
           element={
-            <>
+            <ProtectedRoute>
               <MainNav />
               <Decore />
               <AdminCustomizedPlanDetails />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
       </Routes>

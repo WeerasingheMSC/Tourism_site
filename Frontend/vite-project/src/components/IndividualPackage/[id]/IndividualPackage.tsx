@@ -6,6 +6,8 @@ import { getPackageById } from "../../../api/packages"; // :contentReference[oai
 import Decore from "../../Packages/Decore";
 // 🔄 Add this alongside your other imports
 import { addBooking } from "../../../api/bookings";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface DailyPlan {
   day: number;
@@ -243,15 +245,13 @@ const IndividualPackage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700">
                   Country Code
                 </label>
-                <select
+                <PhoneInput
+                  international
+                  defaultCountry="US"
                   value={countryCode}
-                  onChange={(e) => setCountryCode(e.target.value)}
+                  onChange={(value) => setCountryCode(value || "+1")}
                   className="mt-1 block w-full border-gray-300 rounded-md"
-                >
-                  <option value="+1">+1 (USA)</option>
-                  <option value="+44">+44 (UK)</option>
-                  <option value="+94">+94 (Sri Lanka)</option>
-                </select>
+                />
               </div>
 
               {/* Local number */}
