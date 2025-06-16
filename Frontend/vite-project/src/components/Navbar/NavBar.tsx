@@ -22,7 +22,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-50 bg-white shadow-lg backgroun-transparent">
+    <nav className="p-3 fixed top-0 left-0 w-full z-50 background-transparent">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and Title */}
         <div className="flex items-center">
