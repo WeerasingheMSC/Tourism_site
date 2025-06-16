@@ -63,16 +63,20 @@ const NavBar = () => {
             </li>
           ))}
           <li className="space-x-3">
-            <a href="/login">
-              <Button type="primary" style={{ width: 80 }}>
+            
+              <Button 
+                onClick={() => navigate("/login")}
+                type="primary" style={{ width: 80 }}>
                 Login
               </Button>
-            </a>
-            <a href="/register">
-              <Button type="primary" style={{ background: "#faad14" }}>
+            
+            
+              <Button 
+                onClick={() => navigate("/login")}
+                type="primary" style={{ background: "#faad14" }}>
                 Sign Up
               </Button>
-            </a>
+            
           </li>
 
           <li>
