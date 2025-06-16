@@ -19,8 +19,28 @@ const NavBar = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   // Hook for navigation
   const menuItems = [
-    { label: <a href="/">Home</a>, key: "home" },
-    { label: <a href="/packages">Packages</a>, key: "packages" },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Home
+        </span>
+      ),
+      key: "home",
+    },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/packages")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Home
+        </span>
+      ),
+      key: "packages",
+    },
     {
       label: (
         <span

@@ -17,10 +17,37 @@ const AuthNavBar: React.FC = () => {
 
   // --- Main menu links (same as in NavBar.tsx) ---
   const menuItems = [
-    { label: <a href="/">Home</a>, key: "home" },
-    { label: <a href="/packages">Packages</a>, key: "packages" },
     {
-      label: <a href="/CustomPackageForm">Customize Package</a>,
+      label: (
+        <span
+          onClick={() => navigate("/")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Home
+        </span>
+      ),
+      key: "home",
+    },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/packages")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Home
+        </span>
+      ),
+      key: "packages",
+    },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/CustomPackageForm")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Customize Package
+        </span>
+      ),
       key: "custom-package",
     },
   ];
