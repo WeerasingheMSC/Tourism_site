@@ -1,5 +1,5 @@
 import React from 'react'
-import DecoreImg from '../../assets/decore.png'
+import DecoreImg from '../../assets/Decore.png'
 
 const Decore: React.FC = () => {
   return (
