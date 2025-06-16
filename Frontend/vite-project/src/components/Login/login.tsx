@@ -334,12 +334,10 @@ const LoginPage: React.FC = () => {
                 />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <a
-                href="/forgot-password"
-                className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200 text-center sm:text-left"
-              >
-                Forgot Password?
-              </a>
+              <span
+              className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200 text-center sm:text-left cursor-pointers"
+              onClick={()=> navigate("/forgot-password")}
+              >Forgot Password?</span>
             </div>
 
             {/* Login Button */}
@@ -434,12 +432,10 @@ const LoginPage: React.FC = () => {
           {/* Sign Up Link */}
           <div className="text-center text-gray-600 text-sm">
             Don't have an account?
-            <a
-              href="/register"
-              className="text-sky-400 hover:text-blue-600 font-semibold transition-colors duration-200 hover:underline ml-1"
-            >
-              Sign up here
-            </a>
+            <span  
+            onClick={()=>navigate("/register")}
+            className="text-sky-400 hover:text-blue-600 font-semibold transition-colors duration-200 hover:underline ml-1"
+           >Sign up here</span>
           </div>
         </div>
       </div>
