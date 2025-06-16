@@ -335,7 +335,7 @@ const LoginPage: React.FC = () => {
                 <span className="text-gray-600">Remember me</span>
               </label>
               <span
-              className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200 text-center sm:text-left cursor-pointers"
+              className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200 text-center sm:text-left cursor-pointer"
               onClick={()=> navigate("/forgot-password")}
               >Forgot Password?</span>
             </div>
@@ -434,7 +434,7 @@ const LoginPage: React.FC = () => {
             Don't have an account?
             <span  
             onClick={()=>navigate("/register")}
-            className="text-sky-400 hover:text-blue-600 font-semibold transition-colors duration-200 hover:underline ml-1"
+            className="text-sky-400 hover:text-blue-600 font-semibold transition-colors duration-200 hover:underline ml-1 cursor-pointer"
            >Sign up here</span>
           </div>
         </div>
