@@ -3,7 +3,7 @@ import React from "react";
 import Decore from "../../assets/Decore.png";
 import { Button } from "antd";
 import Traveller from "../../assets/Traveller 1.png";
-import Plane from "../../assets/Plane.png";
+import Plane from "../../assets/plane.png";
 import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
