@@ -1,4 +1,4 @@
-import Decore from '../../assets/decore.png'
+import Decore from '../../assets/Decore.png'
 import CustomPackageForm from './CustomPackageForm'
 
 const hero1 = () => {
