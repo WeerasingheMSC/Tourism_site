@@ -49,6 +49,16 @@ const TravelBookingSite: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 👇 guard for Customize Package: if not logged in, go to /login
+  const handleCustomizeClick = () => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      navigate("/CustomPackageForm");
+    } else {
+      navigate("/login");
+    }
+  };
+
   // Fetch packages from backend
   useEffect(() => {
     const fetchPackages = async () => {
@@ -216,7 +226,7 @@ const TravelBookingSite: React.FC = () => {
                     All packages
                   </button>
                   <button
-                    onClick={() => navigate("/CustomPackageForm")}
+                    onClick={handleCustomizeClick}
                     className="border border-blue-500 text-blue-500 px-6 py-3 rounded-lg font-medium hover:bg-blue-50"
                   >
                     Customized your plan
