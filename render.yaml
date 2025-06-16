@@ -1,9 +1,0 @@
-# render.yaml
-staticSites:
-  - name: tourism-site-FE
-    buildCommand: npm run build
-    publishPath: frontend/dist
-    redirects:
-      - source: /(.*)
-        destination: /index.html
-        status: 200
