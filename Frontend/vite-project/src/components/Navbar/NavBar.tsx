@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import logo from "../../assets/logo.jpeg";
 import { Button, Dropdown, Drawer, Space } from "antd";
 import { DownOutlined, MenuOutlined } from "@ant-design/icons";

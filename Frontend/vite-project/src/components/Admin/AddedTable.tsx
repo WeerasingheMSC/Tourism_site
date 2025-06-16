@@ -111,7 +111,7 @@ const AddedTable: React.FC = () => {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {/* 🔄 5) Map over real data */}
-            {packages.map((pkg, index) => (
+            {packages.map((pkg) => (
               <tr key={pkg._id} className="hover:bg-gray-50 transition-colors">
                 {/* Icon */}
                 <td className="px-6 py-4 text-2xl">

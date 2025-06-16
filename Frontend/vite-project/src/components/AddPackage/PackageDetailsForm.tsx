@@ -237,15 +237,14 @@ const AddPackagesForm: React.FC = () => {
             />
           )}
         </div>
-
         {/* Navigation Buttons */}
         <div className="flex justify-end gap-4 px-6 py-4 bg-transparent">
           <button
             type="button"
             onClick={prevTab}
-            disabled={tabs.indexOf(activeTab) === 0}
+            disabled={tabs.indexOf(activeTab) === 0 || isSubmitting} // <-- disable when submitting
             className={`border border-blue-500 text-blue-500 px-6 py-2 rounded-md font-medium transition-colors ${
-              tabs.indexOf(activeTab) === 0
+              tabs.indexOf(activeTab) === 0 || isSubmitting
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-blue-50"
             }`}
@@ -259,23 +258,31 @@ const AddPackagesForm: React.FC = () => {
               activeTab === tabs[tabs.length - 1] ? handleSubmit : nextTab
             }
             disabled={
+              isSubmitting ||
               (activeTab === tabs[tabs.length - 1] && !isFormValid()) ||
               (activeTab !== tabs[tabs.length - 1] &&
                 tabs.indexOf(activeTab) === tabs.length - 1)
             }
             className={`px-6 py-2 rounded-md font-medium transition-colors ${
               activeTab === tabs[tabs.length - 1]
-                ? isFormValid()
+                ? isFormValid() && !isSubmitting
                   ? "bg-blue-500 text-white hover:bg-blue-600"
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            {activeTab === tabs[tabs.length - 1] ? "Submit" : "Next"}
+            {isSubmitting
+              ? "Submitting..."
+              : activeTab === tabs[tabs.length - 1]
+              ? "Submit"
+              : "Next"}
           </button>
         </div>
 
         {/* Error & Success Popups */}
+        {submitError && (
+          <div className="text-red-600 text-center my-2">{submitError}</div>
+        )}
         {successMessage && (
           <Modal
             message={successMessage}

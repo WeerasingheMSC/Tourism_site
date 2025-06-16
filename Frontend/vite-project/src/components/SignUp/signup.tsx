@@ -146,7 +146,7 @@ const SignupPage: React.FC = () => {
     }
   };
 
-  function handleSocialLogin(arg0: string): void {
+  function handleSocialLogin(_arg0: string): void {
     throw new Error("Function not implemented.");
   }
 

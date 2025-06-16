@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import logo from "../../assets/logo.jpeg"; // same logo
-import { Button, Dropdown, Drawer, Space, Avatar } from "antd"; // add Avatar
+import { Button, Dropdown, Drawer, Space } from "antd"; // add Avatar
 import {
   DownOutlined,
   MenuOutlined,

@@ -1,4 +1,3 @@
-import React from 'react'
 import Decore from '../../assets/decore.png'
 import CustomPackageForm from './CustomPackageForm'
 

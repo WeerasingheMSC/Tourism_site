@@ -2,17 +2,11 @@ import React, { useState, useEffect } from "react";
 
 // Import your icons from assets folder
 import beachIcon from "../../assets/beach icon.png";
-import heartIcon from "../../assets/heart.png";
 import carIcon from "../../assets/car.png";
 import flightIcon from "../../assets/flight.png";
 import travelIllustration from "../../assets/travelillustration.png";
 import hotelIcon from "../../assets/hotel.png";
 import settingsIcon from "../../assets/settings.png";
-import facebookIcon from "../../assets/icons/facebookicon.png";
-import pinterestIcon from "../../assets/icons/printeresticon.png";
-import whatsappIcon from "../../assets/icons/whatsappicon.png";
-import instagramIcon from "../../assets/icons/instaicon.png";
-import tiktokIcon from "../../assets/icons/tiktokicon.png";
 import badgeIcon from "../../assets/badge.png";
 import { useNavigate } from "react-router-dom";
 
@@ -27,19 +21,6 @@ interface PackageType {
   packageIcon: string; // maps to image URL
   startingPrice: string; // e.g. "1200 USD"
   dailyPlans: any[]; // for duration count
-}
-
-interface PackageCardProps {
-  icon: string;
-  title: string;
-  subtitle: string;
-  tags: string[];
-  price: string;
-  duration: string;
-  bgColor?: string;
-  borderColor?: string;
-  scale?: string;
-  isFeatured?: boolean;
 }
 
 interface ServiceCardProps {
