@@ -181,7 +181,7 @@ const AuthNavBar: React.FC = () => {
               <Button
                 block
                 icon={<BookOutlined />}
-                onClick={() => navigate("bookings")}
+                onClick={() => navigate("/bookings")}
               >
                 My Bookings
               </Button>
