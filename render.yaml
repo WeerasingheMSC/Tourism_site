@@ -1,6 +1,6 @@
 # render.yaml
 staticSites:
-  - name: tourism-site-fe
+  - name: tourism-site-FE
     buildCommand: npm run build
     publishPath: frontend/dist
     redirects:
