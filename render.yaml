@@ -1,0 +1,9 @@
+# render.yaml
+staticSites:
+  - name: your-frontend-name
+    buildCommand: npm run build
+    publishPath: frontend/dist
+    redirects:
+      - source: /(.*)
+        destination: /index.html
+        status: 200
