@@ -1,6 +1,6 @@
 // src/pages/Hero.tsx
 import React from "react";
-import Decore from "../../assets/decore.png";
+import Decore from "../../assets/Decore.png";
 import { Button } from "antd";
 import Traveller from "../../assets/Traveller 1.png";
 import Plane from "../../assets/Plane.png";
