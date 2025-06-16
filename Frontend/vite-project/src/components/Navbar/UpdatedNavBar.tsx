@@ -34,7 +34,7 @@ const AuthNavBar: React.FC = () => {
           onClick={() => navigate("/packages")}
           className="cursor-pointer hover:text-orange-500"
         >
-          Home
+          Packages
         </span>
       ),
       key: "packages",
