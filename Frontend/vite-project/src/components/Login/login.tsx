@@ -139,7 +139,7 @@ const LoginPage: React.FC = () => {
       }
 
       console.log("Login successful for user:", user);
-      console.log(message); // “Login successful” from your backend
+      console.log(message); // "Login successful" from your backend
 
       // 5) Redirect to related dashboard based on user.role
       // Assuming your user object has a 'role' property that can be 'admin', 'seller', 'buyer', etc.
@@ -154,7 +154,7 @@ const LoginPage: React.FC = () => {
         navigate("/");
       }
     } catch (error: any) {
-      // 6) Handle failure: show backend’s error message below the password field
+      // 6) Handle failure: show backend's error message below the password field
       console.error("Login error:", error);
       const backendMessage =
         error.response?.data?.message || "Login failed. Please try again.";
@@ -168,14 +168,14 @@ const LoginPage: React.FC = () => {
 
   // (F) Render JSX as before, but wire <form onSubmit={handleSubmit}>
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center p-20">
+    <div className="bg-white min-h-screen flex items-center justify-center p-4 sm:p-8 lg:p-20">
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-sky-400/20 via-transparent to-blue-600/20"></div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-2xl shadow-sky-400/10 w-full max-w-5xl grid lg:grid-cols-2 min-h-[600px] overflow-hidden border border-sky-400/10 relative z-10">
-        {/* Welcome Section (unchanged) */}
-        <div className="bg-gradient-to-br from-sky-400 to-blue-600 flex flex-col justify-center items-center p-8 lg:p-12 text-center relative overflow-hidden">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl shadow-sky-400/10 w-full max-w-5xl grid lg:grid-cols-2 min-h-[500px] sm:min-h-[600px] overflow-hidden border border-sky-400/10 relative z-10">
+        {/* Welcome Section */}
+        <div className="bg-gradient-to-br from-sky-400 to-blue-600 flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12 text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <div
               className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full animate-bounce"
@@ -196,9 +196,9 @@ const LoginPage: React.FC = () => {
           </div>
 
           <div className="relative z-10">
-            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-8 mx-auto">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-6 sm:mb-8 mx-auto">
               <svg
-                className="w-10 h-10 text-white"
+                className="w-8 h-8 sm:w-10 sm:h-10 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -212,28 +212,28 @@ const LoginPage: React.FC = () => {
               </svg>
             </div>
 
-            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 sm:mb-6 tracking-tight">
               Welcome Back!
             </h1>
-            <p className="text-white/90 text-lg leading-relaxed max-w-sm">
-              We’re excited to see you again. Enter your credentials to access
+            <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-sm px-4 sm:px-0">
+              We're excited to see you again. Enter your credentials to access
               your account and continue your journey.
             </p>
           </div>
         </div>
 
         {/* Form Section (with <form> wrapper) */}
-        <div className="p-8 lg:p-12 shadow-2xl border-b-amber-50 h-160 flex flex-col justify-center">
+        <div className="p-6 sm:p-8 lg:p-12 shadow-2xl border-b-amber-50 flex flex-col justify-center">
           {/* Form Header */}
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-800 mb-3">Log In</h2>
-            <p className="text-gray-600">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-3">Log In</h2>
+            <p className="text-gray-600 text-sm sm:text-base">
               Please enter your details to continue
             </p>
           </div>
 
-          {/* Wrap in <form> so that onSubmit fires on “Enter” or button click */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Wrap in <form> so that onSubmit fires on "Enter" or button click */}
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
               <label
@@ -248,9 +248,9 @@ const LoginPage: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border-2 ${getInputBorderColor(
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 ${getInputBorderColor(
                   "email"
-                )} rounded-xl focus:border-sky-400 focus:ring-0 focus:outline-none transition-all duration-300 hover:border-gray-300 focus:shadow-lg focus:shadow-sky-400/10 focus:-translate-y-1`}
+                )} rounded-xl focus:border-sky-400 focus:ring-0 focus:outline-none transition-all duration-300 hover:border-gray-300 focus:shadow-lg focus:shadow-sky-400/10 focus:-translate-y-1 text-sm sm:text-base`}
                 placeholder="Enter your email"
                 required
               />
@@ -274,19 +274,19 @@ const LoginPage: React.FC = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 pr-12 border-2 ${getInputBorderColor(
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 border-2 ${getInputBorderColor(
                     "password"
-                  )} rounded-xl focus:border-sky-400 focus:ring-0 focus:outline-none transition-all duration-300 hover:border-gray-300 focus:shadow-lg focus:shadow-sky-400/10 focus:-translate-y-1`}
+                  )} rounded-xl focus:border-sky-400 focus:ring-0 focus:outline-none transition-all duration-300 hover:border-gray-300 focus:shadow-lg focus:shadow-sky-400/10 focus:-translate-y-1 text-sm sm:text-base`}
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={togglePassword}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sky-400 hover:text-blue-600 transition-colors duration-200"
+                  className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-sky-400 hover:text-blue-600 transition-colors duration-200"
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -323,7 +323,7 @@ const LoginPage: React.FC = () => {
             </div>
 
             {/* Form Options */}
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm space-y-2 sm:space-y-0">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -336,7 +336,7 @@ const LoginPage: React.FC = () => {
               </label>
               <a
                 href="/forgot-password"
-                className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200"
+                className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200 text-center sm:text-left"
               >
                 Forgot Password?
               </a>
@@ -346,7 +346,7 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full bg-gradient-to-r from-sky-400 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold text-lg transition-all duration-300 relative overflow-hidden ${
+              className={`w-full bg-gradient-to-r from-sky-400 to-blue-600 text-white py-2.5 sm:py-3 px-6 rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 relative overflow-hidden ${
                 isLoading
                   ? "opacity-75 cursor-not-allowed"
                   : "hover:shadow-xl hover:shadow-sky-400/30 hover:-translate-y-1"
@@ -355,7 +355,7 @@ const LoginPage: React.FC = () => {
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -383,19 +383,19 @@ const LoginPage: React.FC = () => {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-8">
+          <div className="flex items-center my-6 sm:my-8">
             <div className="flex-1 border-t border-gray-200"></div>
-            <span className="px-4 text-gray-500 text-sm">or continue with</span>
+            <span className="px-4 text-gray-500 text-xs sm:text-sm">or continue with</span>
             <div className="flex-1 border-t border-gray-200"></div>
           </div>
 
           {/* Social Login */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <button
               onClick={() => handleSocialLogin("google")}
-              className="flex items-center justify-center space-x-2 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-sky-400 hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-400/10 transition-all duration-300 group"
+              className="flex items-center justify-center space-x-2 py-2.5 sm:py-3 px-3 sm:px-4 border-2 border-gray-200 rounded-xl hover:border-sky-400 hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-400/10 transition-all duration-300 group"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -413,27 +413,27 @@ const LoginPage: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="font-medium text-gray-700 group-hover:text-sky-400 transition-colors duration-200">
+              <span className="font-medium text-gray-700 group-hover:text-sky-400 transition-colors duration-200 text-xs sm:text-sm">
                 Google
               </span>
             </button>
 
             <button
               onClick={() => handleSocialLogin("facebook")}
-              className="flex items-center justify-center space-x-2 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-sky-400 hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-400/10 transition-all duration-300 group"
+              className="flex items-center justify-center space-x-2 py-2.5 sm:py-3 px-3 sm:px-4 border-2 border-gray-200 rounded-xl hover:border-sky-400 hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-400/10 transition-all duration-300 group"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="#1877F2">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
-              <span className="text-gray-700 group-hover:text-sky-600 transition-colors">
+              <span className="text-gray-700 group-hover:text-sky-600 transition-colors text-xs sm:text-sm">
                 Facebook
               </span>
             </button>
           </div>
 
           {/* Sign Up Link */}
-          <div className="text-center text-gray-600">
-            Don’t have an account?
+          <div className="text-center text-gray-600 text-sm">
+            Don't have an account?
             <a
               href="/register"
               className="text-sky-400 hover:text-blue-600 font-semibold transition-colors duration-200 hover:underline ml-1"

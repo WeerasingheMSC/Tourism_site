@@ -92,7 +92,7 @@ const NavBar = () => {
             
             
               <Button 
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/register")}
                 type="primary" style={{ background: "#faad14" }}>
                 Sign Up
               </Button>
@@ -140,6 +140,24 @@ const NavBar = () => {
                 {item.label}
               </li>
             ))}
+            <li>
+              <Button 
+                onClick={() => navigate("/login")}
+                type="primary" 
+                block
+                style={{ marginBottom: 8 }}>
+                Login
+              </Button>
+            </li>
+            <li>
+              <Button 
+                onClick={() => navigate("/register")}
+                type="primary" 
+                block
+                style={{ background: "#faad14" }}>
+                Sign Up
+              </Button>
+            </li>
             <li>
               <Dropdown menu={languageMenu} trigger={["click"]}>
                 <Button block>Language</Button>
