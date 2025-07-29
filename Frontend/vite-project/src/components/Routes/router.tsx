@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import NavBar from "../Navbar/NavBar.tsx";
+import { ScrollToTop } from "../../components/ScrollToTop.tsx";
+
+import MainNav from "../Navbar/MainNav.tsx";
 import Hero from "../LandingPage/Hero.tsx";
 import Login from "../Login/login.tsx";
 import DashBoard from "../Dashboard/dashBoard.tsx";
@@ -12,7 +14,6 @@ import HotelOwner from "../Dashboard/HotelOwner.tsx";
 import TransportDash from "../Dashboard/TransportOwner.tsx";
 import SignupLanding from "../SignUp/SignRole.tsx";
 import Resetpassword from "../Login/ResetPassword.tsx";
-import NavBarUpdated from "../Navbar/UpdatedNavBar.tsx";
 import Herooo from "../Customised/Herooo.tsx";
 import TravelPackagesPage from "../Packages/Packages.tsx";
 import UpdatedFooter from "../Packages/updatedFooter.tsx";
@@ -25,16 +26,21 @@ import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx"
 import EditPackagesForm from "../Admin/EditPackages.tsx";
 import TravelBookingSite from "../LandingPage/LandingPage.tsx";
 import BookingPage from "../Booking/BookingPage.tsx";
+import HotelsPage from "../Hotels/HotelsPage.tsx";
+import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
+import HotelOwnerDetails from "../HotelDashboard/HotelOwnerDetails.tsx";
+import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route component
 
 const router = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route
           path="/"
           element={
             <>
-              <NavBar />
+              <MainNav />
               <Hero />
               <TravelBookingSite />
               <UpdatedFooter />
@@ -133,7 +139,7 @@ const router = () => {
           path="/CustomPackageForm"
           element={
             <>
-              <NavBar />
+              <MainNav />
               <Herooo />
             </>
           }
@@ -142,7 +148,7 @@ const router = () => {
           path="/packages"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <TravelPackagesPage />
               <UpdatedFooter />
             </>
@@ -152,59 +158,94 @@ const router = () => {
           path="/packages/:id"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <IndividualPackage />
               <UpdatedFooter />
             </>
           }
         />
         <Route
-          path="/addpackage"
+          path="/hotels"
           element={
             <>
-              <NavBarUpdated />
-              <AddPackagesForm />
+              <MainNav />
+              <Decore />
+              <HotelsPage />
               <UpdatedFooter />
             </>
           }
         />
         <Route
-          path="/admin/editpackage"
+          path="/hotels/:id"
           element={
             <>
-              <NavBarUpdated />
-              <EditPackagesForm />
+              <MainNav />
+              <Decore />
+              <HotelDetailsPage />
               <UpdatedFooter />
             </>
+          }
+        />
+        <Route
+          path="/hotel-owner-details"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <HotelOwnerDetails />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addpackage"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <AddPackagesForm />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/admin/editpackage"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <EditPackagesForm />
+              <UpdatedFooter />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/dashboard"
           element={
-            <>
-              <NavBarUpdated />
+            <ProtectedRoute>
+              
+              <MainNav />
               <Decore />
               <AdminDashboardPage />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/customized-plans"
           element={
-            <>
-              <NavBarUpdated />
+            <ProtectedRoute>
+              <MainNav />
               <Decore />
               <AdminCustomizedPlansAllPage />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/booking"
           element={
             <>
-              <NavBarUpdated />
+              <MainNav />
               <BookingPage />
               <UpdatedFooter />
             </>
@@ -213,12 +254,12 @@ const router = () => {
         <Route
           path="/admin/customized-plans-details/:id"
           element={
-            <>
-              <NavBarUpdated />
+            <ProtectedRoute>
+              <MainNav />
               <Decore />
               <AdminCustomizedPlanDetails />
               <UpdatedFooter />
-            </>
+            </ProtectedRoute>
           }
         />
       </Routes>

@@ -1,10 +1,18 @@
 import React from 'react'
-import DecoreImg from '../../assets/decore.png'
+import DecoreImg from '../../assets/Decore.png'
 
 const Decore: React.FC = () => {
   return (
-    <div className="relative w-full h-full z-0">
-      <img src={DecoreImg} alt="Decore" className="absolute right-0 z-0" />
+    <div className="absolute top-0 right-0 z-[-10] pointer-events-none">
+      <img 
+        src={DecoreImg} 
+        alt="Decore" 
+        className="block w-auto h-auto"
+        style={{
+          transform: 'scale(0.75)',
+          transformOrigin: 'top right'
+        }}
+      />
     </div>
   )
 }

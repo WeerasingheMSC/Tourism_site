@@ -7,8 +7,9 @@ import Overview from "../../components/HotelDashboard/Overview";
 import RegisterHotel from "../../components/HotelDashboard/RegisterHotel";
 import Bookings from "../../components/HotelDashboard/Bookings";
 import Profile from "../../components/HotelDashboard/Profile";
+import HotelOwnerDetails from "../../components/HotelDashboard/HotelOwnerDetails";
 
-type Section = "overview" | "registerHotel" | "bookings" | "profile";
+type Section = "overview" | "registerHotel" | "bookings" | "profile" | "hotelOwnerDetails";
 
 const HotelOwnerDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -98,6 +99,18 @@ const HotelOwnerDashboard: React.FC = () => {
             </li>
             <li>
               <button
+                onClick={() => setSection("hotelOwnerDetails")}
+                className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
+                  section === "hotelOwnerDetails"
+                    ? "bg-sky-50 font-semibold"
+                    : "text-gray-700"
+                }`}
+              >
+                Hotel Owner Details
+              </button>
+            </li>
+            <li>
+              <button
                 onClick={() => setSection("bookings")}
                 className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
                   section === "bookings"
@@ -128,6 +141,7 @@ const HotelOwnerDashboard: React.FC = () => {
       <main className="flex-1 p-8">
         {section === "overview" && <Overview />}
         {section === "registerHotel" && <RegisterHotel />}
+        {section === "hotelOwnerDetails" && <HotelOwnerDetails />}
         {section === "bookings" && <Bookings />}
         {section === "profile" && <Profile />}
       </main>

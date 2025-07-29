@@ -6,6 +6,8 @@ import { getPackageById } from "../../../api/packages"; // :contentReference[oai
 import Decore from "../../Packages/Decore";
 // 🔄 Add this alongside your other imports
 import { addBooking } from "../../../api/bookings";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface DailyPlan {
   day: number;
@@ -105,6 +107,14 @@ const IndividualPackage: React.FC = () => {
     setBookingError(null);
     setShowModal(true);
   };
+  const handleCustomizeClick = () => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      onReserveClick();
+    } else {
+      navigate("/login");
+    }
+  };
 
   // 🔄 Cancel & reset modal
   const onCancel = () => {
@@ -149,13 +159,13 @@ const IndividualPackage: React.FC = () => {
               />
             </div>
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="z-200 grid grid-cols-4 gap-4">
               {/* 🔄 Map real photos */}
               {(pkg.packagePhotos || []).map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setMainImage(img)}
-                  className={`focus:outline-none border-2 rounded-xl overflow-hidden transition-all duration-200 ${
+                  className={`z-20 focus:outline-none border-2 rounded-xl overflow-hidden transition-all duration-200 ${
                     mainImage === img
                       ? "border-blue-600"
                       : "border-transparent hover:border-blue-300"
@@ -187,7 +197,9 @@ const IndividualPackage: React.FC = () => {
 
             <div className="space-y-4 mb-6">
               <div>
-                <span className="text-gray-600 font-medium">Duration: {pkg.dailyPlans.length}</span>
+                <span className="text-gray-600 font-medium">
+                  Duration: {pkg.dailyPlans.length}
+                </span>
                 <span className="ml-2 text-gray-900">
                   {/* if you have duration in data, replace here */}
                 </span>
@@ -215,7 +227,7 @@ const IndividualPackage: React.FC = () => {
             <p className="text-gray-700 mb-6">{pkg.description}</p>
 
             <button
-              onClick={onReserveClick}
+              onClick={handleCustomizeClick}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
               Reserve Now
@@ -233,15 +245,13 @@ const IndividualPackage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700">
                   Country Code
                 </label>
-                <select
+                <PhoneInput
+                  international
+                  defaultCountry="US"
                   value={countryCode}
-                  onChange={(e) => setCountryCode(e.target.value)}
+                  onChange={(value) => setCountryCode(value || "+1")}
                   className="mt-1 block w-full border-gray-300 rounded-md"
-                >
-                  <option value="+1">+1 (USA)</option>
-                  <option value="+44">+44 (UK)</option>
-                  <option value="+94">+94 (Sri Lanka)</option>
-                </select>
+                />
               </div>
 
               {/* Local number */}

@@ -327,6 +327,12 @@ const SignupPage: React.FC = () => {
                   </svg>
                 </button>
               </div>
+              <a
+                href="/login"
+                className="text-sky-400 hover:text-blue-600 font-medium transition-colors duration-200"
+              >
+                Have an account ?
+              </a>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}

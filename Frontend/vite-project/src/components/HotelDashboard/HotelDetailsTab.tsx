@@ -1,0 +1,197 @@
+
+import React, { useState } from 'react';
+
+const HotelDetailsTab = () => {
+  // State for form data
+  const [formData, setFormData] = useState({
+    hotelName: '',
+    address: '',
+    area: '',
+    district: 'Colombo',
+    hotelType: 'Luxury hotel',
+    description: '',
+    uploadedFiles: [] as File[]
+  });
+
+  // Handle input changes
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    setFormData(prev => ({
+      ...prev,
+      uploadedFiles: [...prev.uploadedFiles, ...files]
+    }));
+  };
+
+  // Remove uploaded file
+  const removeFile = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      uploadedFiles: prev.uploadedFiles.filter((_, i) => i !== index)
+    }));
+  };
+  return (
+    <div className="max-w-4xl">
+      <h2 className="text-xl font-semibold mb-2 text-gray-800">Hotel Detail</h2>
+      <p className="text-gray-600 mb-6">Enter your Hotel information</p>
+        
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hotel Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.hotelName}
+              onChange={(e) => handleInputChange('hotelName', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Address <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Area <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.area}
+              onChange={(e) => handleInputChange('area', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              District <span className="text-red-500">*</span>
+            </label>
+            <select 
+              value={formData.district}
+              onChange={(e) => handleInputChange('district', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option>Colombo</option>
+              <option>Gampaha</option>
+              <option>Kalutara</option>
+              <option>Kandy</option>
+              <option>Matale</option>
+              <option>Nuwara Eliya</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hotel type <span className="text-red-500">*</span>
+            </label>
+            <select 
+              value={formData.hotelType}
+              onChange={(e) => handleInputChange('hotelType', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option>Luxury hotel</option>
+              <option>Boutique Hotel</option>
+              <option>Resort</option>
+              <option>Guest House</option>
+              <option>Villa</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Small Description <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Google Map Integration <span className="text-red-500">*</span>
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                Select the location
+              </button>
+            </div>
+          </div>
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hotel Pictures <span className="text-red-500">*</span>
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="hotel-pictures"
+              />
+              <label htmlFor="hotel-pictures" className="cursor-pointer block w-full">
+                <div className="text-center">
+                  <div className="mx-auto w-12 h-12 text-gray-400 mb-4 flex items-center justify-center">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2 font-medium">Click to upload images</p>
+                  <p className="text-xs text-gray-500">Or drag and drop files</p>
+                </div>
+              </label>
+            </div>
+
+            {/* Display uploaded files */}
+            {formData.uploadedFiles.length > 0 && (
+              <div className="mt-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Uploaded Files:</h4>
+                <div className="space-y-2">
+                  {formData.uploadedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                      <span className="text-sm text-gray-700">{file.name}</span>
+                      <button
+                        onClick={() => removeFile(index)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="flex justify-between mt-8">
+          <button className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium">
+            Back
+          </button>
+          <button className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium">
+            Next
+          </button>
+        </div>
+    </div>
+  );
+};
+
+export default HotelDetailsTab;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 // Import your icons from assets folder
 import beachIcon from "../../assets/beach icon.png";
@@ -13,8 +13,21 @@ import pinterestIcon from "../../assets/icons/printeresticon.png";
 import whatsappIcon from "../../assets/icons/whatsappicon.png";
 import instagramIcon from "../../assets/icons/instaicon.png";
 import tiktokIcon from "../../assets/icons/tiktokicon.png";
-import badgeIcon from "../../assets/badge.png"; // Add a badge/star icon for the featured package
+import badgeIcon from "../../assets/badge.png";
 import { useNavigate } from "react-router-dom";
+
+// Import the API function
+import { getPackages } from "../../api/packages";
+
+interface PackageType {
+  _id: string;
+  name: string; // maps to title
+  theme: string; // maps to subtitle
+  idealFor: string[]; // maps to tags
+  packageIcon: string; // maps to image URL
+  startingPrice: string; // e.g. "1200 USD"
+  dailyPlans: any[]; // for duration count
+}
 
 interface PackageCardProps {
   icon: string;
@@ -24,8 +37,9 @@ interface PackageCardProps {
   price: string;
   duration: string;
   bgColor?: string;
-  borderColor?: string; // add this
-  scale?: string; // add this
+  borderColor?: string;
+  scale?: string;
+  isFeatured?: boolean;
 }
 
 interface ServiceCardProps {
@@ -49,42 +63,32 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 );
 
 const TravelBookingSite: React.FC = () => {
-  const Navigate = useNavigate();
-  const packages = [
-    {
-      icon: beachIcon,
-      title: "East Coast Tropical Getaway",
-      subtitle: "Beaches, Snorkeling & Culture",
-      tags: ["Beach lovers", "couples", "Families"],
-      price: "$25",
-      duration: "5 Days",
-      bgColor: "bg-white",
-      borderColor: "border-gray-100",
-      scale: "scale-100",
-    },
-    {
-      icon: carIcon,
-      title: "Safari + Beach Combo",
-      subtitle: "Wildlife & Coastal Relaxation",
-      tags: ["Families", "couples", "mixed-interest groups"],
-      price: "$18",
-      duration: "4 Days",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-500",
-      scale: "md:scale-120",
-    },
-    {
-      icon: heartIcon,
-      title: "Luxury Honeymoon Retreat",
-      subtitle: "Romance, Relaxation & Luxury",
-      tags: ["Honeymooners", "special event", "anniversary couples"],
-      price: "$39",
-      duration: "5 Days",
-      bgColor: "bg-white",
-      borderColor: "border-gray-100",
-      scale: "scale-100",
-    },
-  ];
+  const navigate = useNavigate();
+  const [packages, setPackages] = useState<PackageType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch packages from backend
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getPackages();
+        setPackages(response.data);
+      } catch (err) {
+        console.error('Error fetching packages:', err);
+        setError('Failed to load packages. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  // Get top 3 packages for display (you can modify this logic)
+  const displayPackages = packages.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white">
@@ -97,60 +101,98 @@ const TravelBookingSite: React.FC = () => {
               Our Best Packages
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 w-full">
-            {packages.map((pkg, idx) => (
-              <div
-                key={pkg.title}
-                className={`
-                  relative
-                  ${
-                    idx === 1
-                      ? "border-2 border-blue-400 bg-blue-50 scale-105 z-10 shadow-xl"
-                      : "border border-gray-300 scale-95 bg-white"
-                  }
-                  rounded-2xl p-6 flex flex-col items-center transition-transform
-                `}
-                style={{ minHeight: 410 }}
-              >
-                {/* Badge for the middle card */}
-                {idx === 1 && (
-                  <img
-                    src={badgeIcon}
-                    alt="Featured"
-                    className="absolute -top-6 left-1/2 -translate-x-5/2 w-10 h-10"
-                  />
-                )}
-                <div className="flex justify-center mb-4">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                    <img src={pkg.icon} alt={pkg.title} className="w-12 h-12" />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-gray-800 text-center mb-1">
-                  {pkg.title}
-                </h3>
-                <p className="text-sm text-gray-600 text-center mb-4">
-                  {pkg.subtitle}
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center mb-4">
-                  {pkg.tags.map((tag, tagIdx) => (
-                    <span
-                      key={tagIdx}
-                      className="bg-blue-50 border border-blue-300 text-blue-600 px-3 py-1 rounded-full text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center justify-center gap-2 mt-auto">
-                  <span className="text-sm text-gray-600">From</span>
-                  <span className="text-lg font-bold text-gray-800">
-                    {pkg.price}
-                  </span>
-                  <span className="text-sm text-gray-600">{pkg.duration}</span>
-                </div>
+
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              <span className="ml-3 text-gray-600">Loading packages...</span>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg inline-block">
+                {error}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+
+          {/* Packages Grid */}
+          {!loading && !error && (
+            <div className="grid md:grid-cols-3 gap-8 w-full">
+              {displayPackages.length === 0 ? (
+                <div className="col-span-3 text-center py-12">
+                  <p className="text-gray-500">No packages available at the moment.</p>
+                </div>
+              ) : (
+                displayPackages.map((pkg, idx) => (
+                  <div
+                    key={pkg._id}
+                    className={`
+                      relative
+                      ${
+                        idx === 1
+                          ? "border-2 border-blue-400 bg-blue-50 scale-105 z-10 shadow-xl"
+                          : "border border-gray-300 scale-95 bg-white"
+                      }
+                      rounded-2xl p-6 flex flex-col items-center transition-transform hover:scale-100 shadow-xl
+                    `}
+                    style={{ minHeight: 410 }}
+                  >
+                    {/* Badge for the middle card */}
+                    {idx === 1 && (
+                      <img
+                        src={badgeIcon}
+                        alt="Featured"
+                        className="absolute -top-6 left-1/2 -translate-x-1/2 w-10 h-10"
+                      />
+                    )}
+                    
+                    <div className="flex justify-center mb-4">
+                      <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                        <img 
+                          src={pkg.packageIcon || beachIcon} 
+                          alt={pkg.name} 
+                          className="w-12 h-12 rounded-full object-cover" 
+                        />
+                      </div>
+                    </div>
+                    
+                    <h3 className="font-semibold text-gray-800 text-center mb-1">
+                      {pkg.name}
+                    </h3>
+                    
+                    <p className="text-sm text-gray-600 text-center mb-4">
+                      {pkg.theme}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 justify-center mb-4">
+                      {pkg.idealFor?.map((tag, tagIdx) => (
+                        <span
+                          key={tagIdx}
+                          className="bg-blue-50 border border-blue-300 text-blue-600 px-3 py-1 rounded-full text-xs"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-2 mt-auto">
+                      <span className="text-sm text-gray-600">From</span>
+                      <span className="text-lg font-bold text-gray-800">
+                        {pkg.startingPrice}$
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {pkg.dailyPlans?.length || 0} Days
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -160,7 +202,7 @@ const TravelBookingSite: React.FC = () => {
           <div className="text-center mb-12">
             <p className="text-gray-500 mb-2">customize plan</p>
             <h2 className="text-4xl font-bold text-gray-900">
-              customize your package
+              Customize your package
             </h2>
           </div>
           <div
@@ -179,21 +221,21 @@ const TravelBookingSite: React.FC = () => {
               </div>
               <div className="flex-1 md:pl-8 w-full">
                 <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                  Customise Now
+                  Customize Now
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Customise your trip easily—choose places, dates, and
+                  Customize your trip easily—choose places, dates, and
                   activities to create the perfect travel plan just for you.
                 </p>
                 <div className="flex gap-4">
                   <button
-                    onClick={() => Navigate("/packages")}
+                    onClick={() => navigate("/packages")}
                     className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-600"
                   >
                     All packages
                   </button>
                   <button
-                    onClick={() => Navigate("/CustomPackageForm")}
+                    onClick={() => navigate("/CustomPackageForm")}
                     className="border border-blue-500 text-blue-500 px-6 py-3 rounded-lg font-medium hover:bg-blue-50"
                   >
                     Customized your plan

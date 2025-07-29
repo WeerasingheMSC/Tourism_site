@@ -84,7 +84,7 @@ const TravelPackagesPage: React.FC = () => {
           <h1 className="text-5xl text-blue-900 font-bold mb-12">
             Our packages
           </h1>
-          <p className="text-xl text-gray-300 opacity-90">
+          <p className="text-xl text-black opacity-90">
             Select your package with our options
           </p>
         </div>
