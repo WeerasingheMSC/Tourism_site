@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const FAQFacilitiesTab = () => {
@@ -36,30 +36,9 @@ const FAQFacilitiesTab = () => {
     }));
   };
 
-  // Handle file upload
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    setFormData(prev => ({
-      ...prev,
-      uploadedFiles: [...prev.uploadedFiles, ...files]
-    }));
-  };
 
-  // Remove uploaded file
-  const removeFile = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      uploadedFiles: prev.uploadedFiles.filter((_, i) => i !== index)
-    }));
-  };
 
-  // Handle map location input
-  const handleLocationChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  
 
   const addFAQ = () => {
     if (newFAQ.question && newFAQ.answer) {
