@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import visa from "../../assets/visa.png";
 import cash from "../../assets/cash.png";
 import master from "../../assets/master.png";
 
-const HotelRulesTab = () => {
+interface HotelRulesTabProps {
+  onNext: () => void;
+  onBack: () => void;
+  onValidationError: (message: string) => void;
+}
+
+const HotelRulesTab: React.FC<HotelRulesTabProps> = ({ onNext, onBack, onValidationError }) => {
   // State for form data
   const [formData, setFormData] = useState({
     checkIn: '',
@@ -32,6 +38,23 @@ const HotelRulesTab = () => {
         ? prev.paymentMethods.filter(m => m !== method)
         : [...prev.paymentMethods, method]
     }));
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const { checkIn, checkOut, cancellationPolicy, childrenAndBeds, pets } = formData;
+    return checkIn.trim() && checkOut.trim() && cancellationPolicy.trim() && 
+           childrenAndBeds.trim() && pets && formData.paymentMethods.length > 0;
+  };
+
+  // Handle next button
+  const handleNext = () => {
+    if (!validateForm()) {
+      onValidationError('Please fill all required fields and select at least one payment method before proceeding');
+      return;
+    }
+    onValidationError(''); // Clear any previous errors
+    onNext();
   };
   return (
     <div className="max-w-4xl">
@@ -135,6 +158,7 @@ const HotelRulesTab = () => {
                   type="radio" 
                   name="pets" 
                   value="allowed"
+                  required
                   checked={formData.pets === 'allowed'}
                   onChange={(e) => handleInputChange('pets', e.target.value)}
                   className="text-blue-600" 
@@ -146,6 +170,7 @@ const HotelRulesTab = () => {
                   type="radio" 
                   name="pets" 
                   value="not-allowed"
+                  required
                   checked={formData.pets === 'not-allowed'}
                   onChange={(e) => handleInputChange('pets', e.target.value)}
                   className="text-blue-600" 
@@ -200,10 +225,16 @@ const HotelRulesTab = () => {
         </div>
         
         <div className="flex justify-between mt-8">
-          <button className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium">
+          <button 
+            onClick={onBack}
+            className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium"
+          >
             Back
           </button>
-          <button className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium">
+          <button 
+            onClick={handleNext}
+            className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium"
+          >
             Next
           </button>
         </div>

@@ -5,6 +5,7 @@ import HotelRulesTab from './HotelRulesTab';
 
 const HotelOwnerDetails = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [validationError, setValidationError] = useState('');
   
   // State for profile form data
   const [profileData, setProfileData] = useState({
@@ -31,6 +32,42 @@ const HotelOwnerDetails = () => {
       ...prev,
       profilePicture: file
     }));
+  };
+
+  // Validate profile tab
+  const validateProfile = () => {
+    const { firstName, lastName, email, phone, profilePicture } = profileData;
+    return firstName.trim() && lastName.trim() && email.trim() && phone.trim() && profilePicture !== null;
+  };
+
+  // Handle navigation
+  const handleNext = () => {
+    setValidationError('');
+    
+    if (activeTab === 'profile') {
+      if (!validateProfile()) {
+        setValidationError('Please fill all required fields and upload a profile picture before proceeding');
+        return;
+      }
+      setActiveTab('hotel-details');
+    } else if (activeTab === 'hotel-details') {
+      // Validation will be handled by the child component
+      setActiveTab('hotel-rules');
+    } else if (activeTab === 'hotel-rules') {
+      setActiveTab('faq-facilities');
+    }
+  };
+
+  const handleBack = () => {
+    setValidationError('');
+    
+    if (activeTab === 'hotel-details') {
+      setActiveTab('profile');
+    } else if (activeTab === 'hotel-rules') {
+      setActiveTab('hotel-details');
+    } else if (activeTab === 'faq-facilities') {
+      setActiveTab('hotel-rules');
+    }
   };
 
   return (
@@ -83,6 +120,13 @@ const HotelOwnerDetails = () => {
 
           {/* Tab Content */}
           <div className="p-6">
+            {/* Validation Error Message */}
+            {validationError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-sm">{validationError}</p>
+              </div>
+            )}
+
             {activeTab === 'profile' && (
               <div className="max-w-3xl">
                 <h2 className="text-xl font-semibold mb-2 text-gray-800">Hotel Owner Detail</h2>
@@ -158,24 +202,35 @@ const HotelOwnerDetails = () => {
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Upload Hotel Owner Profile Picture
+                        Upload Hotel Owner Profile Picture <span className="text-red-500">*</span>
                       </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                      <div className={`border-2 border-dashed rounded-lg p-6 hover:border-blue-400 transition-colors ${
+                        profileData.profilePicture ? 'border-green-300 bg-green-50' : 'border-gray-300'
+                      }`}>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleProfilePictureUpload}
                           className="hidden"
                           id="owner-profile-picture"
+                          required
                         />
                         <label htmlFor="owner-profile-picture" className="cursor-pointer block w-full">
                           <div className="text-center">
                             <div className="mx-auto w-12 h-12 text-gray-400 mb-4 flex items-center justify-center">
-                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              </svg>
+                              {profileData.profilePicture ? (
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8 text-green-500">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : (
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                              )}
                             </div>
-                            <p className="text-sm text-gray-600 mb-2 font-medium">Click to upload profile picture</p>
+                            <p className="text-sm text-gray-600 mb-2 font-medium">
+                              {profileData.profilePicture ? 'Profile picture uploaded!' : 'Click to upload profile picture'}
+                            </p>
                             <p className="text-xs text-gray-500">Or drag and drop files</p>
                           </div>
                         </label>
@@ -208,17 +263,37 @@ const HotelOwnerDetails = () => {
                     </div>
                   </div>
                   
-                  <div className="flex justify-end mt-8">
-                    <button className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium">
+                  <div className="col-span-2 flex justify-end mt-8">
+                    <button 
+                      onClick={handleNext}
+                      className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium"
+                    >
                       Next
                     </button>
                   </div>
                 </div>
               )}
             
-            {activeTab === 'hotel-details' && <HotelDetailsTab />}
-            {activeTab === 'hotel-rules' && <HotelRulesTab />}
-            {activeTab === 'faq-facilities' && <FAQFacilitiesTab />}
+            {activeTab === 'hotel-details' && (
+              <HotelDetailsTab 
+                onNext={handleNext}
+                onBack={handleBack}
+                onValidationError={setValidationError}
+              />
+            )}
+            {activeTab === 'hotel-rules' && (
+              <HotelRulesTab 
+                onNext={handleNext}
+                onBack={handleBack}
+                onValidationError={setValidationError}
+              />
+            )}
+            {activeTab === 'faq-facilities' && (
+              <FAQFacilitiesTab 
+                onBack={handleBack}
+                onValidationError={setValidationError}
+              />
+            )}
           </div>
         </div>
       </div>

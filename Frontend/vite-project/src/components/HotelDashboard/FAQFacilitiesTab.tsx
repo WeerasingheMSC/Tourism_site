@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-const FAQFacilitiesTab = () => {
+interface FAQFacilitiesTabProps {
+  onBack: () => void;
+  onValidationError: (message: string) => void;
+}
+
+const FAQFacilitiesTab: React.FC<FAQFacilitiesTabProps> = ({ onBack, onValidationError }) => {
   const [showAddFAQ, setShowAddFAQ] = useState(false);
   const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
   const [faqs, setFaqs] = useState([
@@ -51,6 +56,22 @@ const FAQFacilitiesTab = () => {
       setNewFAQ({ question: '', answer: '' });
       setShowAddFAQ(false);
     }
+  };
+
+  // Validate form
+  const validateForm = () => {
+    return formData.facilities.length > 0 && faqs.length > 0;
+  };
+
+  // Handle submit button
+  const handleSubmit = () => {
+    if (!validateForm()) {
+      onValidationError('Please select at least one facility and add at least one FAQ before submitting');
+      return;
+    }
+    onValidationError(''); // Clear any previous errors
+    // Handle final submission here
+    alert('Form submitted successfully!');
   };
 
   return (
@@ -147,10 +168,16 @@ const FAQFacilitiesTab = () => {
         )}
         
         <div className="flex justify-between mt-8">
-          <button className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium">
+          <button 
+            onClick={onBack}
+            className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium"
+          >
             Back
           </button>
-          <button className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium">
+          <button 
+            onClick={handleSubmit}
+            className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium"
+          >
             Submit
           </button>
         </div>

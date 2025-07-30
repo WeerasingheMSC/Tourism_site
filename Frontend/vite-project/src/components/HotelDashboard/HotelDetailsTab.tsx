@@ -1,7 +1,13 @@
 
 import React, { useState } from 'react';
 
-const HotelDetailsTab = () => {
+interface HotelDetailsTabProps {
+  onNext: () => void;
+  onBack: () => void;
+  onValidationError: (message: string) => void;
+}
+
+const HotelDetailsTab: React.FC<HotelDetailsTabProps> = ({ onNext, onBack, onValidationError }) => {
   // State for form data
   const [formData, setFormData] = useState({
     hotelName: '',
@@ -10,7 +16,8 @@ const HotelDetailsTab = () => {
     district: 'Colombo',
     hotelType: 'Luxury hotel',
     description: '',
-    uploadedFiles: [] as File[]
+    uploadedFiles: [] as File[],
+    locationSelected: false
   });
 
   // Handle input changes
@@ -36,6 +43,33 @@ const HotelDetailsTab = () => {
       ...prev,
       uploadedFiles: prev.uploadedFiles.filter((_, i) => i !== index)
     }));
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const { hotelName, address, area, description, locationSelected } = formData;
+    return hotelName.trim() && address.trim() && area.trim() && description.trim() && 
+           formData.uploadedFiles.length > 0 && locationSelected;
+  };
+
+  // Handle next button
+  const handleNext = () => {
+    if (!validateForm()) {
+      onValidationError('Please fill all required fields, upload at least one hotel picture, and select a location before proceeding');
+      return;
+    }
+    onValidationError(''); // Clear any previous errors
+    onNext();
+  };
+
+  // Handle location selection
+  const handleLocationSelect = () => {
+    // Simulate location selection
+    setFormData(prev => ({
+      ...prev,
+      locationSelected: true
+    }));
+    alert('Location selected successfully!');
   };
   return (
     <div className="max-w-4xl">
@@ -132,19 +166,31 @@ const HotelDetailsTab = () => {
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Map Integration
+              Google Map Integration <span className="text-red-500">*</span>
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
-                Select the location
+            <div className={`border-2 border-dashed rounded-lg p-8 text-center ${
+              formData.locationSelected ? 'border-green-300 bg-green-50' : 'border-gray-300'
+            }`}>
+              <button 
+                type="button"
+                onClick={handleLocationSelect}
+                className={`px-6 py-2 rounded-lg font-medium ${
+                  formData.locationSelected 
+                    ? 'bg-green-500 text-white hover:bg-green-600' 
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                {formData.locationSelected ? 'Location Selected ✓' : 'Select the location'}
               </button>
             </div>
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Hotel Pictures
+              Hotel Pictures <span className="text-red-500">*</span>
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+            <div className={`border-2 border-dashed rounded-lg p-6 hover:border-blue-400 transition-colors ${
+              formData.uploadedFiles.length > 0 ? 'border-green-300 bg-green-50' : 'border-gray-300'
+            }`}>
               <input
                 type="file"
                 multiple
@@ -157,11 +203,19 @@ const HotelDetailsTab = () => {
               <label htmlFor="hotel-pictures" className="cursor-pointer block w-full">
                 <div className="text-center">
                   <div className="mx-auto w-12 h-12 text-gray-400 mb-4 flex items-center justify-center">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+                    {formData.uploadedFiles.length > 0 ? (
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8 text-green-500">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-600 mb-2 font-medium">Click to upload images</p>
+                  <p className="text-sm text-gray-600 mb-2 font-medium">
+                    {formData.uploadedFiles.length > 0 ? 'Images uploaded successfully!' : 'Click to upload images'}
+                  </p>
                   <p className="text-xs text-gray-500">Or drag and drop files</p>
                 </div>
               </label>
@@ -190,10 +244,16 @@ const HotelDetailsTab = () => {
         </div>
         
         <div className="flex justify-between mt-8">
-          <button className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium">
+          <button 
+            onClick={onBack}
+            className="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 font-medium"
+          >
             Back
           </button>
-          <button className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium">
+          <button 
+            onClick={handleNext}
+            className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 font-medium"
+          >
             Next
           </button>
         </div>
