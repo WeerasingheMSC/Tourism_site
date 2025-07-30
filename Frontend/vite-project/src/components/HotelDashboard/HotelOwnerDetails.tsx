@@ -91,10 +91,11 @@ const HotelOwnerDetails = () => {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name <span className="text-red-500">*</span>
+                      First Name
                     </label>
                     <input
                       type="text"
+                      required
                       value={profileData.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -103,10 +104,11 @@ const HotelOwnerDetails = () => {
                   </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Last Name <span className="text-red-500">*</span>
+                        Last Name
                       </label>
                       <input
                         type="text"
+                        required
                         value={profileData.lastName}
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -115,10 +117,11 @@ const HotelOwnerDetails = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address <span className="text-red-500">*</span>
+                        Email Address
                       </label>
                       <input
                         type="email"
+                        required
                         value={profileData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -127,10 +130,11 @@ const HotelOwnerDetails = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number <span className="text-red-500">*</span>
+                        Phone Number
                       </label>
                       <input
                         type="tel"
+                        required
                         value={profileData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -139,9 +143,10 @@ const HotelOwnerDetails = () => {
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Language <span className="text-red-500">*</span>
+                        Language
                       </label>
                       <select 
+                        required
                         value={profileData.language}
                         onChange={(e) => handleInputChange('language', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -153,7 +158,7 @@ const HotelOwnerDetails = () => {
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Upload Hotel Owner Profile Picture <span className="text-red-500">*</span>
+                        Upload Hotel Owner Profile Picture
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
                         <input

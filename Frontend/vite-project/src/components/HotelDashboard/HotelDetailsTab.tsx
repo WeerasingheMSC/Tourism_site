@@ -45,10 +45,11 @@ const HotelDetailsTab = () => {
         <div className="grid grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Hotel Name <span className="text-red-500">*</span>
+              Hotel Name
             </label>
             <input
               type="text"
+              required
               value={formData.hotelName}
               onChange={(e) => handleInputChange('hotelName', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -57,10 +58,11 @@ const HotelDetailsTab = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Address <span className="text-red-500">*</span>
+              Address
             </label>
             <input
               type="text"
+              required
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -69,10 +71,11 @@ const HotelDetailsTab = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Area <span className="text-red-500">*</span>
+              Area
             </label>
             <input
               type="text"
+              required
               value={formData.area}
               onChange={(e) => handleInputChange('area', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -81,9 +84,10 @@ const HotelDetailsTab = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              District <span className="text-red-500">*</span>
+              District
             </label>
             <select 
+              required
               value={formData.district}
               onChange={(e) => handleInputChange('district', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -98,9 +102,10 @@ const HotelDetailsTab = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Hotel type <span className="text-red-500">*</span>
+              Hotel type
             </label>
             <select 
+              required
               value={formData.hotelType}
               onChange={(e) => handleInputChange('hotelType', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -114,10 +119,11 @@ const HotelDetailsTab = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Small Description <span className="text-red-500">*</span>
+              Small Description
             </label>
             <input
               type="text"
+              required
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -126,7 +132,7 @@ const HotelDetailsTab = () => {
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Map Integration <span className="text-red-500">*</span>
+              Google Map Integration
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
@@ -136,13 +142,14 @@ const HotelDetailsTab = () => {
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Hotel Pictures <span className="text-red-500">*</span>
+              Hotel Pictures
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
               <input
                 type="file"
                 multiple
                 accept="image/*"
+                required
                 onChange={handleFileUpload}
                 className="hidden"
                 id="hotel-pictures"

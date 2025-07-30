@@ -108,6 +108,7 @@ const FAQFacilitiesTab = () => {
                 <div>
                   <input
                     type="text"
+                    required
                     value={newFAQ.question}
                     onChange={(e) => setNewFAQ({ ...newFAQ, question: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -117,6 +118,7 @@ const FAQFacilitiesTab = () => {
                 <div>
                   <textarea
                     rows={3}
+                    required
                     value={newFAQ.answer}
                     onChange={(e) => setNewFAQ({ ...newFAQ, answer: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

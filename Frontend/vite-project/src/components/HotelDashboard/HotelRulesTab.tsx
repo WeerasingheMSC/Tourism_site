@@ -41,10 +41,11 @@ const HotelRulesTab = () => {
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Check in <span className="text-red-500">*</span>
+              Check in
             </label>
             <input
               type="text"
+              required
               value={formData.checkIn}
               onChange={(e) => handleInputChange('checkIn', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -54,10 +55,11 @@ const HotelRulesTab = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Check out <span className="text-red-500">*</span>
+              Check out
             </label>
             <input
               type="text"
+              required
               value={formData.checkOut}
               onChange={(e) => handleInputChange('checkOut', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -67,10 +69,11 @@ const HotelRulesTab = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cancellation/ prepayment <span className="text-red-500">*</span>
+              Cancellation/ prepayment
             </label>
             <textarea
               rows={4}
+              required
               value={formData.cancellationPolicy}
               onChange={(e) => handleInputChange('cancellationPolicy', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -80,10 +83,11 @@ const HotelRulesTab = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Children and beds <span className="text-red-500">*</span>
+              Children and beds
             </label>
             <textarea
               rows={3}
+              required
               value={formData.childrenAndBeds}
               onChange={(e) => handleInputChange('childrenAndBeds', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
