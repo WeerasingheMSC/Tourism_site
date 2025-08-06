@@ -8,26 +8,47 @@ import mongoose from "mongoose";
  */
 export const registerHotel = async (req, res, next) => {
   try {
-    // ownerId comes from JWT payload (req.user.userId)
-    const ownerId = req.user.userId;
+    // ────────────────────────────────────────
+    // ❶ Pull the owner’s ID straight from the JWT payload
+    //    (populated by your `auth` middleware as `req.user.userId`)
+    const ownerId = req.user.userId
 
-    // build the hotel object; spread body but override ownerId & default approvalStatus
+    // ────────────────────────────────────────
+    // ❷ Prevent duplicate registrations
+    const already = await Hotel.findOne({ ownerId })
+    if (already) {
+      return res
+        .status(400)
+        .json({ message: "You have already registered a hotel." })
+    }
+
+    // ────────────────────────────────────────
+    // ❸ Build your hotel object—`ownerId` is injected here,
+    //    the rest comes from req.body, plus default pending status.
     const hotelData = {
       ownerId,
       ...req.body,
       approvalStatus: { status: "pending" },
-    };
+    }
 
-    const hotel = await Hotel.create(hotelData);
+    // ────────────────────────────────────────
+    // ❹ Persist to Mongo
+    const hotel = await Hotel.create(hotelData)
 
     res.status(201).json({
       message: "Hotel registration submitted, pending admin approval",
       hotel,
-    });
+    })
   } catch (err) {
-    next(err);
+    // handle the unique‐index violation gracefully
+    if (err.code === 11000 && err.keyPattern?.ownerId) {
+      return res
+        .status(400)
+        .json({ message: "You have already registered a hotel." })
+    }
+    next(err)
   }
-};
+}
 
 /**
  * @desc    Get all hotels with pending approval status
@@ -133,6 +154,40 @@ export const getApprovedHotelById = async (req, res, next) => {
     }
 
     res.json(hotel);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @desc    Add a user review to a hotel
+ * @route   POST /api/hotels/:id/reviews
+ * @access  Private (any authenticated user)
+ */
+export const addReviewToHotel = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+    const { rating, comment } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid hotel ID" });
+    }
+
+    const hotel = await Hotel.findById(id);
+    if (!hotel || hotel.approvalStatus.status !== "approved") {
+      return res
+        .status(404)
+        .json({ message: "Hotel not found or not approved" });
+    }
+
+    // push into the reviews array
+    hotel.reviews.push({ user: userId, rating, comment });
+    await hotel.save();
+
+    res
+      .status(201)
+      .json({ message: "Review added", review: hotel.reviews.slice(-1)[0] });
   } catch (err) {
     next(err);
   }
