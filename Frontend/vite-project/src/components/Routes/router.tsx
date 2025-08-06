@@ -27,6 +27,10 @@ import EditPackagesForm from "../Admin/EditPackages.tsx";
 import TravelBookingSite from "../LandingPage/LandingPage.tsx";
 import BookingPage from "../Booking/BookingPage.tsx";
 import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route component
+// Hotel components
+import HotelsPage from "../Hotels/HotelsPage.tsx";
+import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
+import HotelRegistrationForm from "../HotelDashboard/HotelRegistrationForm.tsx";
 
 const router = () => {
   return (
@@ -224,6 +228,40 @@ const router = () => {
               <AdminCustomizedPlanDetails />
               <UpdatedFooter />
             </ProtectedRoute>
+          }
+        />
+        // Hotel Routes
+        <Route
+          path="/hotels"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <HotelsPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/hotels/:id"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <HotelDetailsPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/hotel-register"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <HotelRegistrationForm />
+              <UpdatedFooter />
+            </>
           }
         />
       </Routes>

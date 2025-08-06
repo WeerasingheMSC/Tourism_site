@@ -86,7 +86,7 @@ const HotelOwnerDashboard: React.FC = () => {
             </li>
             <li>
               <button
-                onClick={() => setSection("registerHotel")}
+                onClick={()=>navigate("/hotel-register")}
                 className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
                   section === "registerHotel"
                     ? "bg-sky-50 font-semibold"

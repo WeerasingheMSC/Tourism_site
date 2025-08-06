@@ -92,7 +92,7 @@ const NavBar = () => {
             
             
               <Button 
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/signup")}
                 type="primary" style={{ background: "#faad14" }}>
                 Sign Up
               </Button>
