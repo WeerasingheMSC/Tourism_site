@@ -7,6 +7,8 @@ import {
   approveRejectHotel,
   getApprovedHotels,
   getApprovedHotelById,
+  addReviewToHotel,
+  getAllHotels,
 } from "../controllers/hotelController.js";
 import auth from "../middleware/auth.js";
 import { authorizeRoles } from "../middleware/roles.js";
@@ -66,6 +68,13 @@ router.put(
   }
 );
 
+// in your hotelRoutes.js
+router.get(
+  '/all',
+  auth,
+  authorizeRoles('admin'),
+  getAllHotels   // you’ll need to implement this in your controller
+);
 // Public route: list approved hotels
 router.get("/", getApprovedHotels);
 
@@ -85,5 +94,7 @@ router.post(
     addReviewToHotel(req, res, next);
   }
 );
+
+
 
 export default router;

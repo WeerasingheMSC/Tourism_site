@@ -1,5 +1,6 @@
 import Hotel from "../models/Hotel.js";
 import mongoose from "mongoose";
+import { sendEmail } from "../services/emailService.js";
 
 /**
  * @desc    Register a new hotel (role must be "hotel-owner")
@@ -73,31 +74,48 @@ export const getPendingHotels = async (req, res, next) => {
 export const approveRejectHotel = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { status, adminNotes } = req.body;
 
+    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid hotel ID" });
     }
-
-    const { status, adminNotes } = req.body;
-
+    // Validate status
     if (!["approved", "rejected"].includes(status)) {
       return res
         .status(400)
         .json({ message: 'Status must be "approved" or "rejected"' });
     }
 
+    // Fetch hotel
     const hotel = await Hotel.findById(id);
     if (!hotel) {
       return res.status(404).json({ message: "Hotel not found" });
     }
 
-    hotel.approvalStatus.status = status;
+    // Update fields
+    hotel.approvalStatus.status    = status;
     hotel.approvalStatus.adminNotes = adminNotes || "";
     hotel.approvalStatus.reviewedAt = new Date();
     hotel.approvalStatus.reviewedBy = req.user.userId;
 
+    // Save
     await hotel.save();
 
+    // Send notification email
+    const ownerEmail = hotel.contact?.email;
+    if (ownerEmail) {
+      const subject = `Your hotel registration has been ${status}`;
+      const body = status === "approved"
+        ? `Congratulations! Your hotel "${hotel.name}" has been approved by our admin team.`
+        : `We’re sorry to inform you that your hotel "${hotel.name}" registration was rejected. Notes: ${hotel.approvalStatus.adminNotes}`;
+
+      sendEmail(ownerEmail, subject, body)
+        .then(() => console.log(`Status email sent to ${ownerEmail}`))
+        .catch((err) => console.error("Failed to send status email:", err));
+    }
+
+    // Respond
     res.json({
       message: `Hotel ${status} successfully`,
       hotel,
@@ -126,26 +144,19 @@ export const getApprovedHotels = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get details of a single approved hotel by ID
- * @route   GET /api/hotels/:id
- * @access  Public
- */
 export const getApprovedHotelById = async (req, res, next) => {
   try {
     const { id } = req.params;
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid hotel ID" });
     }
 
-    // Find hotel by ID only if approved
     const hotel = await Hotel.findOne({
       _id: id,
       "approvalStatus.status": "approved",
-    }).select(
-      "-approvalStatus.adminNotes -approvalStatus.reviewedBy -approvalStatus.reviewedAt -__v"
-    );
+    })
+      .select("-approvalStatus.adminNotes -approvalStatus.reviewedBy -approvalStatus.reviewedAt -__v")
+      .populate({ path: "reviews.user", select: "name" });  // << populate user.name
 
     if (!hotel) {
       return res
@@ -192,3 +203,21 @@ export const addReviewToHotel = async (req, res, next) => {
     next(err);
   }
 };
+
+// at the bottom of controllers/hotelController.js
+
+/**
+ * @desc    Get all hotels (admin only)
+ * @route   GET /api/hotels/all
+ * @access  Admin only
+ */
+export const getAllHotels = async (req, res, next) => {
+  try {
+    const hotels = await Hotel.find();      // no filter: returns everything
+    res.json(hotels);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
