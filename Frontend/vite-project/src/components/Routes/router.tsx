@@ -31,6 +31,7 @@ import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route co
 import HotelsPage from "../Hotels/HotelsPage.tsx";
 import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
 import HotelRegistrationForm from "../HotelDashboard/HotelRegistrationForm.tsx";
+import AdminHotelTab from "../Admin/AdminHotelTab.tsx";
 
 const router = () => {
   return (
@@ -262,6 +263,17 @@ const router = () => {
               <HotelRegistrationForm />
               <UpdatedFooter />
             </>
+          }
+        />
+        <Route
+          path="/admin/pending-hotels"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <AdminHotelTab />
+              <UpdatedFooter />
+            </ProtectedRoute>
           }
         />
       </Routes>

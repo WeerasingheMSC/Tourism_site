@@ -154,9 +154,11 @@ const HotelRegistrationForm: React.FC = () => {
   };
 
   return (
-    <div className="relative z-10 max-w-3xl mx-auto mt-19 px-6 py-8 backdrop-blur rounded-xl shadow-sm">
+    
+    <div className="min-h-screen relative z-10">
+      <div className=" relative z-10 max-w-3xl mx-auto mt-19 px-6 py-8 backdrop-blur rounded-xl shadow-sm">
       {/* Tab navigation */}
-      <div className="rounded-xl shadow-sm mb-8 ">
+      <div className="rounded-xl shadow-sm mb-8  mt-4">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -225,6 +227,7 @@ const HotelRegistrationForm: React.FC = () => {
       {/* Feedback */}
       {submitError && <p className="mt-4 text-red-600">{submitError}</p>}
       {submitSuccess && <p className="mt-4 text-green-600">{submitSuccess}</p>}
+    </div>
     </div>
   );
 };

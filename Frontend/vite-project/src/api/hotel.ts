@@ -130,3 +130,11 @@ export async function addReviewToHotel(
   return response.data;
 }
 
+
+// GET /api/hotels/all  → returns Hotel.find()
+export async function getAllHotels(): Promise<any[]> {
+  const response = await api.get<any[]>('/api/hotels/all');
+  return response.data;
+}
+
+
