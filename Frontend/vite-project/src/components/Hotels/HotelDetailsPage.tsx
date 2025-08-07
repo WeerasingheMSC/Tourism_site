@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import HotelMap from "../Map/location";
 import { getApprovedHotelById, addReviewToHotel } from "../../api/hotel";
+import { createBooking } from "../../api/hotelBooking";
+import { useNavigate } from "react-router-dom";
 
 interface FAQ {
   question: string;
@@ -70,7 +72,12 @@ interface HotelDetail {
   faqs: FAQ[];
 }
 
+
 const HotelDetailsPage = () => {
+  
+
+  
+
   const { id } = useParams<{ id: string }>();
   const [hotel, setHotel] = useState<HotelDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -84,6 +91,16 @@ const HotelDetailsPage = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [hoverRating, setHoverRating] = useState<number>(0);
+
+  // Booking modal state
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [bookingRoomType, setBookingRoomType] = useState<string>("");
+  const [bookingStartDate, setBookingStartDate] = useState<string>("");
+  const [bookingEndDate, setBookingEndDate] = useState<string>("");
+  const [bookingNumRooms, setBookingNumRooms] = useState<number>(1);
+  const [bookingContact, setBookingContact] = useState<string>("");
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [bookingLoading, setBookingLoading] = useState<boolean>(false);
 
   const toggleFAQ = (index: number) => {
     setExpandedFAQ(expandedFAQ === index ? null : index);
@@ -126,6 +143,47 @@ const HotelDetailsPage = () => {
     }
   };
 
+  const openBookingModal = (roomTypeName: string) => {
+    setBookingRoomType(roomTypeName);
+    setBookingStartDate("");
+    setBookingEndDate("");
+    setBookingNumRooms(1);
+    setBookingContact(hotel?.contact.phone || "");
+    setBookingError(null);
+    setShowModal(true);
+  };
+
+  const handleBookingSubmit = async () => {
+    if (!id) return;
+    if (
+      !bookingStartDate ||
+      !bookingEndDate ||
+      !bookingNumRooms ||
+      !bookingContact
+    ) {
+      setBookingError("All fields are required");
+      return;
+    }
+    setBookingLoading(true);
+    setBookingError(null);
+    try {
+      await createBooking({
+        hotelId: id,
+        roomType: bookingRoomType,
+        startDate: bookingStartDate,
+        endDate: bookingEndDate,
+        numRooms: bookingNumRooms,
+        contactNumber: bookingContact,
+      });
+      setShowModal(false);
+      // Optionally toast success
+    } catch (err: any) {
+      setBookingError(err.response?.data?.message || err.message);
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
   if (loading) return <div className="my-8 text-center">Loading hotel...</div>;
   if (error || !hotel)
     return <div className="my-8 text-center text-red-500">Error: {error}</div>;
@@ -154,7 +212,7 @@ const HotelDetailsPage = () => {
   const [lng, lat] = coords;
 
   return (
-    <div className="min-h-screen mt-20 z-10">
+    <div className="min-h-screen mt-18 z-10">
       <div className="border-b border-gray-500">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center text-sm text-gray-500">
@@ -581,13 +639,81 @@ const HotelDetailsPage = () => {
                     <Bed className="w-4 h-4" />
                     <span>Total Rooms: {rt.totalRooms || 0}</span>
                   </div>
-                  <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  <button
+                    onClick={() => openBookingModal(rt.name)}
+                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
                     Book Now
                   </button>
                 </div>
               ))}
             </div>
           </div>
+
+          {/* Booking Modal */}
+          {showModal && (
+            <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                >
+                  &times;
+                </button>
+                <h3 className="text-lg font-semibold mb-4">
+                  Book {bookingRoomType}
+                </h3>
+                {bookingError && (
+                  <p className="text-red-500 mb-2">{bookingError}</p>
+                )}
+                <label className="block mb-2">
+                  <span className="text-sm">Start Date</span>
+                  <input
+                    type="date"
+                    value={bookingStartDate}
+                    onChange={(e) => setBookingStartDate(e.target.value)}
+                    className="w-full border rounded p-2"
+                  />
+                </label>
+                <label className="block mb-2">
+                  <span className="text-sm">End Date</span>
+                  <input
+                    type="date"
+                    value={bookingEndDate}
+                    onChange={(e) => setBookingEndDate(e.target.value)}
+                    className="w-full border rounded p-2"
+                  />
+                </label>
+                <label className="block mb-2">
+                  <span className="text-sm">Number of Rooms</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={bookingNumRooms}
+                    onChange={(e) => setBookingNumRooms(Number(e.target.value))}
+                    className="w-full border rounded p-2"
+                  />
+                </label>
+                <label className="block mb-4">
+                  <span className="text-sm">Contact Number</span>
+                  <input
+                    type="tel"
+                    value={bookingContact}
+                    onChange={(e) => setBookingContact(e.target.value)}
+                    className="w-full border rounded p-2"
+                  />
+                </label>
+                <button
+                  onClick={handleBookingSubmit}
+                  disabled={bookingLoading}
+                  className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                >
+                  {bookingLoading ? "Booking..." : "Confirm Booking"}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Review submission form */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-2">Add Your Review</h3>

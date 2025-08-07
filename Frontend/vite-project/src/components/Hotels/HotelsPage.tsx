@@ -3,11 +3,7 @@ import HotelCard from './HotelCard';
 import { FilterSection, type Filters } from './FilterSection';
 import hotelBg from '../../assets/hotelbg.png';
 import beach2 from '../../assets/beach2.jpg';
-import beach3 from '../../assets/beach3.jpg';
-import beach4 from '../../assets/beach4.jpg';
-import beach5 from '../../assets/beach5.jpg';
-import sriLankaTourism from '../../assets/Sri-Lanka-tourism.jpg';
-import sriLankaTravelTips from '../../assets/Sri-Lanka-Travel-Tips-Things-to-Do-in-Sri-Lanka-12.jpeg';
+
 import { getApprovedHotels } from '../../api/hotel';
 
 interface HotelType {

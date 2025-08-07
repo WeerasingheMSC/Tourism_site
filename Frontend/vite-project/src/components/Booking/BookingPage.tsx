@@ -1,5 +1,6 @@
 import React from "react";
 import BookingTable from "../Booking/Booking";
+import HotelBookingTable from "./HotelBookingTable";
 
 const BookingPage: React.FC = () => {
   return (
@@ -65,8 +66,15 @@ const BookingPage: React.FC = () => {
           </button>
         </div>
         {/* Table */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Tuor Package</h2>
+        <p className="text-gray-500 mb-4">View all booking packages here</p>
         <div className="rounded-2xl border border-gray-300 overflow-hidden bg-white">
           <BookingTable />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Hotel Booking</h2>
+        <p className="text-gray-500 mb-4">View all hotel bookings here</p>
+        <div className="rounded-2xl border border-gray-300 overflow-hidden bg-white">
+          <HotelBookingTable />
         </div>
         {/* Pagination */}
         <div className="flex justify-center mt-6">

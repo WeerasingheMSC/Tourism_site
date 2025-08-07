@@ -26,12 +26,13 @@ import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx"
 import EditPackagesForm from "../Admin/EditPackages.tsx";
 import TravelBookingSite from "../LandingPage/LandingPage.tsx";
 import BookingPage from "../Booking/BookingPage.tsx";
-import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route component
+import ProtectedRoute from "../Routes/ProtectedRoute.tsx"; // Protected route component
 // Hotel components
 import HotelsPage from "../Hotels/HotelsPage.tsx";
 import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
 import HotelRegistrationForm from "../HotelDashboard/HotelRegistrationForm.tsx";
 import AdminHotelTab from "../Admin/AdminHotelTab.tsx";
+import OwnerHotelBookingsPage from "../HotelDashboard/Bookings.tsx"; // Owner hotel bookings page
 
 const router = () => {
   return (
@@ -101,7 +102,9 @@ const router = () => {
           path="/hotel-owner-dashboard"
           element={
             <>
+              <MainNav />
               <HotelOwner />
+              <UpdatedFooter />
             </>
           }
         />
@@ -176,7 +179,6 @@ const router = () => {
             </ProtectedRoute>
           }
         />
-        
         <Route
           path="/admin/editpackage"
           element={
@@ -191,7 +193,6 @@ const router = () => {
           path="/admin/dashboard"
           element={
             <ProtectedRoute>
-              
               <MainNav />
               <Decore />
               <AdminDashboardPage />
@@ -274,6 +275,17 @@ const router = () => {
               <AdminHotelTab />
               <UpdatedFooter />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/owner/hotels/:hotelId/bookings"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <OwnerHotelBookingsPage />
+              <UpdatedFooter />
+            </>
           }
         />
       </Routes>

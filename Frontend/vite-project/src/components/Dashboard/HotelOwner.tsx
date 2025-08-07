@@ -1,138 +1,162 @@
-// src/pages/HotelOwnerDashboard.tsx
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { getOwnerHotels } from "../../api/hotel";
+import HotelOwnerBookingTable from "../../components/HotelDashboard/HotelOwnerBookingTable";
 
-// 1) Import each section component
-import Overview from "../../components/HotelDashboard/Overview";
-import RegisterHotel from "../../components/HotelDashboard/RegisterHotel";
-import Bookings from "../../components/HotelDashboard/Bookings";
-import Profile from "../../components/HotelDashboard/Profile";
+const AdminDashboardPage: React.FC = () => {
+  // ─── owner’s hotels ──────────────────────────────────────
+  const [hotels, setHotels] = useState<any[]>([]);
+  const [loadingHotels, setLoadingHotels] = useState(true);
+  const [errorHotels, setErrorHotels] = useState<string | null>(null);
 
-type Section = "overview" | "registerHotel" | "bookings" | "profile";
-
-const HotelOwnerDashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const [section, setSection] = useState<Section>("overview");
-  const [userName, setUserName] = useState<string>(""); // store user name
-  const [userAvatar, setUserAvatar] = useState<string>(""); // store avatar URL if available
-
-  // 2) Dynamic user role check + extract name
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (!stored) {
-      navigate("/login");
-      return;
-    }
-    try {
-      const userObj = JSON.parse(stored) as {
-        id: string;
-        name: string;
-        email: string;
-        role: string;
-        avatarUrl?: string;
-      };
-      if (userObj.role !== "hotel-owner") {
-        navigate("/login");
-        return;
-      }
-      setUserName(userObj.name);
-      // If your user object has an avatarUrl field, use it; otherwise fallback to a placeholder
-      setUserAvatar(userObj.avatarUrl || "/placeholder-avatar.png");
-    } catch (e) {
-      console.error("Failed to parse stored user:", e);
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+    getOwnerHotels()
+      .then((data) => setHotels(data))
+      .catch((err) =>
+        setErrorHotels(err.response?.data?.message || err.message)
+      )
+      .finally(() => setLoadingHotels(false));
+  }, []);
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col">
-        {/* Profile at top */}
-        <div className="p-6 bg-gradient-to-br from-sky-100 to-blue-160 text-black flex flex-col items-center border-b-2 border-gray-200">
-          <img
-            src={userAvatar}
-            alt="Profile"
-            className="w-20 h-20 rounded-full border-2 border-blue-400 mb-4 object-cover"
-          />
-          <h2 className="text-xl font-semibold">{userName}</h2>
-          <button
-            onClick={handleLogout}
-            className="mt-3 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition duration-200 text-sm"
-          >
-            Logout
-          </button>
+    <div className=" min-h-screen flex flex-col relative z-10">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto w-full px-2 sm:px-6 lg:px-8 pt-24 pb-12 flex-1">
+        {/* Dashboard Title */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 mt-2">
+          Hotel Owner Dashboard
+        </h1>
+
+        {/* Dashboard Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+          <div className="bg-white/30 backdrop-blur border-2 border-blue-400 rounded-2xl p-6 flex flex-col items-center shadow-md ">
+            <span className="text-blue-500 font-semibold text-sm mb-2">
+              Active Reservation
+            </span>
+            <span className="text-3xl font-bold text-blue-500 mb-1">34</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">
+              Total Packages
+            </span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">10</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">
+              cancel reservation
+            </span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">6</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">
+              Plan proposals
+            </span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">12</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">
+              Revenue
+            </span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">13450</span>
+          </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="mt-8 flex-1">
-          <ul className="space-y-1">
-            <li>
-              <button
-                onClick={() => setSection("overview")}
-                className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
-                  section === "overview"
-                    ? "bg-sky-50 font-semibold"
-                    : "text-gray-700"
-                }`}
-              >
-                Dashboard Overview
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={()=>navigate("/hotel-register")}
-                className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
-                  section === "registerHotel"
-                    ? "bg-sky-50 font-semibold"
-                    : "text-gray-700"
-                }`}
-              >
-                Register New Hotel
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => setSection("bookings")}
-                className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
-                  section === "bookings"
-                    ? "bg-sky-50 font-semibold"
-                    : "text-gray-700"
-                }`}
-              >
-                View Bookings
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => setSection("profile")}
-                className={`w-full text-left px-6 py-3 hover:bg-sky-100 transition ${
-                  section === "profile"
-                    ? "bg-sky-50 font-semibold"
-                    : "text-gray-700"
-                }`}
-              >
-                Manage Profile
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </aside>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">My Hotels</h2>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        {section === "overview" && <Overview />}
-        {section === "registerHotel" && <RegisterHotel />}
-        {section === "bookings" && <Bookings />}
-        {section === "profile" && <Profile />}
+        {loadingHotels ? (
+          <div className="my-8 text-center">Loading your hotels…</div>
+        ) : errorHotels ? (
+          <div className="my-8 text-center text-red-500">
+            Error: {errorHotels}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-blue-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Hotel ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      City
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      State
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      View
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {hotels.map((hotel) => (
+                    <tr key={hotel._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm text-gray-900 break-all">
+                        {hotel._id}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {hotel.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {hotel.address?.city || "-"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {hotel.address?.state || "-"}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <span
+                          className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            hotel.approvalStatus.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : hotel.approvalStatus.status === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {hotel.approvalStatus.status.charAt(0).toUpperCase() +
+                            hotel.approvalStatus.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <a
+                          href={`/hotels`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          View
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        {/* ─── My Bookings Table ──────────────────────────────── */}
+        {hotels.map((hotel) => (
+          <div
+            className="mt-10 bg-white rounded-2xl shadow-sm "
+            key={hotel._id}
+          >
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              Bookings for {hotel.name}
+            </h2>
+            <HotelOwnerBookingTable hotelId={hotel._id} />
+          </div>
+        ))}
       </main>
     </div>
   );
 };
 
-export default HotelOwnerDashboard;
+export default AdminDashboardPage;
+
+{
+  /* ─── My Bookings For Each Hotel ──────────────────────── */
+}

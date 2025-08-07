@@ -137,4 +137,8 @@ export async function getAllHotels(): Promise<any[]> {
   return response.data;
 }
 
+export async function getOwnerHotels(): Promise<any[]> {
+  const response = await api.get<any[]>('/api/hotels/owner');
+  return response.data;
+}
 

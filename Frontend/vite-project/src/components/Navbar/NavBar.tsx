@@ -52,6 +52,17 @@ const NavBar = () => {
       ),
       key: "custom-package",
     },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/hotels")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Hotels
+        </span>
+      ),
+      key: "hotels",
+    },
   ];
 
   const languageMenu = {

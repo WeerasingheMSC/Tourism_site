@@ -14,13 +14,17 @@ import { useNavigate } from "react-router-dom";
 const AuthNavBar: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false); // mobile drawer state
   const navigate = useNavigate(); // for navigation
+  // get auth token from localStorage
+  const hotelId = localStorage.getItem("currentHotelId") || "";
+
 
   // --- Main menu links (same as in NavBar.tsx) ---
   const menuItems = [
+    
     {
       label: (
         <span
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/hotel-owner-dashboard")}
           className="cursor-pointer hover:text-orange-500"
         >
           Home
@@ -31,10 +35,10 @@ const AuthNavBar: React.FC = () => {
     {
       label: (
         <span
-          onClick={() => navigate("/packages")}
+          onClick={() => navigate("/hotel-register")}
           className="cursor-pointer hover:text-orange-500"
         >
-          Packages
+          Hotel Register
         </span>
       ),
       key: "packages",
@@ -42,24 +46,13 @@ const AuthNavBar: React.FC = () => {
     {
       label: (
         <span
-          onClick={() => navigate("/CustomPackageForm")}
+          onClick={() => navigate(`/owner/hotels/${hotelId}/bookings`)}
           className="cursor-pointer hover:text-orange-500"
         >
-          Customize Package
+          Bookings 
         </span>
       ),
       key: "custom-package",
-    },
-    {
-      label: (
-        <span
-          onClick={() => navigate("/hotels")}
-          className="cursor-pointer hover:text-orange-500"
-        >
-          Hotels
-        </span>
-      ),
-      key: "hotels",
     },
   ];
 
