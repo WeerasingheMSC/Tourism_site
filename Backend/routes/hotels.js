@@ -9,6 +9,7 @@ import {
   getApprovedHotelById,
   addReviewToHotel,
   getAllHotels,
+  getOwnerHotels
 } from "../controllers/hotelController.js";
 import auth from "../middleware/auth.js";
 import { authorizeRoles } from "../middleware/roles.js";
@@ -66,6 +67,13 @@ router.put(
     }
     approveRejectHotel(req, res, next);
   }
+);
+//  GET /api/hotels/owner  → hotel-owner only
+router.get(
+  "/owner",
+  auth,
+  authorizeRoles("hotel-owner"),
+  getOwnerHotels
 );
 
 // in your hotelRoutes.js

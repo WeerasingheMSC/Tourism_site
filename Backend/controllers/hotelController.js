@@ -220,4 +220,23 @@ export const getAllHotels = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Get all hotels owned by the current hotel-owner
+ * @route   GET /api/hotels/owner
+ * @access  Private (hotel-owner only)
+ */
+export const getOwnerHotels = async (req, res, next) => {
+  try {
+    const ownerId = req.user.userId;               // from auth middleware
+    if (!mongoose.Types.ObjectId.isValid(ownerId)) {
+      return res.status(400).json({ message: "Invalid owner ID" });
+    }
+
+    const hotels = await Hotel.find({ ownerId });
+    res.json(hotels);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
