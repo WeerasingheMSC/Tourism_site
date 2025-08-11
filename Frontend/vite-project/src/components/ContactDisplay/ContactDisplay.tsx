@@ -2,141 +2,41 @@ import React from 'react';
 import hotelIcon from '../../assets/icons/hotel icon.png';
 import vehicleIcon from '../../assets/icons/vehicle icon.png';
 
-interface ContactItem {
-  id: string;
-  name: string;
-  contactNumber: string;
-}
-
-interface ContactData {
+interface ContactDisplayProps {
   type: 'hotel' | 'vehicle';
-  id: string;
-  items: ContactItem[];
 }
 
-// Demo data
-const demoData: ContactData[] = [
-  {
-    type: 'hotel',
-    id: 'hotels-section',
-    items: [
-      { id: 'h1', name: 'Grand Hotel Colombo', contactNumber: '+94 11 234 5678' },
-      { id: 'h2', name: 'Ocean View Resort', contactNumber: '+94 11 345 6789' },
-      { id: 'h3', name: 'Mountain Peak Hotel', contactNumber: '+94 11 456 7890' },
-      { id: 'h4', name: 'City Center Inn', contactNumber: '+94 11 567 8901' },
-    ]
-  },
-  {
-    type: 'vehicle',
-    id: 'vehicles-section',
-    items: [
-      { id: 'v1', name: 'Sri Lanka Tours & Travels', contactNumber: '+94 77 123 4567' },
-      { id: 'v2', name: 'Island Express Rentals', contactNumber: '+94 77 234 5678' },
-      { id: 'v3', name: 'Paradise Car Hire', contactNumber: '+94 77 345 6789' },
-      { id: 'v4', name: 'Coastal Transport Services', contactNumber: '+94 77 456 7890' },
-    ]
-  }
-];
-
-const ContactDisplay: React.FC = () => {
-  const getIcon = (type: 'hotel' | 'vehicle') => {
-    return type === 'hotel' ? hotelIcon : vehicleIcon;
+const ContactDisplay: React.FC<ContactDisplayProps> = ({ type }) => {
+  const getIcon = (contactType: 'hotel' | 'vehicle') => {
+    return contactType === 'hotel' ? hotelIcon : vehicleIcon;
   };
 
-  const getTypeLabel = (type: 'hotel' | 'vehicle') => {
-    return type === 'hotel' ? 'Hotels' : 'Vehicles';
+  const getTypeLabel = (contactType: 'hotel' | 'vehicle') => {
+    return contactType === 'hotel' ? 'Hotel X' : 'Travel X';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-          Contact Information
-        </h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {demoData.map((section) => (
-            <div key={section.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-                <div className="flex items-center justify-center space-x-3">
-                  <img 
-                    src={getIcon(section.type)} 
-                    alt={`${section.type} icon`}
-                    className="w-8 h-8 object-contain"
-                  />
-                  <h2 className="text-2xl font-bold text-white">
-                    {getTypeLabel(section.type)}
-                  </h2>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <div className="space-y-4">
-                  {section.items.map((item) => (
-                    <div 
-                      key={item.id}
-                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                            {item.name}
-                          </h3>
-                          <p className="text-gray-600 text-sm">
-                            Contact: {item.contactNumber}
-                          </p>
-                        </div>
-                        
-                        <div className="flex space-x-2">
-                          <button 
-                            onClick={() => window.open(`tel:${item.contactNumber}`)}
-                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-1"
-                          >
-                            <span>📞</span>
-                            <span>Call</span>
-                          </button>
-                          
-                          <button 
-                            onClick={() => window.open(`https://wa.me/${item.contactNumber.replace(/\s+/g, '').replace('+', '')}`)}
-                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-1"
-                          >
-                            <span>💬</span>
-                            <span>WhatsApp</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Contact Message */}
-                <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-blue-100 rounded-full p-2">
-                      <img 
-                        src={getIcon(section.type)} 
-                        alt={`${section.type} icon`}
-                        className="w-6 h-6 object-contain"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-blue-800 mb-1">
-                        {section.type === 'hotel' ? 'Hotel X' : 'Vehicle X'}
-                      </h4>
-                      <p className="text-blue-700 text-sm">
-                        We will contact you soon
-                      </p>
-                      <p className="text-blue-600 text-xs mt-1">
-                        For further detail contact us via WhatsApp
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-200">
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">
+          <img 
+            src={getIcon(type)} 
+            alt={`${type} icon`}
+            className="w-10 h-10 object-contain"
+          />
+        </div>
+        <div>
+          <h4 className="text-xl font-semibold text-gray-900">{getTypeLabel(type)}</h4>
+          <p className="text-gray-600 text-sm">we will contact you soon</p>
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-2 text-sm">
+        <span className="text-gray-600">For further detail contact us via</span>
+        <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
+          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.097"/>
+          </svg>
         </div>
       </div>
     </div>
