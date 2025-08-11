@@ -29,6 +29,7 @@ import BookingPage from "../Booking/BookingPage.tsx";
 import HotelsPage from "../Hotels/HotelsPage.tsx";
 import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
 import HotelOwnerDetails from "../HotelDashboard/HotelOwnerDetails.tsx";
+import ContactPage from "../ContactPage/ContactPage.tsx";
 import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route component
 
 const router = () => {
@@ -247,6 +248,16 @@ const router = () => {
             <>
               <MainNav />
               <BookingPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <>
+              <MainNav />
+              <ContactPage />
               <UpdatedFooter />
             </>
           }
