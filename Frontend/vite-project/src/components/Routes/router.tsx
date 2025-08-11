@@ -28,8 +28,13 @@ import TravelBookingSite from "../LandingPage/LandingPage.tsx";
 import BookingPage from "../Booking/BookingPage.tsx";
 import HotelsPage from "../Hotels/HotelsPage.tsx";
 import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
+import VehiclesPage from "../Vehicles/VehiclesPage.tsx";
+import VehicleDetailsPage from "../Vehicles/VehicleDetailsPage.tsx";
 import HotelOwnerDetails from "../HotelDashboard/HotelOwnerDetails.tsx";
+import VehicleOwnerDetails from "../VehicleDashboard/VehicleOwnerDetails.tsx";
+import PartnerDashboard from "../VehicleDashboard/PartnerDashboard.tsx";
 import ContactPage from "../ContactPage/ContactPage.tsx";
+import ProfilePage from "../Profile/ProfilePage.tsx";
 import ProtectedRoute from '../Routes/ProtectedRoute.tsx'; // Protected route component
 
 const router = () => {
@@ -188,12 +193,67 @@ const router = () => {
           }
         />
         <Route
+          path="/vehicles"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <VehiclesPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/vehicles/:id"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <VehicleDetailsPage />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
           path="/hotel-owner-details"
           element={
             <ProtectedRoute>
               <MainNav />
               <Decore />
               <HotelOwnerDetails />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vehicle-owner-details"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <VehicleOwnerDetails />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vehicle-partner-dashboard"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <PartnerDashboard type="vehicle" />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hotel-partner-dashboard"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <PartnerDashboard type="hotel" />
               <UpdatedFooter />
             </ProtectedRoute>
           }
@@ -271,6 +331,17 @@ const router = () => {
               <AdminCustomizedPlanDetails />
               <UpdatedFooter />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/:id"
+          element={
+            <>
+              <MainNav />
+              <Decore />
+              <ProfilePage />
+              <UpdatedFooter />
+            </>
           }
         />
       </Routes>

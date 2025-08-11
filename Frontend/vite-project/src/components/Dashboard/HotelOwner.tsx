@@ -50,6 +50,10 @@ const HotelOwnerDashboard: React.FC = () => {
     navigate("/login");
   };
 
+  const handleDashboardNavigation = () => {
+    navigate("/hotel-partner-dashboard");
+  };
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
@@ -73,6 +77,14 @@ const HotelOwnerDashboard: React.FC = () => {
         {/* Navigation */}
         <nav className="mt-8 flex-1">
           <ul className="space-y-1">
+            <li>
+              <button
+                onClick={handleDashboardNavigation}
+                className="w-full text-left px-6 py-3 hover:bg-sky-100 transition text-gray-700"
+              >
+                Dashboard
+              </button>
+            </li>
             <li>
               <button
                 onClick={() => setSection("overview")}
