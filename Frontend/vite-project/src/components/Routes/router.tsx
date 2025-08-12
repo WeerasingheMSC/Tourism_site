@@ -238,7 +238,6 @@ const router = () => {
           element={
             <>
               <MainNav />
-              <Decore />
               <HotelsPage />
               <UpdatedFooter />
             </>
