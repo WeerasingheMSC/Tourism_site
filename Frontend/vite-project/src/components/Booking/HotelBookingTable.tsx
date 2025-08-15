@@ -14,6 +14,8 @@ interface HotelBooking {
   contactNumber: string;
   status: string;
   createdAt: string;
+  totalPrice: number;
+  currency: string;
 }
 // badge colors for statuses
 const getStatusColor = (status: string) => {
@@ -75,11 +77,9 @@ export default function HotelBookingTable(): JSX.Element {
                   Contact
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Status
+                  Price
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-700 rounded-tr-2xl">
-                  View
-                </th>
+                
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -112,34 +112,10 @@ export default function HotelBookingTable(): JSX.Element {
                         b.status
                       )}`}
                     >
-                      {b.status}
+                      {b.totalPrice}$
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() =>
-                        navigate(`/hotels/${b._id || ""}`)
-                      }
-                      className="text-blue-500 hover:text-blue-700 transition-colors p-1"
-                    >
-                      {/* simple external-link icon */}
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 
-                           0 002 2h10a2 2 0 002-2v-4M14 
-                           4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </button>
-                  </td>
+                  
                 </tr>
               ))}
             </tbody>

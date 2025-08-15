@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   Star,
@@ -72,12 +72,7 @@ interface HotelDetail {
   faqs: FAQ[];
 }
 
-
 const HotelDetailsPage = () => {
-  
-
-  
-
   const { id } = useParams<{ id: string }>();
   const [hotel, setHotel] = useState<HotelDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -101,6 +96,28 @@ const HotelDetailsPage = () => {
   const [bookingContact, setBookingContact] = useState<string>("");
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingLoading, setBookingLoading] = useState<boolean>(false);
+
+  const roomTypesRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToRoomTypes = () => {
+    const el = roomTypesRef.current;
+    if (!el) return;
+    // adjust for your fixed navbar height (~100px). tweak if needed.
+    const offset = 100;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
+
+  const navigate = useNavigate();
+  // auth guard: returns true if logged in, otherwise redirects to login
+  const ensureAuth = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      navigate("/login"); // change to your actual login route if different
+      return false;
+    }
+    return true;
+  };
 
   const toggleFAQ = (index: number) => {
     setExpandedFAQ(expandedFAQ === index ? null : index);
@@ -128,6 +145,7 @@ const HotelDetailsPage = () => {
 
   const handleReviewSubmit = async () => {
     if (!id) return;
+    if (!ensureAuth()) return; // ⬅️  NEW
     setSubmitting(true);
     setReviewError(null);
     try {
@@ -144,6 +162,7 @@ const HotelDetailsPage = () => {
   };
 
   const openBookingModal = (roomTypeName: string) => {
+    if (!ensureAuth()) return; // ⬅️  NEW
     setBookingRoomType(roomTypeName);
     setBookingStartDate("");
     setBookingEndDate("");
@@ -326,7 +345,10 @@ const HotelDetailsPage = () => {
                     ))}
                   </div>
                 </div>
-                <button className="w-full bg-blue-600/90 backdrop-blur-sm text-white py-3 rounded-lg hover:bg-blue-700/90 font-semibold transition-all shadow-lg">
+                <button
+                  onClick={scrollToRoomTypes}
+                  className="w-full bg-blue-600/90 backdrop-blur-sm text-white py-3 rounded-lg hover:bg-blue-700/90 font-semibold transition-all shadow-lg"
+                >
                   Reserve Now
                 </button>
               </div>
@@ -600,7 +622,7 @@ const HotelDetailsPage = () => {
             </div>
           </div>
           {/* Room Types Section */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div ref={roomTypesRef} className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <h2 className="text-xl font-semibold mb-6">Room Types</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {roomTypes.map((rt, idx) => (

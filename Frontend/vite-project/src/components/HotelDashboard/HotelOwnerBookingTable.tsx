@@ -11,6 +11,8 @@ interface HotelBooking {
   numRooms: number;
   contactNumber: string;
   createdAt: string;
+  totalPrice: number;
+  currency: string;
 }
 
 interface Props {
@@ -66,7 +68,7 @@ const HotelOwnerBookingTable: React.FC<Props> = ({ hotelId }) => {
                   Booked On
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700 rounded-tr-2xl">
-                  View
+                  Price
                 </th>
               </tr>
             </thead>
@@ -95,30 +97,7 @@ const HotelOwnerBookingTable: React.FC<Props> = ({ hotelId }) => {
                     {new Date(b.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
-                    <button
-                      onClick={() =>
-                        navigate(
-                          `/owner/hotels/${hotelId}/bookings/${b._id}`
-                        )
-                      }
-                      className="text-blue-500 hover:text-blue-700 transition-colors p-1"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 
-                             0 002 2h10a2 2 0 002-2v-4M14 
-                             4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </button>
+                    {b.totalPrice}$
                   </td>
                 </tr>
               ))}
