@@ -9,6 +9,7 @@ import userRoutes from "./routes/users.js";
 import errorHandler from "./middleware/errorHandler.js";
 import hotelRoutes from "./routes/hotels.js";
 import vehicleRoutes from "./routes/vehicles.js";
+import vehicleBookingRoutes from "./routes/vehicleBookings.js";
 import customTourRequestRoutes from "./routes/customTourRequests.js";
 import packageRoutes from "./routes/packageRoutes.js";
 import bookingRoutes from './routes/booking.js';
@@ -21,7 +22,7 @@ const app = express();
 
 app.use(express.json()); // parse JSON
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true
 })); // enable CORS for frontend
 app.use(morgan("dev")); // request logging
@@ -33,6 +34,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/hotels", hotelRoutes);
 //vehicle routs
 app.use("/api/vehicles", vehicleRoutes);
+// Vehicle booking routes
+app.use("/api/vehicle-bookings", vehicleBookingRoutes);
 // Register routes for custom tour requests
 app.use("/api/tours", customTourRequestRoutes);
 // Mount under /api/packages

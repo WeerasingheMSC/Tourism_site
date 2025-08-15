@@ -103,7 +103,7 @@ const AuthNavBar: React.FC = () => {
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-100 bg-white shadow-lg backgroun-transparent">
+    <nav className="p-3 fixed top-0 left-0 w-full z-100  bg-white shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo & title (clickable) */}
         <div

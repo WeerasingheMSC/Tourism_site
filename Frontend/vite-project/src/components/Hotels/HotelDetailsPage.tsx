@@ -16,7 +16,6 @@ import {
 import HotelMap from "../Map/location";
 import { getApprovedHotelById, addReviewToHotel } from "../../api/hotel";
 import { createBooking } from "../../api/hotelBooking";
-import { useNavigate } from "react-router-dom";
 
 interface FAQ {
   question: string;
@@ -197,7 +196,6 @@ const HotelDetailsPage = () => {
     address,
     contact,
     policies,
-    starRating,
     reviews,
     faqs,
     roomTypes,

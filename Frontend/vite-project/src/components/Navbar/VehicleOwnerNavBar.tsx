@@ -20,7 +20,7 @@ const AuthNavBar: React.FC = () => {
     {
       label: (
         <span
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/transport-owner-dashboard")}
           className="cursor-pointer hover:text-orange-500"
         >
           Home
@@ -31,24 +31,13 @@ const AuthNavBar: React.FC = () => {
     {
       label: (
         <span
-          onClick={() => navigate("/packages")}
+          onClick={() => navigate("/vehicle-register")}
           className="cursor-pointer hover:text-orange-500"
         >
-          Packages
+          Vehicle Register
         </span>
       ),
       key: "packages",
-    },
-    {
-      label: (
-        <span
-          onClick={() => navigate("/CustomPackageForm")}
-          className="cursor-pointer hover:text-orange-500"
-        >
-          Customize Package
-        </span>
-      ),
-      key: "custom-package",
     },
   ];
 
