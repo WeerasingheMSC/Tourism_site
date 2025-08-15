@@ -58,7 +58,7 @@ const HotelCard: React.FC<HotelCardProps> = ({
         
         {/* Rating */}
         <div className="flex items-center gap-2">
-          <span className="text-lg font-semibold text-gray-900">{rating}</span>
+          <span className="text-lg font-semibold text-gray-900">{rating.toFixed(2) }</span>
           <span className="text-gray-500 text-sm">({reviewCount})</span>
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (

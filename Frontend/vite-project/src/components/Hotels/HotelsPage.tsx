@@ -6,13 +6,14 @@ import beach2 from '../../assets/beach2.jpg';
 
 import { getApprovedHotels } from '../../api/hotel';
 
+interface Review { rating: number }
 interface HotelType {
   _id: string;
   name: string;
   address: { city?: string; state?: string; country?: string };
   contact?: { phone?: string; email?: string };
   starRating?: number;
-  reviews?: unknown[];
+  reviews?: Review[];
   amenities?: string[];
   images?: string[];
   roomTypes?: Array<{ pricePerNight?: number }>;
@@ -65,35 +66,47 @@ const HotelsPage: React.FC = () => {
   useEffect(() => {
     getApprovedHotels()
       .then((data: HotelType[]) => {
-        const mapped: CardData[] = data.map(h => ({
-          id: h._id,
-          image: h.images?.[0] || beach2,
-          name: h.name,
-          location: [h.address.city, h.address.state, h.address.country]
-            .filter(Boolean)
-            .join(', '),
-          price: h.roomTypes?.[0]?.pricePerNight
-            ? `$${h.roomTypes[0].pricePerNight.toFixed(2)}`
-            : 'N/A',
-          rating: h.starRating || 0,
-          reviewCount: h.reviews?.length || 0,
-          tags: h.amenities || [],
-          hotelType: h.hotelType || ''
-        }));
+        const mapped: CardData[] = data.map((h) => {
+          // average from reviews (if present)
+          const reviewCount = Array.isArray(h.reviews) ? h.reviews.length : 0;
+          const avgFromReviews =
+            reviewCount > 0
+              ? h.reviews!.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / reviewCount
+              : 0;
+
+          const rating = h.starRating != null ? h.starRating : avgFromReviews;
+
+          return {
+            id: h._id,
+            image: h.images?.[0] || beach2,
+            name: h.name,
+            location: [h.address.city, h.address.state, h.address.country]
+              .filter(Boolean)
+              .join(', '),
+            price:
+              h.roomTypes?.[0]?.pricePerNight != null
+                ? `$${h.roomTypes[0].pricePerNight!.toFixed(2)}`
+                : 'N/A',
+            rating: Math.max(0, Math.min(5, Number(rating) || 0)), // clamp 0–5 for the stars UI
+            reviewCount,
+            tags: h.amenities || [],
+            hotelType: h.hotelType || ''
+          };
+        });
         setHotelsData(mapped);
       })
-      .catch(err => setError(err.message || 'Failed to load hotels'))
+      .catch((err) => setError(err.message || 'Failed to load hotels'))
       .finally(() => setLoading(false));
   }, []);
 
-  // Filtered list
-  const filteredHotels = hotelsData.filter(hotel => {
+  // Filtered list (unchanged)
+  const filteredHotels = hotelsData.filter((hotel) => {
     let matches = true;
     if (searchQuery) {
-      matches = matches && (
-        hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      matches =
+        matches &&
+        (hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          hotel.location.toLowerCase().includes(searchQuery.toLowerCase()));
     }
     if (activeFilter) {
       matches = matches && hotel.hotelType === activeFilter;
@@ -105,11 +118,13 @@ const HotelsPage: React.FC = () => {
       matches = matches && hotel.location === filters.location;
     }
     if (filters.amenities.length > 0) {
-      matches = matches && filters.amenities.some(a => hotel.tags.includes(a));
+      matches = matches && filters.amenities.some((a) => hotel.tags.includes(a));
     }
     if (filters.priceRange) {
       const priceNum = parseFloat(hotel.price.replace('$', ''));
-      const [min, max] = filters.priceRange.split(' - ').map(p => parseFloat(p.replace('$','').replace('+','')));
+      const [min, max] = filters.priceRange
+        .split(' - ')
+        .map((p) => parseFloat(p.replace('$', '').replace('+', '')));
       matches = filters.priceRange.includes('+')
         ? matches && priceNum >= min
         : matches && priceNum >= min && priceNum <= max;
@@ -145,7 +160,7 @@ const HotelsPage: React.FC = () => {
                   type="text"
                   placeholder="What are you looking for ......."
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-6 py-4 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                 />
                 <button className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
@@ -156,7 +171,7 @@ const HotelsPage: React.FC = () => {
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
-              {filterButtons.map(filter => (
+              {filterButtons.map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(activeFilter === filter ? '' : filter)}
@@ -173,6 +188,7 @@ const HotelsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
       {/* Hotels Section - White Background */}
       <div className="bg-white py-8">
         <div className="container mx-auto px-4">
@@ -198,6 +214,7 @@ const HotelsPage: React.FC = () => {
               <div className="w-24" />
             </div>
           </div>
+
           <div className="flex gap-6">
             <FilterSection
               isOpen={isFilterOpen}
@@ -206,13 +223,23 @@ const HotelsPage: React.FC = () => {
               filterButtons={filterButtons}
               onApplyFilters={() => setIsFilterOpen(false)}
             />
-            <div className={`${isFilterOpen ? 'flex-1' : 'w-full'}`}>  
+            <div className={`${isFilterOpen ? 'flex-1' : 'w-full'}`}>
               {filteredHotels.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">No hotels found.</p>
                   <button
                     onClick={() => {
-                      setFilters({ hotelType: '', priceRange: '', location: '', amenities: [], rating: '', roomType: '', famousPlaces: [], offers: [], others: [] });
+                      setFilters({
+                        hotelType: '',
+                        priceRange: '',
+                        location: '',
+                        amenities: [],
+                        rating: '',
+                        roomType: '',
+                        famousPlaces: [],
+                        offers: [],
+                        others: []
+                      });
                       setActiveFilter('');
                       setSearchQuery('');
                     }}
@@ -223,7 +250,7 @@ const HotelsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredHotels.map(hotel => (
+                  {filteredHotels.map((hotel) => (
                     <HotelCard
                       key={hotel.id}
                       id={hotel.id}
@@ -231,7 +258,7 @@ const HotelsPage: React.FC = () => {
                       name={hotel.name}
                       location={hotel.location}
                       price={hotel.price}
-                      rating={hotel.rating}
+                      rating={hotel.rating}          
                       reviewCount={hotel.reviewCount}
                       tags={hotel.tags}
                     />
