@@ -4,6 +4,7 @@ import { Button, message, Popconfirm } from 'antd';
 import { vehicleService, vehicleBookingService } from '../../api/vehicleBookings';
 import type { Vehicle, VehicleBooking } from '../../api/vehicleBookings';
 import { getCurrentVehicleOwner, isAuthenticated } from '../../utils/authHelper';
+import { vehicleOwnerService } from '../../api/vehicleOwner';
 
 const VehicleOwner: React.FC = () => {
   const navigate = useNavigate();
@@ -37,9 +38,7 @@ const VehicleOwner: React.FC = () => {
     
     if (owner && (owner.userId || owner.id)) {
       setCurrentOwner(owner);
-      loadVehicles();
-      loadBookings();
-      loadStatistics();
+      checkOwnerProfile();
     } else {
       console.log('❌ VehicleOwner Debug - No valid owner ID found. Owner data:', owner);
       console.log('❌ VehicleOwner Debug - Available fields:', owner ? Object.keys(owner) : 'none');
@@ -47,14 +46,38 @@ const VehicleOwner: React.FC = () => {
       if (owner && owner.email) {
         console.log('✅ VehicleOwner Debug - User has valid token with email, proceeding...');
         setCurrentOwner(owner);
-        loadVehicles();
-        loadBookings();
-        loadStatistics();
+        checkOwnerProfile();
       } else {
         navigate('/login');
       }
     }
   }, [navigate]);
+
+  const checkOwnerProfile = async () => {
+    try {
+      const profileCheck = await vehicleOwnerService.checkProfileExists();
+      
+      if (!profileCheck.profileExists) {
+        // Profile doesn't exist, redirect to details form
+        console.log('🔍 VehicleOwner - No profile found, redirecting to details form');
+        message.info('Please complete your vehicle owner profile to access the dashboard.');
+        navigate('/vehicle-owner-details');
+        return;
+      }
+
+      // Profile exists, load dashboard data
+      loadVehicles();
+      loadBookings();
+      loadStatistics();
+    } catch (error: any) {
+      console.error('❌ Error checking owner profile:', error);
+      // If there's an error checking profile, still allow access but show message
+      message.warning('Unable to verify profile status. Please complete your profile if needed.');
+      loadVehicles();
+      loadBookings();
+      loadStatistics();
+    }
+  };
 
   const loadVehicles = async () => {
     try {
@@ -347,7 +370,8 @@ const VehicleOwner: React.FC = () => {
                             <Button 
                               danger 
                               size="small"
-                              className="text-red-600 border-red-600 hover:bg-red-50"
+                              style={{height: '32px'}}
+                              className="text-red-600 border-red-600 hover:bg-red-50 height-12"
                             >
                               Delete
                             </Button>

@@ -383,14 +383,37 @@ const VehicleDetailsPage = () => {
                 <div className="border-t pt-4">
                   <h4 className="text-sm font-semibold text-gray-900 mb-3">Contact Owner</h4>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Phone className="w-4 h-4" />
-                      <span>+94 77 123 4567</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Mail className="w-4 h-4" />
-                      <span>owner@example.com</span>
-                    </div>
+                    {vehicle.ownerDetails ? (
+                      <>
+                        <div className="text-sm font-medium text-gray-900 mb-2">
+                          {vehicle.ownerDetails.ownerName}
+                          {vehicle.ownerDetails.businessName && (
+                            <span className="text-gray-600 block text-xs">
+                              ({vehicle.ownerDetails.businessName})
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Phone className="w-4 h-4" />
+                          <span>{vehicle.ownerDetails.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Mail className="w-4 h-4" />
+                          <span>{vehicle.ownerDetails.email}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Phone className="w-4 h-4" />
+                          <span>Contact information not available</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Mail className="w-4 h-4" />
+                          <span>Please contact through the platform</span>
+                        </div>
+                      </>
+                    )}
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Clock className="w-4 h-4" />
                       <span>Available 24/7</span>

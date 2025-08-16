@@ -1,5 +1,6 @@
 import Vehicle from "../models/Vehicle.js";
 import VehicleBooking from '../models/VehicleBooking.js';
+import VehicleOwner from '../models/VehicleOwner.js';
 import mongoose from "mongoose";
 import { validationResult } from 'express-validator';
 
@@ -147,6 +148,13 @@ export const getVehicleById = async (req, res) => {
     .limit(5)
     .select('rating review customer.name updatedAt');
 
+    // Get owner details if ownerId exists
+    let ownerDetails = null;
+    if (vehicle.ownerId) {
+      ownerDetails = await VehicleOwner.findOne({ userId: vehicle.ownerId })
+        .select('ownerName businessName email phone');
+    }
+
     res.json({
       success: true,
       data: {
@@ -156,7 +164,8 @@ export const getVehicleById = async (req, res) => {
           startDate: booking.booking.startDate,
           endDate: booking.booking.endDate
         })),
-        recentReviews: recentBookings
+        recentReviews: recentBookings,
+        ownerDetails: ownerDetails
       }
     });
   } catch (error) {

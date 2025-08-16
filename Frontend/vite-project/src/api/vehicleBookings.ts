@@ -102,6 +102,13 @@ export interface Vehicle {
   description?: string;
   createdAt: Date;
   updatedAt: Date;
+  // Owner details
+  ownerDetails?: {
+    ownerName: string;
+    businessName?: string;
+    email: string;
+    phone: string;
+  };
 }
 
 export interface BookingFilters {
