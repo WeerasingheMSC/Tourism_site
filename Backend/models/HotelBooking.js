@@ -53,6 +53,12 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: 'USD', // change to 'LKR' if you prefer
     },
+    // NEW: booking status
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "cancelled", "rejected", "completed"],
+      default: "pending",
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

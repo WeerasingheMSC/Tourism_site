@@ -85,6 +85,8 @@ export const createBooking = async (req, res, next) => {
       numRooms,
       contactNumber,
       user: req.user.userId,
+      //Status will default to "pending" from schema
+      status: "pending",
 
       // new price fields
       unitPrice,
@@ -106,6 +108,11 @@ try {
     const text =
       `Hi ${dbUser?.name || 'there'},\n\n` +
       `Thanks for your booking at ${hotel.name}.\n\n` +
+      `Here are your booking details:\n` +
+      `• Hotel: ${hotel.name}\n` +
+      `• Booking ID: ${booking._id}\n` +
+      `• Contact: ${contactNumber}\n` +
+      `• Status: ${booking.status}\n\n` +
       `• Room type: ${roomType}\n` +
       `• Dates: ${fmt(startDate)} – ${fmt(endDate)}\n` +
       `• Rooms: ${numRooms}\n` +
@@ -165,6 +172,72 @@ export const getHotelBookings = async (req, res, next) => {
     const bookings = await Booking.find({ hotelId })
       .populate("user", "name email")
       .sort("-createdAt");
+    res.json(bookings);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// createBooking will automatically set status = 'pending' from schema default
+
+/**
+ * @desc    Admin updates booking status
+ * @route   PUT /api/hotel-bookings/:id/status
+ * @access  Admin only
+ * @body    { status: "pending"|"confirmed"|"cancelled"|"rejected"|"completed" }
+ */
+export const updateBookingStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid booking ID" });
+    }
+
+    const allowed = ["pending", "confirmed", "cancelled", "rejected", "completed"];
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const booking = await Booking.findById(id);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    booking.status = status;
+    await booking.save();
+
+    // Optional: notify customer via email
+    try {
+      const user = await User.findById(booking.user).select("email name");
+      if (user?.email) {
+        await sendEmail(
+          user.email,
+          `Your booking is ${status}`,
+          `Hi ${user.name || "there"},\n\nYour booking for ${booking.hotelName} (${booking.roomType}) is now ${status}.\n\nDates: ${booking.startDate.toDateString()} → ${booking.endDate.toDateString()}\nTotal: ${booking.currency} ${booking.totalPrice.toFixed(2)}\n\nThank you!`
+        );
+      }
+    } catch (e) {
+      console.error("Failed to send booking status email:", e);
+    }
+
+    res.json({ message: "Status updated", booking });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @desc    Get all hotel bookings (admin only)
+ * @route   GET /api/hotel-bookings
+ * @access  Admin
+ */
+export const getAllHotelBookings = async (req, res, next) => {
+  try {
+    const bookings = await Booking
+      .find({})
+      .sort({ createdAt: -1 });
+
+    // return as-is (your frontend expects hotelName, roomType, dates, status, totals, etc.)
     res.json(bookings);
   } catch (err) {
     next(err);

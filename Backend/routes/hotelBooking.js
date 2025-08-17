@@ -2,7 +2,9 @@ import express from 'express';
 import {
   createBooking,
   getMyBookings,
-  getHotelBookings
+  getHotelBookings,
+  updateBookingStatus,
+  getAllHotelBookings
 } from '../controllers/hotelBookingController.js';
 import auth from '../middleware/auth.js';
 import { authorizeRoles } from "../middleware/roles.js";
@@ -22,5 +24,11 @@ router.get(
   authorizeRoles('hotel-owner'),
   getHotelBookings
 );
+
+// NEW: update status (admin)
+router.put('/:id/status', auth, authorizeRoles('admin'), updateBookingStatus);
+
+// ADMIN: list all hotel bookings
+router.get('/', auth, authorizeRoles('admin'), getAllHotelBookings);
 
 export default router;
