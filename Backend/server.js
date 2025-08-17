@@ -40,6 +40,16 @@ app.use('/api/hotel-bookings',hotelbookingRoutes);
 
 // global error handler (after routes)
 app.use(errorHandler);
+app.set('etag', false); // Disable ETag generation
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    // Force revalidation and no stored copies
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+  next();
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
