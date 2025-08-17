@@ -1,5 +1,5 @@
 // src/components/Admin/AllHotelsTable.tsx
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useMemo, useState, type JSX } from "react";
 import { ExternalLink } from "lucide-react";
 import { getAllHotels } from "../../api/hotel";
 
@@ -16,6 +16,9 @@ export default function AllHotelsTable(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // NEW: search state
+  const [search, setSearch] = useState("");
+
   useEffect(() => {
     getAllHotels()
       .then((data) => setHotels(data))
@@ -28,12 +31,48 @@ export default function AllHotelsTable(): JSX.Element {
       .finally(() => setLoading(false));
   }, []);
 
+  // NEW: derived filtered list
+  const filteredHotels = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return hotels;
+    return hotels.filter((h) =>
+      (h._id?.toLowerCase() || "").includes(q) ||
+      (h.name?.toLowerCase() || "").includes(q)
+    );
+  }, [hotels, search]);
+
   if (loading) return <div className="my-8 text-center">Loading hotels…</div>;
   if (error)
     return <div className="my-8 text-center text-red-500">Error: {error}</div>;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div>
+      {/* NEW: search bar header (keeps your look & spacing) */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 ">
+        <div className="text-sm text-gray-600 ">
+          Showing {filteredHotels.length} of {hotels.length}
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by ID or name…"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      
+
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead>
@@ -65,7 +104,7 @@ export default function AllHotelsTable(): JSX.Element {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {hotels.map((hotel) => (
+            {filteredHotels.map((hotel) => (
               <tr
                 key={hotel._id}
                 className="hover:bg-gray-50 transition-colors"
@@ -104,7 +143,7 @@ export default function AllHotelsTable(): JSX.Element {
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <a
-                    href={`/admin/hotels/${hotel._id}`}
+                    href={`/hotels/${hotel._id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-blue-500 hover:text-blue-700 p-1"
@@ -114,9 +153,21 @@ export default function AllHotelsTable(): JSX.Element {
                 </td>
               </tr>
             ))}
+            {filteredHotels.length === 0 && (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                  No hotels match your search.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
     </div>
+    </div>
+    
   );
 }

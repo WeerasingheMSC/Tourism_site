@@ -31,13 +31,13 @@ const AuthNavBar: React.FC = () => {
     {
       label: (
         <span
-          onClick={() => navigate("/packages")}
+          onClick={() => navigate("/admin/pending-hotels")}
           className="cursor-pointer hover:text-orange-500"
         >
-          Packages
+          Hotel
         </span>
       ),
-      key: "packages",
+      key: "hotels",
     },
     {
       label: (
@@ -66,16 +66,20 @@ const AuthNavBar: React.FC = () => {
   // --- Profile dropdown menu: My Bookings & Logout ---
   const profileMenu = {
     items: [
-      {
-        key: "my-bookings",
-        icon: <BookOutlined />,
-        label: <span onClick={() => navigate("/booking")}>My Bookings</span>,
-      },
+      
       {
         key: "logout",
-        icon: <LogoutOutlined />,
+        icon: <LogoutOutlined onClick={() => {
+              // TODO: your real logout logic here (e.g., clear tokens)
+              localStorage.removeItem("authToken");
+              localStorage.removeItem("user");
+              navigate("/");
+              window.location.reload();
+            }}
+        />,
         label: (
           <span
+            className="cursor-pointer hover:text-red-100  bg-red-600 text-white px-2 py-1 rounded"
             onClick={() => {
               // TODO: your real logout logic here (e.g., clear tokens)
               localStorage.removeItem("authToken");

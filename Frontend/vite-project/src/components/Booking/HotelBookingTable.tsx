@@ -26,6 +26,8 @@ const getStatusColor = (status: string) => {
       return "bg-green-100 text-green-700 border-green-200";
     case "cancelled":
       return "bg-red-100 text-red-700 border-red-200";
+    case "completed":
+      return "bg-blue-100 text-blue-700 border-blue-200";
     default:
       return "bg-gray-100 text-gray-700 border-gray-200";
   }
@@ -74,10 +76,10 @@ export default function HotelBookingTable(): JSX.Element {
                   Rooms
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Contact
+                  Price
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Price
+                  Status
                 </th>
                 
               </tr>
@@ -104,7 +106,7 @@ export default function HotelBookingTable(): JSX.Element {
                     {b.numRooms}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.contactNumber}
+                    {b.currency} {b.totalPrice?.toFixed(2) || "0.00"}
                   </td>
                   <td className="px-6 py-4">
                     <span
@@ -112,7 +114,7 @@ export default function HotelBookingTable(): JSX.Element {
                         b.status
                       )}`}
                     >
-                      {b.totalPrice}$
+                      {b.status}
                     </span>
                   </td>
                   
@@ -123,7 +125,7 @@ export default function HotelBookingTable(): JSX.Element {
         </div>
         <div className="px-6 py-4 border-t border-gray-100 text-center">
           <button
-            onClick={() => navigate("/my-bookings")}
+            onClick={() => navigate("")}
             className="text-blue-500 hover:text-blue-700 text-sm font-medium transition-colors"
           >
             View all bookings

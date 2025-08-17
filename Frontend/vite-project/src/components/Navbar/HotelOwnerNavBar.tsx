@@ -70,11 +70,7 @@ const AuthNavBar: React.FC = () => {
   // --- Profile dropdown menu: My Bookings & Logout ---
   const profileMenu = {
     items: [
-      {
-        key: "my-bookings",
-        icon: <BookOutlined />,
-        label: <span onClick={() => navigate("/booking")}>My Bookings</span>,
-      },
+    
       {
         key: "logout",
         icon: <LogoutOutlined />,

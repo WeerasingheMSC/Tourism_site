@@ -1,6 +1,9 @@
 import React from "react";
 import PendingHotelsTable from "../Admin/PendingHotelsTable";
 import AllHotelsTable from "../Admin/AllHotelsTable";
+// src/components/AdminDashboardPage.tsx
+import AdminHotelBookingsTable from "../Admin/AdminHotelBookingsTable";
+
 
 const AdminHotelTab: React.FC = () => {
   return (
@@ -58,6 +61,11 @@ const AdminHotelTab: React.FC = () => {
         <h2 className="text-2xl font-bold mt-8">All Hotels</h2>
         <div className="mt-4 mb-12">
           <AllHotelsTable />
+        </div>
+        {/* Hotel Bookings Section */}
+        <h2 className="text-2xl font-bold mt-8">Hotel Bookings</h2>
+        <div className="mt-4 mb-12">
+          <AdminHotelBookingsTable />
         </div>
       </main>
     </div>

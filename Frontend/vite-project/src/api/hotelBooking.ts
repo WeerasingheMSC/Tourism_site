@@ -68,3 +68,40 @@ export async function getHotelBookings(
   );
   return data;
 }
+
+// ---------- Types ----------
+export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'rejected' | 'completed';
+
+export interface HotelBookingRow {
+  _id: string;
+  hotelId: string;
+  hotelName: string;
+  roomType: string;
+  startDate: string;           // ISO
+  endDate: string;             // ISO
+  numRooms: number;
+  contactNumber: string;
+  unitPrice: number;
+  nights: number;
+  totalPrice: number;
+  currency: string;
+  status: BookingStatus;
+  user: string | { _id: string; name?: string; email?: string };
+  createdAt: string;
+}
+
+// ---------- Admin-only ----------
+/** GET /api/hotel-bookings  (admin) */
+export async function getAllHotelBookings(): Promise<HotelBookingRow[]> {
+  const { data } = await api.get<HotelBookingRow[]>('/api/hotel-bookings');
+  return data;
+}
+
+/** PUT /api/hotel-bookings/:id/status  (admin) */
+export async function updateHotelBookingStatus(
+  id: string,
+  status: BookingStatus
+) {
+  const { data } = await api.put(`/api/hotel-bookings/${id}/status`, { status });
+  return data; // { message, booking }
+}

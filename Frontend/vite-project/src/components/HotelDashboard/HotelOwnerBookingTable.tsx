@@ -13,21 +13,43 @@ interface HotelBooking {
   createdAt: string;
   totalPrice: number;
   currency: string;
+  status: string;
 }
 
 interface Props {
   hotelId: string;
 }
+// map any approval status to your existing badge colors
+const getApprovalBadgeColor = (status: string) => {
+  switch ((status || "").toLowerCase()) {
+    case "confirmed":
+      return "bg-green-100 text-green-800";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
+    case "rejected":
+    case "cancelled":
+      return "bg-red-100 text-red-800";
+    case "completed":
+      return "bg-blue-200 text-gray-700";
+    case "draft":
+      return "bg-gray-100 text-gray-700";
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+};
+
+// turn "under_review" / "in-review" into "Under Review"
+const formatStatusLabel = (status: string) =>
+  (status || "").replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 const HotelOwnerBookingTable: React.FC<Props> = ({ hotelId }) => {
-  
   const [bookings, setBookings] = useState<HotelBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('fetching bookings for', hotelId)
+    console.log("fetching bookings for", hotelId);
     if (!hotelId) return;
     getHotelBookings(hotelId)
       .then((data) => setBookings(data))
@@ -62,7 +84,7 @@ const HotelOwnerBookingTable: React.FC<Props> = ({ hotelId }) => {
                   # Rooms
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Contact
+                  Status
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Booked On
@@ -91,14 +113,18 @@ const HotelOwnerBookingTable: React.FC<Props> = ({ hotelId }) => {
                     {b.numRooms}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.contactNumber}
+                    <span
+                      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${getApprovalBadgeColor(
+                        b.status
+                      )}`}
+                    >
+                      {formatStatusLabel(b.status)}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {new Date(b.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4">
-                    {b.totalPrice}$
-                  </td>
+                  <td className="px-6 py-4">{b.totalPrice}$</td>
                 </tr>
               ))}
             </tbody>
@@ -115,5 +141,5 @@ const HotelOwnerBookingTable: React.FC<Props> = ({ hotelId }) => {
       </div>
     </div>
   );
-}
+};
 export default HotelOwnerBookingTable;
