@@ -23,7 +23,6 @@ import AdminDashboardPage from "../Admin/AdminDashboardPage.tsx";
 import Decore from "../Packages/Decore.tsx";
 import AdminCustomizedPlansAllPage from "../Admin/AdminCustomizedPlansAllPage.tsx";
 import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx";
-import EditPackagesForm from "../Admin/EditPackages.tsx";
 import TravelBookingSite from "../LandingPage/LandingPage.tsx";
 import BookingPage from "../Booking/BookingPage.tsx";
 import ProtectedRoute from "../Routes/ProtectedRoute.tsx"; // Protected route component
@@ -33,6 +32,7 @@ import HotelDetailsPage from "../Hotels/HotelDetailsPage.tsx";
 import HotelRegistrationForm from "../HotelDashboard/HotelRegistrationForm.tsx";
 import AdminHotelTab from "../Admin/AdminHotelTab.tsx";
 import OwnerHotelBookingsPage from "../HotelDashboard/Bookings.tsx"; // Owner hotel bookings page
+import EditPackagePage from "../EditPackage/EditPackagePage.tsx"; // New import for edit package page
 
 const router = () => {
   return (
@@ -180,11 +180,11 @@ const router = () => {
           }
         />
         <Route
-          path="/admin/editpackage"
+          path="/admin/packages/:id/edit"
           element={
             <ProtectedRoute>
               <MainNav />
-              <EditPackagesForm />
+              <EditPackagePage />
               <UpdatedFooter />
             </ProtectedRoute>
           }

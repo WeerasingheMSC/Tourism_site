@@ -145,7 +145,9 @@ const AddedTable: React.FC = () => {
                 </td>
                 {/* Edit button (unchanged) */}
                 <td className="px-6 py-4">
-                  <button className="text-blue-500 hover:text-blue-700 transition-colors p-1">
+                  <button 
+                  onClick={() => navigate(`/admin/packages/${pkg._id}/edit`)}
+                  className="text-blue-500 hover:text-blue-700 transition-colors p-1">
                     {/* icon SVG */}
                     <svg
                       className="w-5 h-5"

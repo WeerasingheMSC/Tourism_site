@@ -62,3 +62,16 @@ export function deletePackage(id: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
 }
+/**
+ * Update (admin)
+ * Uses PUT /api/packages/:id as per your controller.
+ */
+export function updatePackage(id: string, payload: any) {
+  const token = localStorage.getItem("authToken");
+  return api.put(`/api/packages/${id}`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+}
