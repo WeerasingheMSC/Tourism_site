@@ -109,6 +109,13 @@ export interface Vehicle {
     email: string;
     phone: string;
   };
+  // Approval status
+  approvalStatus?: {
+    status: "pending" | "approved" | "rejected";
+    adminNotes?: string;
+    reviewedAt?: Date;
+    reviewedBy?: string;
+  };
 }
 
 export interface BookingFilters {

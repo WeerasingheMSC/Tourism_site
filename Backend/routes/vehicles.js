@@ -12,6 +12,7 @@ import {
   getAvailableVehicles,
   registerVehicle,
   getPendingVehicles,
+  getAllVehiclesForAdmin,
   approveRejectVehicle,
   getApprovedVehicles,
   getApprovedVehicleById,
@@ -66,6 +67,9 @@ router.get("/approved", getApprovedVehicles);
 // GET /api/vehicles/pending - Get pending vehicles (admin only)
 router.get("/pending", auth, authorizeRoles("admin"), getPendingVehicles);
 
+// GET /api/vehicles/admin/all - Get all vehicles for admin management (admin only)
+router.get("/admin/all", auth, authorizeRoles("admin"), getAllVehiclesForAdmin);
+
 // GET /api/vehicles/:id - Get single vehicle (public access for viewing)
 router.get("/:id", getVehicleById);
 
@@ -104,8 +108,8 @@ router.put(
   auth,
   authorizeRoles("admin"),
   body("status")
-    .isIn(["approved", "rejected"])
-    .withMessage("Status must be approved or rejected"),
+    .isIn(["pending", "approved", "rejected"])
+    .withMessage("Status must be pending, approved or rejected"),
   body("adminNotes").optional().isString(),
   (req, res, next) => {
     const errors = validationResult(req);

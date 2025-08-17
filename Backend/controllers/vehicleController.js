@@ -63,6 +63,7 @@ export const getAllVehicles = async (req, res) => {
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     const vehicles = await Vehicle.find(filter)
+      .populate('ownerId', 'name email phone businessName personalInfo contactInfo')
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit));
@@ -393,7 +394,27 @@ export const registerVehicle = async (req, res, next) => {
  */
 export const getPendingVehicles = async (req, res, next) => {
   try {
-    const vehicles = await Vehicle.find({ "approvalStatus.status": "pending" });
+    const vehicles = await Vehicle.find({ "approvalStatus.status": "pending" })
+      .populate('ownerId', 'name email phone businessName personalInfo contactInfo')
+      .sort({ createdAt: -1 }); // Latest first
+    res.json(vehicles);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @desc    Get all vehicles for admin management
+ * @route   GET /api/vehicles/admin/all
+ * @access  Admin only
+ */
+export const getAllVehiclesForAdmin = async (req, res, next) => {
+  try {
+    // Get all vehicles with owner details populated
+    const vehicles = await Vehicle.find({})
+      .populate('ownerId', 'name email phone businessName personalInfo contactInfo')
+      .sort({ createdAt: -1 }); // Latest first
+    
     res.json(vehicles);
   } catch (err) {
     next(err);
@@ -404,7 +425,7 @@ export const getPendingVehicles = async (req, res, next) => {
  * @desc    Admin approves or rejects a vehicle
  * @route   PUT /api/transports/:id/approve
  * @access  Admin only
- * @body    { status: "approved" | "rejected", adminNotes?: String }
+ * @body    { status: "pending" | "approved" | "rejected", adminNotes?: String }
  */
 export const approveRejectVehicle = async (req, res, next) => {
   try {
@@ -416,10 +437,10 @@ export const approveRejectVehicle = async (req, res, next) => {
 
     const { status, adminNotes } = req.body;
 
-    if (!["approved", "rejected"].includes(status)) {
+    if (!["pending", "approved", "rejected"].includes(status)) {
       return res
         .status(400)
-        .json({ message: 'Status must be "approved" or "rejected"' });
+        .json({ message: 'Status must be "pending", "approved" or "rejected"' });
     }
 
     const vehicle = await Vehicle.findById(id);

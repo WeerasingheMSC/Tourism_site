@@ -25,6 +25,7 @@ import UpdatedFooter from "../Packages/updatedFooter.tsx";
 import IndividualPackage from "../IndividualPackage/[id]/IndividualPackage.tsx";
 import AddPackagesForm from "../AddPackage/PackageDetailsForm.tsx";
 import AdminDashboardPage from "../Admin/AdminDashboardPage.tsx";
+import AdminVehiclesPage from "../Admin/AdminVehiclesPage.tsx";
 import Decore from "../Packages/Decore.tsx";
 import AdminCustomizedPlansAllPage from "../Admin/AdminCustomizedPlansAllPage.tsx";
 import AdminCustomizedPlanDetails from "../Admin/AdminCustomizedPlanDetails.tsx";
@@ -320,6 +321,17 @@ const router = () => {
               <MainNav />
               <Decore />
               <AdminDashboardPage />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/vehicles"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <AdminVehiclesPage />
               <UpdatedFooter />
             </ProtectedRoute>
           }

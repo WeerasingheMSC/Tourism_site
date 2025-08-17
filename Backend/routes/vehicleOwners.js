@@ -5,6 +5,7 @@ import {
   createOrUpdateVehicleOwnerProfile,
   checkVehicleOwnerProfileExists,
   updateProfileStep,
+  getVehicleOwnerByUserId,
 } from "../controllers/vehicleOwnerController.js";
 import auth from "../middleware/auth.js";
 
@@ -43,5 +44,8 @@ router.put("/profile/step", auth,
   ],
   updateProfileStep
 );
+
+// GET /api/vehicle-owners/user/:userId - Get vehicle owner details by user ID (public endpoint)
+router.get("/user/:userId", getVehicleOwnerByUserId);
 
 export default router;

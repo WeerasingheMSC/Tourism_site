@@ -289,27 +289,30 @@ const VehicleOwner: React.FC = () => {
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">My Vehicles</h3>
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-blue-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Vehicle ID
+                      Vehicle Name
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Name
+                      Registration
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      License Plate
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Category
+                      Type
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                       Price/Day
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Status
+                      Approval Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Availability
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                       Actions
@@ -319,20 +322,32 @@ const VehicleOwner: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {vehicles.map((vehicle) => (
                     <tr key={vehicle._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-900 break-all">
-                        {vehicle._id}
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {vehicle.title || vehicle.name || `${vehicle.make || vehicle.brand || ''} ${vehicle.model}`.trim()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                        {vehicle.registrationNumber || vehicle.licensePlate || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {vehicle.title || vehicle.name || `${vehicle.make || vehicle.brand} ${vehicle.model}`}
+                        <span className="capitalize">{(vehicle.vehicleType || vehicle.category) || 'Vehicle'}</span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {vehicle.registrationNumber || vehicle.licensePlate}
+                        ${vehicle.price?.perDay || vehicle.pricing?.pricePerDay || 0}/day
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {(vehicle.vehicleType || vehicle.category)?.toUpperCase() || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        Dollar {vehicle.price?.perDay || vehicle.pricing?.pricePerDay || 0}
+                      <td className="px-6 py-4 text-sm">
+                        <span
+                          className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            vehicle.approvalStatus?.status === 'approved'
+                              ? "bg-green-100 text-green-800"
+                              : vehicle.approvalStatus?.status === 'rejected'
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {vehicle.approvalStatus?.status === 'approved' ? 'Approved' :
+                           vehicle.approvalStatus?.status === 'rejected' ? 'Rejected' :
+                           'Pending'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span
@@ -361,8 +376,8 @@ const VehicleOwner: React.FC = () => {
                           </button>
                           <Popconfirm
                             title="Delete the vehicle"
-                            description={`Are you sure you want to delete "${vehicle.vehicleType || 'this vehicle'}"? This action cannot be undone.`}
-                            onConfirm={() => deleteVehicle(vehicle._id, vehicle.vehicleType || 'vehicle')}
+                            description={`Are you sure you want to delete "${vehicle.title || vehicle.vehicleType || 'this vehicle'}"? This action cannot be undone.`}
+                            onConfirm={() => deleteVehicle(vehicle._id, vehicle.title || vehicle.vehicleType || 'vehicle')}
                             onCancel={() => message.info('Delete cancelled')}
                             okText="Yes"
                             cancelText="No"
@@ -371,7 +386,7 @@ const VehicleOwner: React.FC = () => {
                               danger 
                               size="small"
                               style={{height: '32px'}}
-                              className="text-red-600 border-red-600 hover:bg-red-50 height-12"
+                              className="text-red-600 border-red-600 hover:bg-red-50"
                             >
                               Delete
                             </Button>

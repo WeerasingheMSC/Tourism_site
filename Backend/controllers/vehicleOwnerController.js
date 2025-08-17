@@ -217,3 +217,46 @@ export const updateProfileStep = async (req, res) => {
     });
   }
 };
+
+// Get vehicle owner details by user ID (for admin/public use)
+export const getVehicleOwnerByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const ownerProfile = await VehicleOwner.findOne({ userId });
+
+    if (!ownerProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Vehicle owner profile not found",
+      });
+    }
+
+    // Return only essential public information
+    const publicOwnerData = {
+      ownerName: ownerProfile.ownerName,
+      businessName: ownerProfile.businessName,
+      phone: ownerProfile.phone,
+      email: ownerProfile.email,
+    };
+
+    res.json({
+      success: true,
+      data: publicOwnerData,
+    });
+  } catch (error) {
+    console.error("Get vehicle owner by user ID error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch vehicle owner details",
+      error: error.message,
+    });
+  }
+};
