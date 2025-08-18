@@ -3,6 +3,7 @@ import AddedTable from './AddedTable';
 import CustomizeTable from '../Admin/CustomizeTable';
 import AdminBookingTable from '../Admin/AdminBookingTable';
 import AdminVehicleTable from '../Admin/AdminVehicleTable';
+import AdminVehicleBookingTable from '../Admin/AdminVehicleBookingTable';
 
 const AdminDashboardPage: React.FC = () => {
   return (
@@ -57,6 +58,13 @@ const AdminDashboardPage: React.FC = () => {
         <p className="text-gray-500 mb-4">Review and approve vehicle owner registrations</p>
         <div className="rounded-2xl border border-gray-300 overflow-hidden mb-12 bg-white">
           <AdminVehicleTable />
+        </div>
+
+        {/* Vehicle Bookings Section */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Vehicle Bookings</h2>
+        <p className="text-gray-500 mb-4">Manage customer vehicle booking requests and approvals</p>
+        <div className="rounded-2xl border border-gray-300 overflow-hidden mb-12 bg-white">
+          <AdminVehicleBookingTable onCountsChange={(counts) => console.log('Vehicle booking counts:', counts)} />
         </div>
 
         {/* Customized Plans Section */}

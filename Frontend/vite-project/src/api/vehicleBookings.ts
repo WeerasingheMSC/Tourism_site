@@ -11,6 +11,8 @@ export interface VehicleBooking {
     email: string;
     phone: string;
     address?: string;
+    driverLicense?: string;  // Made optional to match backend validation
+    idNumber?: string;       // Made optional to match backend validation
   };
   vehicle: {
     vehicleId: string;
@@ -19,21 +21,26 @@ export interface VehicleBooking {
     category: string;
   };
   booking: {
-    startDate: Date;
-    endDate: Date;
-    duration: number;
+    startDate: Date | string;
+    endDate: Date | string;
+    duration: string | number;  // Can be string or number
     pickupLocation: string;
     dropoffLocation: string;
     pickupTime?: string;
     dropoffTime?: string;
-    driverRequired: boolean;
+    withDriver?: boolean;
+    driverRequired?: boolean;  // Added for backend compatibility
   };
   pricing: {
-    basePrice: number;
-    driverFee?: number;
-    taxes: number;
-    discounts?: number;
-    totalAmount: number;
+    basePrice: number;        // Required by backend validation
+    dailyRate?: number;
+    totalDays?: number;
+    subtotal?: number;
+    driverCharge?: number;
+    insurance?: number;
+    tax?: number;
+    discount?: number;
+    totalAmount: number;      // Required by backend validation
   };
   payment: {
     method: 'cash' | 'card' | 'bank_transfer' | 'online';
@@ -100,6 +107,9 @@ export interface Vehicle {
   available?: boolean;
   unavailabilityReason?: string;
   description?: string;
+  // Rating fields
+  averageRating?: number;
+  totalRatings?: number;
   createdAt: Date;
   updatedAt: Date;
   // Owner details

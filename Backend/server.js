@@ -15,6 +15,7 @@ import customTourRequestRoutes from "./routes/customTourRequests.js";
 import packageRoutes from "./routes/packageRoutes.js";
 import bookingRoutes from './routes/booking.js';
 import hotelbookingRoutes from "./routes/hotelBooking.js";
+import ratingRoutes from "./routes/ratings.js";
 
 dotenv.config(); // load .env
 connectDB(); // connect to MongoDB
@@ -46,6 +47,8 @@ app.use("/api/packages", packageRoutes);
 app.use('/api/bookings', bookingRoutes);
 // Register the HotelBooking routes
 app.use('/api/hotel-bookings',hotelbookingRoutes);
+// Register the Rating routes
+app.use('/api/ratings', ratingRoutes);
 
 // global error handler (after routes)
 app.use(errorHandler);

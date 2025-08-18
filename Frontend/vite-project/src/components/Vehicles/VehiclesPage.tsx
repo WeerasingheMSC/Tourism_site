@@ -1,147 +1,90 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import VehicleCard from './VehicleCard';
 import { FilterSection, type Filters } from './FilterSection';
 import vehicleBg from '../../assets/vehiclebg.png';
-import beach2 from '../../assets/beach2.jpg';
-import beach3 from '../../assets/beach3.jpg';
-import beach4 from '../../assets/beach4.jpg';
-import beach5 from '../../assets/beach5.jpg';
-import sriLankaTourism from '../../assets/Sri-Lanka-tourism.jpg';
-import sriLankaTravelTips from '../../assets/Sri-Lanka-Travel-Tips-Things-to-Do-in-Sri-Lanka-12.jpeg';
 
 // Define types
 interface Vehicle {
-  id: string;
-  image: string;
-  name: string;
-  brand: string;
-  price: string;
-  rating: number;
-  reviewCount: number;
-  tags: string[];
+  _id: string;
+  title: string;
+  description?: string;
   vehicleType: string;
-  fuelType: string;
-  serviceType: string;
-  rentalType: string;
-  seatCount: string;
-  drivingPurpose: string;
+  make?: string;
+  brand?: string;
+  model: string;
+  year: number;
+  registrationNumber?: string;
+  licensePlate?: string;
+  seatCapacity?: number;
+  seatingCapacity?: number;
+  transmission?: string;
+  fuelType?: string;
+  price?: {
+    perDay?: number;
+    perHour?: number;
+  };
+  images?: string[];
+  features?: string[];
+  available?: boolean;
+  approvalStatus?: {
+    status: "pending" | "approved" | "rejected";
+  };
+  ownerId?: string | {
+    _id: string;
+    name?: string;
+    email?: string;
+  };
+  location?: {
+    city?: string;
+    area?: string;
+  };
+  averageRating?: number;
+  totalRatings?: number;
+  createdAt: Date;
 }
 
-// Sample vehicle data
-const vehiclesData: Vehicle[] = [
-  {
-    id: '1',
-    image: beach2,
-    name: 'Name of the vehicle',
-    brand: 'Toyota',
-    price: '$12/day',
-    rating: 4.5,
-    reviewCount: 200,
-    tags: ['Luxury', 'Free insurance'],
-    vehicleType: 'Car',
-    fuelType: 'Petrol',
-    serviceType: 'With Driver',
-    rentalType: 'Per Day',
-    seatCount: '5',
-    drivingPurpose: 'Long distance touring'
-  },
-  {
-    id: '2',
-    image: beach3,
-    name: 'Name of the vehicle',
-    brand: 'Honda',
-    price: '$29/day',
-    rating: 4.5,
-    reviewCount: 201,
-    tags: ['Free insurance', 'GPS'],
-    vehicleType: 'Van',
-    fuelType: 'Diesel',
-    serviceType: 'Without Driver',
-    rentalType: 'Per Day',
-    seatCount: '8',
-    drivingPurpose: 'Short distance'
-  },
-  {
-    id: '3',
-    image: beach4,
-    name: 'Name of the vehicle',
-    brand: 'Nissan',
-    price: '$11.70/day',
-    rating: 4.5,
-    reviewCount: 200,
-    tags: ['Luxury', 'Free insurance', 'Air Conditioning'],
-    vehicleType: 'SUV',
-    fuelType: 'Hybrid',
-    serviceType: 'With Driver',
-    rentalType: 'Per Day',
-    seatCount: '7',
-    drivingPurpose: 'Long distance touring'
-  },
-  {
-    id: '4',
-    image: beach5,
-    name: 'Name of the vehicle',
-    brand: 'Mitsubishi',
-    price: '$8.99/day',
-    rating: 4.5,
-    reviewCount: 200,
-    tags: ['Luxury', 'Free insurance', 'GPS'],
-    vehicleType: 'Tuk Tuk',
-    fuelType: 'Petrol',
-    serviceType: 'With Driver',
-    rentalType: 'Per Hour',
-    seatCount: '3',
-    drivingPurpose: 'Short distance'
-  },
-  {
-    id: '5',
-    image: sriLankaTourism,
-    name: 'Name of the vehicle',
-    brand: 'Toyota',
-    price: '$14.81/day',
-    rating: 4.5,
-    reviewCount: 200,
-    tags: ['Luxury', 'Free insurance'],
-    vehicleType: 'Bus',
-    fuelType: 'Diesel',
-    serviceType: 'With Driver',
-    rentalType: 'Per Day',
-    seatCount: '25',
-    drivingPurpose: 'Long distance touring'
-  },
-  {
-    id: '6',
-    image: sriLankaTravelTips,
-    name: 'Name of the vehicle',
-    brand: 'Honda',
-    price: '$6.48/day',
-    rating: 4.5,
-    reviewCount: 201,
-    tags: ['Luxury', 'Free insurance', 'GPS'],
-    vehicleType: 'Bike',
-    fuelType: 'Petrol',
-    serviceType: 'Without Driver',
-    rentalType: 'Per Day',
-    seatCount: '2',
-    drivingPurpose: 'Short distance'
+// API function to fetch vehicles
+const fetchVehicles = async (): Promise<Vehicle[]> => {
+  try {
+    const response = await fetch('http://localhost:5001/api/vehicles', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch vehicles');
+    }
+    
+    const result = await response.json();
+    const vehicles = result.data || result;
+    
+    // Filter to show only approved and available vehicles
+    return vehicles.filter((vehicle: Vehicle) => 
+      vehicle.approvalStatus?.status === 'approved' && 
+      vehicle.available === true
+    );
+  } catch (error) {
+    console.error('Error fetching vehicles:', error);
+    return [];
   }
-];
+};
 
 const filterButtons: string[] = [
-  'Car',
-  'Van',
-  'SUV',
-  'Bus',
-  'Bike',
-  'Tuk Tuk',
-  'Long drive vehicle',
-  'Luxury vehicle'
+  'car',
+  'van',
+  'bus',
+  'suv',
+  'motorcycle',
+  'truck'
 ];
 
 const VehiclesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeFilter, setActiveFilter] = useState<string>('');
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<Filters>({
     vehicleType: '',
     priceRange: '',
@@ -152,67 +95,207 @@ const VehiclesPage: React.FC = () => {
     brand: '',
     seatCount: '',
     drivingPurpose: '',
+    location: '', // Added location filter
     others: []
   });
 
-  // Filter vehicles based on active filters
-  const filteredVehicles = vehiclesData.filter(vehicle => {
-    let matches = true;
+  // Load vehicles on component mount
+  useEffect(() => {
+    const loadVehicles = async () => {
+      setLoading(true);
+      const vehicleData = await fetchVehicles();
+      setVehicles(vehicleData);
+      setLoading(false);
+    };
+    
+    loadVehicles();
+  }, []);
 
-    // Search query filter
-    if (searchQuery) {
-      matches = matches && (
-        vehicle.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  // Helper functions to get vehicle data with fallbacks
+  const getVehicleName = (vehicle: Vehicle) => {
+    return vehicle.title || `${vehicle.make || vehicle.brand || ''} ${vehicle.model || ''}`.trim() || 'Unnamed Vehicle';
+  };
+
+  const getVehiclePrice = (vehicle: Vehicle) => {
+    if (vehicle.price?.perDay) {
+      return `$${vehicle.price.perDay}/day`;
+    } else if (vehicle.price?.perHour) {
+      return `$${vehicle.price.perHour}/hour`;
     }
+    return 'Price on request';
+  };
 
-    // Active filter button
-    if (activeFilter) {
-      matches = matches && vehicle.vehicleType === activeFilter;
+  const getVehicleImage = (vehicle: Vehicle) => {
+    return vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : vehicleBg;
+  };
+
+  const getVehicleBrand = (vehicle: Vehicle) => {
+    return vehicle.make || vehicle.brand || 'Unknown Brand';
+  };
+
+  const getVehicleTags = (vehicle: Vehicle) => {
+    const tags = [];
+    if (vehicle.features && vehicle.features.length > 0) {
+      tags.push(...vehicle.features.slice(0, 3)); // Show first 3 features
     }
-
-    // Sidebar filters
-    if (filters.vehicleType) {
-      matches = matches && vehicle.vehicleType === filters.vehicleType;
+    if (vehicle.fuelType) {
+      tags.push(vehicle.fuelType);
     }
-
-    if (filters.brand) {
-      matches = matches && vehicle.brand === filters.brand;
+    if (vehicle.transmission) {
+      tags.push(vehicle.transmission);
     }
+    return tags;
+  };
 
-    if (filters.fuelType) {
-      matches = matches && vehicle.fuelType === filters.fuelType;
-    }
+  const getSeatCount = (vehicle: Vehicle) => {
+    return (vehicle.seatCapacity || vehicle.seatingCapacity || 0).toString();
+  };
 
-    if (filters.serviceType) {
-      matches = matches && vehicle.serviceType === filters.serviceType;
-    }
+  // Memoized filtered vehicles for better performance
+  const filteredVehicles = useMemo(() => {
+    return vehicles.filter((vehicle: Vehicle) => {
+      let matches = true;
 
-    if (filters.rentalType) {
-      matches = matches && vehicle.rentalType === filters.rentalType;
-    }
-
-    if (filters.seatCount) {
-      matches = matches && vehicle.seatCount === filters.seatCount;
-    }
-
-    if (filters.drivingPurpose) {
-      matches = matches && vehicle.drivingPurpose === filters.drivingPurpose;
-    }
-
-    if (filters.priceRange) {
-      const price = parseFloat(vehicle.price.replace('$', '').split('/')[0]);
-      const [min, max] = filters.priceRange.split(' - ').map((p: string) => parseFloat(p.replace('$', '').replace('+', '')));
-      if (filters.priceRange.includes('+')) {
-        matches = matches && price >= min;
-      } else {
-        matches = matches && price >= min && price <= max;
+      // Search query filter - comprehensive search across multiple fields
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        const vehicleName = getVehicleName(vehicle).toLowerCase();
+        const vehicleBrand = getVehicleBrand(vehicle).toLowerCase();
+        const vehicleType = vehicle.vehicleType.toLowerCase();
+        const description = vehicle.description?.toLowerCase() || '';
+        const registrationNumber = vehicle.registrationNumber?.toLowerCase() || '';
+        const licensePlate = vehicle.licensePlate?.toLowerCase() || '';
+        const model = vehicle.model?.toLowerCase() || '';
+        const features = vehicle.features?.map(f => f.toLowerCase()).join(' ') || '';
+        
+        const searchMatches = (
+          vehicleName.includes(query) ||
+          vehicleBrand.includes(query) ||
+          vehicleType.includes(query) ||
+          description.includes(query) ||
+          registrationNumber.includes(query) ||
+          licensePlate.includes(query) ||
+          model.includes(query) ||
+          features.includes(query)
+        );
+        matches = matches && searchMatches;
       }
-    }
 
-    return matches;
-  });
+      // Active filter button
+      if (activeFilter) {
+        matches = matches && vehicle.vehicleType.toLowerCase() === activeFilter.toLowerCase();
+      }
+
+      // Sidebar filters
+      if (filters.vehicleType) {
+        matches = matches && vehicle.vehicleType.toLowerCase() === filters.vehicleType.toLowerCase();
+      }
+
+      if (filters.brand) {
+        const vehicleBrand = getVehicleBrand(vehicle);
+        matches = matches && vehicleBrand.toLowerCase().includes(filters.brand.toLowerCase());
+      }
+
+      if (filters.fuelType) {
+        matches = matches && vehicle.fuelType?.toLowerCase() === filters.fuelType.toLowerCase();
+      }
+
+      if (filters.seatCount) {
+        const seatCount = getSeatCount(vehicle);
+        const seatCountNum = parseInt(seatCount);
+        if (filters.seatCount === 'Above') {
+          matches = matches && seatCountNum > 10;
+        } else {
+          matches = matches && seatCountNum === parseInt(filters.seatCount);
+        }
+      }
+
+      if (filters.location) {
+        matches = matches && vehicle.location?.city?.toLowerCase() === filters.location.toLowerCase();
+      }
+
+      if (filters.priceRange && vehicle.price?.perDay) {
+        const price = vehicle.price.perDay;
+        const [min, max] = filters.priceRange.split(' - ').map((p: string) => parseFloat(p.replace('$', '').replace('+', '')));
+        if (filters.priceRange.includes('+')) {
+          matches = matches && price >= min;
+        } else {
+          matches = matches && price >= min && price <= max;
+        }
+      }
+
+      // Service Type filter (AC, features, etc.)
+      if (filters.serviceType) {
+        if (filters.serviceType === 'With Driver') {
+          const hasDriver = vehicle.features?.some(feature => 
+            feature.toLowerCase().includes('driver') || 
+            feature.toLowerCase().includes('chauffeur')
+          ) || false;
+          matches = matches && hasDriver;
+        } else if (filters.serviceType === 'Without Driver') {
+          const hasDriver = vehicle.features?.some(feature => 
+            feature.toLowerCase().includes('driver') || 
+            feature.toLowerCase().includes('chauffeur')
+          ) || false;
+          matches = matches && !hasDriver;
+        }
+      }
+
+      // Rental Type filter
+      if (filters.rentalType) {
+        if (filters.rentalType === 'Per Day' && !vehicle.price?.perDay) {
+          matches = false;
+        } else if (filters.rentalType === 'Per Hour' && !vehicle.price?.perHour) {
+          matches = false;
+        }
+      }
+
+      // Rating filter (placeholder for when rating system is implemented)
+      if (filters.rating) {
+        // For now, assume all vehicles meet rating criteria
+        // This can be updated when vehicle rating system is implemented
+      }
+
+      // Driving Purpose filter (check if vehicle type matches purpose)
+      if (filters.drivingPurpose) {
+        if (filters.drivingPurpose === 'Long distance touring') {
+          matches = matches && ['bus', 'van', 'suv'].includes(vehicle.vehicleType.toLowerCase());
+        } else if (filters.drivingPurpose === 'Short distance touring') {
+          matches = matches && ['car', 'suv', 'van'].includes(vehicle.vehicleType.toLowerCase());
+        } else if (filters.drivingPurpose === 'Local taxi') {
+          matches = matches && ['car', 'van'].includes(vehicle.vehicleType.toLowerCase());
+        }
+      }
+
+      // Others filter (Air conditioning, Luggage Capacity)
+      if (filters.others.length > 0) {
+        const hasAirConditioning = vehicle.features?.some(feature => 
+          feature.toLowerCase().includes('air conditioning') || 
+          feature.toLowerCase().includes('ac') ||
+          feature.toLowerCase().includes('climate control')
+        ) || false;
+        
+        const hasLuggageCapacity = vehicle.features?.some(feature => 
+          feature.toLowerCase().includes('luggage') || 
+          feature.toLowerCase().includes('cargo') ||
+          feature.toLowerCase().includes('storage')
+        ) || false;
+
+        for (const filter of filters.others) {
+          if (filter === 'Air conditioning' && !hasAirConditioning) {
+            matches = false;
+            break;
+          }
+          if (filter === 'Luggage Capacity' && !hasLuggageCapacity) {
+            matches = false;
+            break;
+          }
+        }
+      }
+
+      return matches;
+    });
+  }, [vehicles, searchQuery, activeFilter, filters]);
 
   return (
     <div className="bg-white pt-20">
@@ -271,7 +354,7 @@ const VehiclesPage: React.FC = () => {
                       : 'bg-blue-500 text-white hover:bg-blue-400'
                   }`}
                 >
-                  {filter}
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
@@ -321,7 +404,11 @@ const VehiclesPage: React.FC = () => {
             
             {/* Vehicles Grid */}
             <div className={`${isFilterOpen ? 'flex-1' : 'w-full'}`}>
-              {filteredVehicles.length === 0 ? (
+              {loading ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">Loading vehicles...</p>
+                </div>
+              ) : filteredVehicles.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">No vehicles found matching your criteria.</p>
                   <button 
@@ -336,6 +423,7 @@ const VehiclesPage: React.FC = () => {
                         brand: '',
                         seatCount: '',
                         drivingPurpose: '',
+                        location: '', // Added location reset
                         others: []
                       });
                       setActiveFilter('');
@@ -348,17 +436,17 @@ const VehiclesPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredVehicles.map((vehicle) => (
+                  {filteredVehicles.map((vehicle: Vehicle) => (
                     <VehicleCard
-                      key={vehicle.id}
-                      id={vehicle.id}
-                      image={vehicle.image}
-                      name={vehicle.name}
-                      brand={vehicle.brand}
-                      price={vehicle.price}
-                      rating={vehicle.rating}
-                      reviewCount={vehicle.reviewCount}
-                      tags={vehicle.tags}
+                      key={vehicle._id}
+                      id={vehicle._id}
+                      image={getVehicleImage(vehicle)}
+                      name={getVehicleName(vehicle)}
+                      brand={getVehicleBrand(vehicle)}
+                      price={getVehiclePrice(vehicle)}
+                      rating={vehicle.averageRating || 0}
+                      reviewCount={vehicle.totalRatings || 0}
+                      tags={getVehicleTags(vehicle)}
                     />
                   ))}
                 </div>

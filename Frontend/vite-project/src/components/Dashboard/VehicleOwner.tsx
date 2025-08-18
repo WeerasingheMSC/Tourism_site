@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, message, Popconfirm } from 'antd';
+import { Button, message, Popconfirm, Switch } from 'antd';
 import { vehicleService, vehicleBookingService } from '../../api/vehicleBookings';
 import type { Vehicle, VehicleBooking } from '../../api/vehicleBookings';
 import { getCurrentVehicleOwner, isAuthenticated } from '../../utils/authHelper';
@@ -52,6 +52,10 @@ const VehicleOwner: React.FC = () => {
       }
     }
   }, [navigate]);
+
+  const handleViewBookingDetails = (booking: VehicleBooking) => {
+    navigate(`/vehicle-booking-details/${booking._id}`);
+  };
 
   const checkOwnerProfile = async () => {
     try {
@@ -175,6 +179,22 @@ const VehicleOwner: React.FC = () => {
       } else {
         message.error(error?.message || 'Failed to delete vehicle. Please try again.');
       }
+    }
+  };
+
+  const toggleVehicleAvailability = async (vehicleId: string, currentStatus: boolean, vehicleName: string) => {
+    try {
+      const newStatus = !currentStatus;
+      await vehicleService.toggleAvailability(vehicleId, newStatus);
+      
+      // Show success message
+      message.success(`Vehicle "${vehicleName}" is now ${newStatus ? 'active' : 'inactive'}`);
+      
+      // Refresh the vehicle list to show updated status
+      loadVehicles();
+    } catch (error: any) {
+      console.error('Error toggling vehicle availability:', error);
+      message.error(error?.message || 'Failed to update vehicle status. Please try again.');
     }
   };
 
@@ -350,15 +370,27 @@ const VehicleOwner: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            (vehicle.available !== false)
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {(vehicle.available !== false) ? "Available" : "Unavailable"}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={vehicle.available !== false}
+                            onChange={() => 
+                              toggleVehicleAvailability(
+                                vehicle._id, 
+                                vehicle.available !== false, 
+                                vehicle.title || vehicle.name || `${vehicle.make || vehicle.brand || ''} ${vehicle.model}`.trim()
+                              )
+                            }
+                            checkedChildren="Active"
+                            unCheckedChildren="Inactive"
+                            size="small"
+                            disabled={vehicle.approvalStatus?.status !== 'approved'}
+                          />
+                          {vehicle.approvalStatus?.status !== 'approved' && (
+                            <span className="text-xs text-gray-500">
+                              (Requires approval)
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex space-x-2">
@@ -438,6 +470,9 @@ const VehicleOwner: React.FC = () => {
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                         Status
                       </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -475,6 +510,14 @@ const VehicleOwner: React.FC = () => {
                           >
                             {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1) || "Unknown"}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <button
+                            onClick={() => handleViewBookingDetails(booking)}
+                            className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded border border-blue-600 hover:bg-blue-50 transition-colors text-sm"
+                          >
+                            View Details
+                          </button>
                         </td>
                       </tr>
                     ))}

@@ -45,6 +45,7 @@ import VehicleRegistrationForm from "../VehicleDashboard/RegisterVehicle.tsx";
 import EditVehicle from "../VehicleDashboard/EditVehicle.tsx";
 import VehicleOwnerDetails from "../VehicleDashboard/VehicleOwnerDetails.tsx";
 import PartnerDashboard from "../VehicleDashboard/PartnerDashboard.tsx";
+import VehicleBookingDetailsPage from "../Dashboard/VehicleBookingDetailsPage.tsx";
 import ContactPage from "../ContactPage/ContactPage.tsx";
 
 
@@ -128,6 +129,16 @@ const router = () => {
             <>
               <MainNav />
               <VehicleOwner />
+              <UpdatedFooter />
+            </>
+          }
+        />
+        <Route
+          path="/vehicle-booking-details/:bookingId"
+          element={
+            <>
+              <MainNav />
+              <VehicleBookingDetailsPage />
               <UpdatedFooter />
             </>
           }

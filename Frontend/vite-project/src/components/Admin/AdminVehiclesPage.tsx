@@ -1,6 +1,7 @@
 // src/components/Admin/AdminVehiclesPage.tsx
 import React, { useState, useEffect } from 'react';
 import AdminVehicleTable from './AdminVehicleTable';
+import VehicleBookingsTable from './VehicleBookingsTable';
 
 interface Vehicle {
   _id: string;
@@ -125,6 +126,15 @@ const AdminVehiclesPage: React.FC = () => {
           <p className="text-gray-500 mb-4">Review and approve vehicle owner registrations</p>
           <div className="rounded-2xl border border-gray-300 overflow-hidden bg-white">
             <AdminVehicleTable onCountsChange={handleCountsChange} />
+          </div>
+        </div>
+
+        {/* Vehicle Bookings Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">Vehicle Bookings</h2>
+          <p className="text-gray-500 mb-4">Manage customer vehicle booking requests and approvals</p>
+          <div className="rounded-2xl border border-gray-300 overflow-hidden bg-white">
+            <VehicleBookingsTable />
           </div>
         </div>
       </main>

@@ -104,6 +104,18 @@ const vehicleSchema = new mongoose.Schema(
       fuelPolicy: String,
       mileageLimit: String,
     },
+    // Rating fields
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    totalRatings: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     approvalStatus: approvalStatusSchema,
   },
   {

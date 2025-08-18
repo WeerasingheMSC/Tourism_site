@@ -14,8 +14,8 @@ const vehicleBookingSchema = new mongoose.Schema({
     email: { type: String, required: true },
     phone: { type: String, required: true },
     address: { type: String },
-    driverLicense: { type: String, required: true },
-    idNumber: { type: String, required: true }
+    driverLicense: { type: String }, // Made optional
+    idNumber: { type: String } // Made optional
   },
   vehicle: {
     vehicleId: { 
@@ -30,12 +30,13 @@ const vehicleBookingSchema = new mongoose.Schema({
   booking: {
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    duration: { type: String, required: true },
+    duration: { type: mongoose.Schema.Types.Mixed }, // Can be string or number
     pickupLocation: { type: String, required: true },
     dropoffLocation: { type: String, required: true },
     pickupTime: { type: String, default: '09:00' },
     dropoffTime: { type: String, default: '18:00' },
     withDriver: { type: Boolean, default: false },
+    driverRequired: { type: Boolean, default: false }, // Added for frontend compatibility
     driverInfo: {
       name: { type: String },
       phone: { type: String },
@@ -43,9 +44,10 @@ const vehicleBookingSchema = new mongoose.Schema({
     }
   },
   pricing: {
-    dailyRate: { type: Number, required: true },
-    totalDays: { type: Number, required: true },
-    subtotal: { type: Number, required: true },
+    basePrice: { type: Number, required: true }, // Added for route validation compatibility
+    dailyRate: { type: Number }, // Made optional since we have basePrice
+    totalDays: { type: Number },
+    subtotal: { type: Number },
     driverCharge: { type: Number, default: 0 },
     insurance: { type: Number, default: 0 },
     tax: { type: Number, default: 0 },

@@ -1,31 +1,38 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Star, ChevronDown, Car, MapPin, Phone, Mail, Clock, Users, Fuel, Settings, Palette, Gauge, CheckCircle, XCircle } from 'lucide-react';
 import { vehicleService } from '../../api/vehicleBookings';
 import type { Vehicle } from '../../api/vehicleBookings';
-import { ensureAuthForTesting } from '../../utils/authHelper';
+import ReviewsDisplayComponent from './ReviewsDisplayComponent';
+import AddRatingComponent from './AddRatingComponent';
+import VehicleBookingModal from './VehicleBookingModal';
+import { getCurrentUser } from '../../utils/authHelper';
+import { message } from 'antd';
 
 // Import images from assets
 import beach2 from '../../assets/beach2.jpg';
 import beach4 from '../../assets/beach4.jpg';
 import beach5 from '../../assets/beach5.jpg';
 
-const reviews = [
-  { id: '1', name: 'Robert DJ', rating: 5.0, date: 'Thu Vehicle 16 h17', avatar: 'R' },
-  { id: '2', name: 'Elisa Wirasoef', rating: 5.0, date: 'Thu Vehicle 16 h17', avatar: 'E' },
-  { id: '3', name: 'Jane Cooper', rating: 4.2, date: 'Thu Vehicle 16 h17', avatar: 'J' },
-  { id: '4', name: 'Kathryn Murphy', rating: 3.0, date: 'Thu Vehicle 16 h17', avatar: 'K' }
-];
+// Removed static reviews - now using dynamic rating system
 
 // Removed static FAQs - will use vehicle.faqs instead
 
 const VehicleDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [currentRating, setCurrentRating] = useState<number>(0);
+  const [totalRatings, setTotalRatings] = useState<number>(0);
+  const [bookingModalVisible, setBookingModalVisible] = useState(false);
+
+  // Check authentication status
+  const currentUser = getCurrentUser();
+  const isLoggedIn = !!localStorage.getItem("authToken") && !!currentUser;
 
   useEffect(() => {
     const loadVehicle = async () => {
@@ -35,13 +42,12 @@ const VehicleDetailsPage = () => {
         return;
       }
 
-      try {
-        // Ensure authentication for testing
-        ensureAuthForTesting();
-        
+      try {        
         setLoading(true);
         const response = await vehicleService.getVehicleById(id);
         setVehicle(response.data);
+        setCurrentRating(response.data.averageRating || 0);
+        setTotalRatings(response.data.totalRatings || 0);
         setError(null);
       } catch (err: any) {
         console.error('Error loading vehicle:', err);
@@ -56,6 +62,25 @@ const VehicleDetailsPage = () => {
 
   const toggleFAQ = (index: number) => {
     setExpandedFAQ(expandedFAQ === index ? null : index);
+  };
+
+  const handleRatingUpdate = (newAverage: number, newTotal: number) => {
+    setCurrentRating(newAverage);
+    setTotalRatings(newTotal);
+  };
+
+  const handleBookNowClick = () => {
+    if (!isLoggedIn) {
+      message.warning("Please login to book this vehicle");
+      navigate("/login");
+      return;
+    }
+    setBookingModalVisible(true);
+  };
+
+  const handleBookingSuccess = () => {
+    message.success("Booking submitted successfully! You will receive a confirmation shortly.");
+    setBookingModalVisible(false);
   };
 
   // Loading state
@@ -139,7 +164,7 @@ const VehicleDetailsPage = () => {
         {/* Header and Sidebar Container */}
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 mb-6 lg:mb-8">
           {/* Main Content - Left Side */}
-          <div className="flex-1 order-2 lg:order-1">
+          <div className="flex-1 order-1 lg:order-1">
             {/* Header */}
             <div className="bg-white rounded-lg shadow-sm mb-4 lg:mb-6">
               <div className="p-4 lg:p-6">
@@ -375,7 +400,10 @@ const VehicleDetailsPage = () => {
                 </div>
 
                 {/* Book Now Button */}
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-4">
+                <button 
+                  onClick={handleBookNowClick}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-4"
+                >
                   Book Now
                 </button>
 
@@ -429,10 +457,14 @@ const VehicleDetailsPage = () => {
                 {/* Left side - Rating score and star */}
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl lg:text-4xl font-bold">4.5</span>
+                    <span className="text-2xl lg:text-4xl font-bold">
+                      {currentRating > 0 ? currentRating.toFixed(1) : 'No rating'}
+                    </span>
                     <Star className="w-4 lg:w-6 h-4 lg:h-6 fill-white text-white" />
                   </div>
-                  <p className="text-xs lg:text-sm text-blue-100">0 reviews</p>
+                  <p className="text-xs lg:text-sm text-blue-100">
+                    {totalRatings} {totalRatings === 1 ? 'review' : 'reviews'}
+                  </p>
                 </div>
                 
                 {/* Right side - Rating bars */}
@@ -445,10 +477,7 @@ const VehicleDetailsPage = () => {
                         <div 
                           className="h-full bg-white rounded-full"
                           style={{ 
-                            width: rating === 5 ? '85%' : 
-                                   rating === 4 ? '12%' : 
-                                   rating === 3 ? '2%' : 
-                                   rating === 2 ? '1%' : '0%' 
+                            width: currentRating >= rating ? '85%' : '5%'
                           }}
                         />
                       </div>
@@ -462,42 +491,14 @@ const VehicleDetailsPage = () => {
 
         {/* Full Width Content Section */}
         <div className="max-w-7xl mx-auto">
-          {/* Reviews Section */}
-          <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6 mb-4 lg:mb-6">
-            <h2 className="text-lg lg:text-xl font-semibold mb-4 lg:mb-6">Reviews</h2>
-            
-            {/* Individual Reviews */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-              {reviews.map((review) => (
-                <div key={review.id} className="border-2 border-blue-200 rounded-lg p-3 lg:p-4 bg-white">
-                  {/* Top section: Profile image left, name and rating right */}
-                  <div className="flex items-start gap-2 lg:gap-3 mb-2 lg:mb-3">
-                    <div className="w-10 lg:w-12 h-10 lg:h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
-                      <img 
-                        src={`https://images.unsplash.com/photo-${review.id === '1' ? '1472099645785-5658abf4ff4e' : review.id === '2' ? '1494790108755-2616c01c5944' : review.id === '3' ? '1517841905240-472988babdf9' : '1438761681033-6461ffad8d80'}?w=48&h=48&fit=crop&crop=face`}
-                        alt={review.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 text-right">
-                      <h4 className="font-semibold text-gray-900 text-xs lg:text-sm mb-1 truncate">{review.name}</h4>
-                      <div className="flex items-center justify-end gap-1">
-                        <Star className="w-2.5 lg:w-3 h-2.5 lg:h-3 fill-blue-400 text-blue-400" />
-                        <span className="font-semibold text-xs lg:text-sm text-blue-600">{review.rating}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Bottom section: Review text left aligned */}
-                  <div className="text-left">
-                    <p className="text-xs text-gray-500 mb-1">Super recommended product.</p>
-                    <p className="text-xs text-gray-400">You have to try!</p>
-                  </div>
-                </div>
-              ))}
+           <div className="mb-6 lg:mt-8 space-y-6 max-h-96 overflow-auto border-gray-100 border-2 rounded-2xl ">
+            {/* Reviews Display Section - Available to all users */}
+            <ReviewsDisplayComponent
+              vehicleId={vehicle._id}
+              averageRating={currentRating}
+              totalRatings={totalRatings}
+            />
             </div>
-          </div>
-
           {/* Description About Vehicle */}
           <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6 mb-4 lg:mb-6">
             <h2 className="text-lg lg:text-xl font-semibold mb-3 lg:mb-4">Description About Vehicle</h2>
@@ -740,8 +741,27 @@ const VehicleDetailsPage = () => {
               </div>
             )}
           </div>
+
+          {/* Reviews & Ratings Section - Moved to Bottom */}
+          <div className="mt-6 lg:mt-8 space-y-6">
+            {/* Add Rating Section - Login required */}
+            <AddRatingComponent
+              vehicleId={vehicle._id}
+              onRatingUpdate={handleRatingUpdate}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Vehicle Booking Modal */}
+      {vehicle && (
+        <VehicleBookingModal
+          visible={bookingModalVisible}
+          onCancel={() => setBookingModalVisible(false)}
+          vehicle={vehicle}
+          onBookingSuccess={handleBookingSuccess}
+        />
+      )}
     </div>
   );
 };

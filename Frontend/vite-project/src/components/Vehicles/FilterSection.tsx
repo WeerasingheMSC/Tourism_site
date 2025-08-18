@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // Define types
-interface Filters {
+export interface Filters {
   vehicleType: string;
   priceRange: string;
   fuelType: string;
@@ -11,6 +11,7 @@ interface Filters {
   brand: string;
   seatCount: string;
   drivingPurpose: string;
+  location: string; // Added location filter
   others: string[];
 }
 
@@ -38,6 +39,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     rating: true,
     seatCount: true,
     drivingPurpose: true,
+    location: true, // Added location section
     others: true
   });
 
@@ -66,6 +68,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
       brand: '',
       seatCount: '',
       drivingPurpose: '',
+      location: '', // Added location reset
       others: []
     });
   };
@@ -96,7 +99,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         </div>
         {expandedSections.vehicleType && (
           <div className="space-y-1 ml-2">
-            {['Car', 'Van', 'Tuk Tuk', 'SUV', 'Bus', 'Bike'].map((type) => (
+            {['car', 'van', 'bus', 'suv', 'motorcycle', 'truck'].map((type) => (
               <label key={type} className="flex items-center text-xs">
                 <input
                   type="checkbox"
@@ -105,7 +108,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   onChange={(e) => handleFilterChange('vehicleType', e.target.checked ? e.target.value : '')}
                   className="mr-2 w-3 h-3"
                 />
-                <span className="text-gray-600">{type}</span>
+                <span className="text-gray-600">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
               </label>
             ))}
           </div>
@@ -184,6 +187,40 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   className="mr-2 w-3 h-3"
                 />
                 <span className="text-gray-600">{fuel}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Location Filter */}
+      <div className="mb-4">
+        <div 
+          className="flex items-center justify-between mb-2 cursor-pointer"
+          onClick={() => toggleSection('location')}
+        >
+          <h4 className="font-medium text-gray-800 text-sm">Location</h4>
+          <svg 
+            className={`w-4 h-4 text-gray-400 transition-transform ${expandedSections.location ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        {expandedSections.location && (
+          <div className="space-y-1 ml-2">
+            {['Colombo', 'Kandy', 'Galle', 'Jaffna', 'Matara', 'Negombo', 'Anuradhapura', 'Polonnaruwa', 'Batticaloa', 'Kurunegala'].map((city) => (
+              <label key={city} className="flex items-center text-xs">
+                <input
+                  type="checkbox"
+                  value={city}
+                  checked={filters.location === city}
+                  onChange={(e) => handleFilterChange('location', e.target.checked ? e.target.value : '')}
+                  className="mr-2 w-3 h-3"
+                />
+                <span className="text-gray-600">{city}</span>
               </label>
             ))}
           </div>
@@ -459,4 +496,3 @@ const FilterSection: React.FC<FilterSectionProps> = ({
 };
 
 export { FilterSection };
-export type { Filters };

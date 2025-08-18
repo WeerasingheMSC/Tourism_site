@@ -72,7 +72,7 @@ const NavBar = () => {
           Vehicles
         </span>
       ),
-      key: "hotels",
+      key: "vehicles",
     },
   ];
 

@@ -22,9 +22,13 @@ export const getAllVehicleBookings = async (req, res) => {
     
     // Check if this is a request for owner-specific bookings
     if (req.route.path === '/my-bookings' && req.user?.id) {
+      console.log('🔍 VehicleBooking Debug - Owner request:', { userId: req.user.id, userRole: req.user.role });
+      
       // First find all vehicles owned by this user
       const ownerVehicles = await Vehicle.find({ ownerId: req.user.id }).select('_id');
       const vehicleIds = ownerVehicles.map(v => v._id.toString());
+      
+      console.log('🔍 VehicleBooking Debug - Owner vehicles:', vehicleIds);
       
       // Filter bookings for these vehicles
       filter['vehicle.vehicleId'] = { $in: vehicleIds };
@@ -66,6 +70,9 @@ export const getAllVehicleBookings = async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit));
+
+    console.log('🔍 VehicleBooking Debug - Found bookings:', bookings.length);
+    console.log('🔍 VehicleBooking Debug - First booking customer:', bookings[0]?.customer);
 
     const total = await VehicleBooking.countDocuments(filter);
 
@@ -144,8 +151,11 @@ export const getVehicleBookingById = async (req, res) => {
 // Create new vehicle booking
 export const createVehicleBooking = async (req, res) => {
   try {
+    console.log('📥 Received booking data:', JSON.stringify(req.body, null, 2));
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -199,9 +209,9 @@ export const createVehicleBooking = async (req, res) => {
       customer,
       vehicle: {
         vehicleId: vehicle._id,
-        name: vehicle.name,
-        licensePlate: vehicle.licensePlate,
-        category: vehicle.category
+        name: vehicle.name || vehicle.title,  // Handle both new and legacy field names
+        licensePlate: vehicle.licensePlate || vehicle.registrationNumber,
+        category: vehicle.category || vehicle.vehicleType
       },
       booking,
       pricing,
@@ -271,20 +281,30 @@ export const updateVehicleBooking = async (req, res) => {
 // Update booking status
 export const updateBookingStatus = async (req, res) => {
   try {
+    console.log('🔄 Backend - UpdateBookingStatus called with:', {
+      params: req.params,
+      body: req.body,
+      user: req.user,
+      userId: req.user?.id || req.user?.userId
+    });
+
     const { id } = req.params;
     const { status, cancellationReason } = req.body;
 
     const booking = await VehicleBooking.findById(id);
     if (!booking) {
+      console.log('❌ Backend - Booking not found:', id);
       return res.status(404).json({
         success: false,
         message: 'Vehicle booking not found'
       });
     }
 
+    console.log('✅ Backend - Booking found, updating status from', booking.status, 'to', status);
+
     const updateData = { 
       status,
-      updatedBy: req.user?.id
+      updatedBy: req.user?.id || req.user?.userId
     };
 
     if (status === 'cancelled' && cancellationReason) {
@@ -297,13 +317,19 @@ export const updateBookingStatus = async (req, res) => {
       { new: true }
     );
 
+    console.log('✅ Backend - Booking updated successfully:', {
+      id: updatedBooking._id,
+      oldStatus: booking.status,
+      newStatus: updatedBooking.status
+    });
+
     res.json({
       success: true,
       message: `Booking ${status} successfully`,
       data: updatedBooking
     });
   } catch (error) {
-    console.error('Update booking status error:', error);
+    console.error('❌ Backend - Update booking status error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to update booking status',
