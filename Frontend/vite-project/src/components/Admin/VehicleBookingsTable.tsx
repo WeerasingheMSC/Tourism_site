@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Tag, Space, message, Modal, Card, Descriptions, Avatar } from 'antd';
-import { 
-  EyeOutlined, 
-  CheckCircleOutlined, 
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Tag,
+  Space,
+  message,
+  Modal,
+  Card,
+  Descriptions,
+  Avatar,
+} from "antd";
+import {
+  EyeOutlined,
+  CheckCircleOutlined,
   CloseCircleOutlined,
   CalendarOutlined,
   UserOutlined,
@@ -10,17 +20,19 @@ import {
   PhoneOutlined,
   MailOutlined,
   EnvironmentOutlined,
-  DollarOutlined
-} from '@ant-design/icons';
-import { vehicleBookingService } from '../../api/vehicleBookings';
-import type { VehicleBooking } from '../../api/vehicleBookings';
+  DollarOutlined,
+} from "@ant-design/icons";
+import { vehicleBookingService } from "../../api/vehicleBookings";
+import type { VehicleBooking } from "../../api/vehicleBookings";
 
 const VehicleBookingsTable: React.FC = () => {
   const [bookings, setBookings] = useState<VehicleBooking[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<VehicleBooking | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<VehicleBooking | null>(
+    null
+  );
   const [detailsVisible, setDetailsVisible] = useState(false);
-  const [statusLoading, setStatusLoading] = useState<string>('');
+  const [statusLoading, setStatusLoading] = useState<string>("");
 
   useEffect(() => {
     fetchBookings();
@@ -30,14 +42,14 @@ const VehicleBookingsTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await vehicleBookingService.getAllBookings({
-        status: 'all',
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
+        status: "all",
+        sortBy: "createdAt",
+        sortOrder: "desc",
       });
       setBookings(response.data || []);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
-      message.error('Failed to fetch vehicle bookings');
+      console.error("Error fetching bookings:", error);
+      message.error("Failed to fetch vehicle bookings");
     } finally {
       setLoading(false);
     }
@@ -50,10 +62,12 @@ const VehicleBookingsTable: React.FC = () => {
       message.success(`Booking ${newStatus} successfully`);
       fetchBookings(); // Refresh the list
     } catch (error: any) {
-      console.error('Error updating booking status:', error);
-      message.error(error.response?.data?.message || `Failed to ${newStatus} booking`);
+      console.error("Error updating booking status:", error);
+      message.error(
+        error.response?.data?.message || `Failed to ${newStatus} booking`
+      );
     } finally {
-      setStatusLoading('');
+      setStatusLoading("");
     }
   };
 
@@ -64,46 +78,53 @@ const VehicleBookingsTable: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'orange';
-      case 'confirmed': return 'blue';
-      case 'active': return 'green';
-      case 'completed': return 'purple';
-      case 'cancelled': return 'red';
-      default: return 'default';
+      case "pending":
+        return "orange";
+      case "confirmed":
+        return "blue";
+      case "active":
+        return "green";
+      case "completed":
+        return "purple";
+      case "cancelled":
+        return "red";
+      default:
+        return "default";
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const columns = [
     {
-      title: 'Booking ID',
-      dataIndex: 'bookingId',
-      key: 'bookingId',
-      width: 120,
+      title: "Booking ID",
+      dataIndex: "bookingId",
+      key: "bookingId",
+      width: 150,
+      className: "pl-4",
       render: (bookingId: string) => (
-        <span className="font-mono text-sm">{bookingId}</span>
+        <span className="font-mono text-sm pl-4">{bookingId}</span>
       ),
     },
     {
-      title: 'Customer',
-      key: 'customer',
+      title: "Customer",
+      key: "customer",
       width: 200,
       render: (_: any, record: VehicleBooking) => (
         <div className="flex items-center space-x-3">
@@ -116,62 +137,66 @@ const VehicleBookingsTable: React.FC = () => {
       ),
     },
     {
-      title: 'Vehicle',
-      key: 'vehicle',
+      title: "Vehicle",
+      key: "vehicle",
       width: 200,
       render: (_: any, record: VehicleBooking) => (
         <div className="flex items-center space-x-2">
           <CarOutlined className="text-blue-600" />
           <div>
             <div className="font-medium">{record.vehicle.name}</div>
-            <div className="text-sm text-gray-500">{record.vehicle.licensePlate}</div>
+            <div className="text-sm text-gray-500">
+              {record.vehicle.licensePlate}
+            </div>
           </div>
         </div>
       ),
     },
     {
-      title: 'Rental Period',
-      key: 'period',
+      title: "Rental Period",
+      key: "period",
       width: 180,
       render: (_: any, record: VehicleBooking) => (
         <div>
-          <div className="text-sm">{formatDate(record.booking.startDate.toString())}</div>
-          <div className="text-sm text-gray-500">to {formatDate(record.booking.endDate.toString())}</div>
+          <div className="text-sm">
+            {formatDate(record.booking.startDate.toString())}
+          </div>
+          <div className="text-sm text-gray-500">
+            to {formatDate(record.booking.endDate.toString())}
+          </div>
         </div>
       ),
     },
     {
-      title: 'Total Amount',
-      dataIndex: ['pricing', 'totalAmount'],
-      key: 'totalAmount',
+      title: "Total Amount",
+      dataIndex: ["pricing", "totalAmount"],
+      key: "totalAmount",
       width: 120,
       render: (amount: number) => (
         <span className="font-semibold text-green-600">${amount}</span>
       ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       width: 120,
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {status.toUpperCase()}
-        </Tag>
+        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
       ),
     },
     {
-      title: 'Created',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "Created",
+      dataIndex: "createdAt",
+      key: "createdAt",
       width: 120,
       render: (date: string) => (
         <span className="text-sm">{formatDate(date)}</span>
       ),
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       width: 200,
       render: (_: any, record: VehicleBooking) => (
         <Space size="small">
@@ -183,12 +208,12 @@ const VehicleBookingsTable: React.FC = () => {
           >
             View
           </Button>
-          {record.status === 'pending' && (
+          {record.status === "pending" && (
             <>
               <Button
                 type="text"
                 icon={<CheckCircleOutlined />}
-                onClick={() => handleStatusUpdate(record._id, 'confirmed')}
+                onClick={() => handleStatusUpdate(record._id, "confirmed")}
                 loading={statusLoading === record._id}
                 size="small"
                 className="text-green-600"
@@ -198,7 +223,7 @@ const VehicleBookingsTable: React.FC = () => {
               <Button
                 type="text"
                 icon={<CloseCircleOutlined />}
-                onClick={() => handleStatusUpdate(record._id, 'cancelled')}
+                onClick={() => handleStatusUpdate(record._id, "cancelled")}
                 loading={statusLoading === record._id}
                 size="small"
                 className="text-red-600"
@@ -223,7 +248,7 @@ const VehicleBookingsTable: React.FC = () => {
           pageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
+          showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} bookings`,
         }}
         scroll={{ x: 1200 }}
@@ -273,7 +298,7 @@ const VehicleBookingsTable: React.FC = () => {
                   {selectedBooking.customer.idNumber}
                 </Descriptions.Item>
                 <Descriptions.Item label="Address">
-                  {selectedBooking.customer.address || 'Not provided'}
+                  {selectedBooking.customer.address || "Not provided"}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
@@ -321,13 +346,13 @@ const VehicleBookingsTable: React.FC = () => {
                   </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="With Driver">
-                  {selectedBooking.booking.withDriver ? 'Yes' : 'No'}
+                  {selectedBooking.booking.withDriver ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Pickup Time">
-                  {selectedBooking.booking.pickupTime || 'Not specified'}
+                  {selectedBooking.booking.pickupTime || "Not specified"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Drop-off Time">
-                  {selectedBooking.booking.dropoffTime || 'Not specified'}
+                  {selectedBooking.booking.dropoffTime || "Not specified"}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
@@ -337,15 +362,17 @@ const VehicleBookingsTable: React.FC = () => {
               <Descriptions column={2} size="small">
                 <Descriptions.Item label="Subtotal">
                   <div className="flex items-center">
-                    <DollarOutlined className="mr-2" />
-                    ${selectedBooking.pricing.subtotal}
+                    <DollarOutlined className="mr-2" />$
+                    {selectedBooking.pricing.subtotal}
                   </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Driver Charge">
                   ${selectedBooking.pricing.driverCharge || 0}
                 </Descriptions.Item>
                 <Descriptions.Item label="Tax & Insurance">
-                  ${(selectedBooking.pricing.tax || 0) + (selectedBooking.pricing.insurance || 0)}
+                  $
+                  {(selectedBooking.pricing.tax || 0) +
+                    (selectedBooking.pricing.insurance || 0)}
                 </Descriptions.Item>
                 <Descriptions.Item label="Discount">
                   -${selectedBooking.pricing.discount || 0}
@@ -367,12 +394,18 @@ const VehicleBookingsTable: React.FC = () => {
                   </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Payment Status">
-                  <Tag color={selectedBooking.payment.status === 'paid' ? 'green' : 'orange'}>
+                  <Tag
+                    color={
+                      selectedBooking.payment.status === "paid"
+                        ? "green"
+                        : "orange"
+                    }
+                  >
                     {selectedBooking.payment.status.toUpperCase()}
                   </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Notes">
-                  {selectedBooking.notes || 'No additional notes'}
+                  {selectedBooking.notes || "No additional notes"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Created">
                   {formatDateTime(selectedBooking.createdAt.toString())}
@@ -381,13 +414,13 @@ const VehicleBookingsTable: React.FC = () => {
             </Card>
 
             {/* Action Buttons */}
-            {selectedBooking.status === 'pending' && (
+            {selectedBooking.status === "pending" && (
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <Button
                   type="primary"
                   icon={<CheckCircleOutlined />}
                   onClick={() => {
-                    handleStatusUpdate(selectedBooking._id, 'confirmed');
+                    handleStatusUpdate(selectedBooking._id, "confirmed");
                     setDetailsVisible(false);
                   }}
                   loading={statusLoading === selectedBooking._id}
@@ -399,7 +432,7 @@ const VehicleBookingsTable: React.FC = () => {
                   danger
                   icon={<CloseCircleOutlined />}
                   onClick={() => {
-                    handleStatusUpdate(selectedBooking._id, 'cancelled');
+                    handleStatusUpdate(selectedBooking._id, "cancelled");
                     setDetailsVisible(false);
                   }}
                   loading={statusLoading === selectedBooking._id}
