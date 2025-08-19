@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = (to, subject, text) => {
   const mailOptions = {
-    from: `"Tourism Platform" <${process.env.SMTP_USER}>`,
+    from: `"Travel Booking Sri Lanka" <${process.env.SMTP_USER}>`,
     to,
     subject,
     text,
