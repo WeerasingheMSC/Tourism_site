@@ -98,7 +98,7 @@ const vehicleOwnerSchema = new mongoose.Schema(
 );
 
 // Indexes
-vehicleOwnerSchema.index({ userId: 1 });
+//vehicleOwnerSchema.index({ userId: 1 });
 vehicleOwnerSchema.index({ email: 1 });
 vehicleOwnerSchema.index({ phone: 1 });
 
