@@ -57,7 +57,7 @@ const MainNav: React.FC = () => {
       return <HotelOwnerNavBar />;
     case "admin":
       return <AdminNavBar />;
-    case "vehicle-owner":
+    case "transport-owner":
       return <VehicleOwnerNavBar />;
     default:
       // token exists but no role or unrecognized role

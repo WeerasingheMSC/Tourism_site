@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import AddedTable from "./AddedTable";
 import CustomizeTable from "../Admin/CustomizeTable";
 import AdminBookingTable from "../Admin/AdminBookingTable";
-
+import AdminVehicleTable from '../Admin/AdminVehicleTable';
+import AdminVehicleBookingTable from '../Admin/AdminVehicleBookingTable';
 import { getPackages } from "../../api/packages";
 import { getAllBookings } from "../../api/bookings";
 import { getCustomTourRequests } from "../../api/customTourRequest"; // <— use your helper file's path
@@ -15,6 +16,9 @@ type BookingRow = {
   amount?: number;
   totalPrice?: number;
 };
+
+
+
 
 const AdminDashboardPage: React.FC = () => {
   const [totalPackages, setTotalPackages] = useState(0);
@@ -117,7 +121,7 @@ const AdminDashboardPage: React.FC = () => {
           <AdminBookingTable />
         </div>
 
-        {/* Customised Plans */}
+        {/* Customized Plans Section */}
         <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Pending Customised Plans</h2>
         <p className="text-gray-500 mb-4">Tourist customised plan proposals</p>
         <div className="rounded-2xl border border-gray-300 overflow-hidden bg-white">
