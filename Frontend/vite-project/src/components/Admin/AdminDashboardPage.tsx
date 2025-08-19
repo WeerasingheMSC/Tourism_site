@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import AddedTable from "./AddedTable";
 import CustomizeTable from "../Admin/CustomizeTable";
 import AdminBookingTable from "../Admin/AdminBookingTable";
-import AdminVehicleTable from '../Admin/AdminVehicleTable';
-import AdminVehicleBookingTable from '../Admin/AdminVehicleBookingTable';
 import { getPackages } from "../../api/packages";
 import { getAllBookings } from "../../api/bookings";
 import { getCustomTourRequests } from "../../api/customTourRequest"; // <— use your helper file's path
