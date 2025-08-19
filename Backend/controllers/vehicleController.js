@@ -448,6 +448,12 @@ export const approveRejectVehicle = async (req, res, next) => {
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
+    // Initialize approvalStatus if it doesn't exist
+    if (!vehicle.approvalStatus) {
+      vehicle.approvalStatus = {};
+    }
+
+    // Set the approval status fields
     vehicle.approvalStatus.status = status;
     vehicle.approvalStatus.adminNotes = adminNotes || "";
     vehicle.approvalStatus.reviewedAt = new Date();
