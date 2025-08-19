@@ -1,95 +1,210 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { message } from 'antd';
+
+interface VehicleBooking {
+  _id: string;
+  bookingId: string;
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    address?: string;
+    driverLicense?: string;
+    idNumber?: string;
+  };
+  vehicle: {
+    vehicleId: string;
+    name: string;
+    licensePlate: string;
+    category: string;
+  };
+  booking: {
+    startDate: Date | string;
+    endDate: Date | string;
+    duration: string | number;
+    pickupLocation: string;
+    dropoffLocation: string;
+    pickupTime?: string;
+    dropoffTime?: string;
+    withDriver?: boolean;
+    driverRequired?: boolean;
+  };
+  pricing: {
+    basePrice: number;
+    dailyRate?: number;
+    totalDays?: number;
+    subtotal?: number;
+    driverCharge?: number;
+    insurance?: number;
+    tax?: number;
+    discount?: number;
+    totalAmount: number;
+  };
+  payment: {
+    method: 'cash' | 'card' | 'bank_transfer' | 'online';
+    status: 'pending' | 'partial' | 'paid' | 'refunded';
+    advanceAmount?: number;
+    remainingAmount?: number;
+    transactionId?: string;
+  };
+  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'approved';
+  adminStatus: 'pending' | 'completed';
+  ownerStatus: 'pending' | 'confirmed';
+  notes?: string;
+  rating?: number;
+  review?: string;
+  cancellationReason?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// API functions for vehicle booking management
+const vehicleBookingAPI = {
+  getOwnerBookings: async (): Promise<VehicleBooking[]> => {
+    const token = localStorage.getItem('authToken');
+    
+    const response = await fetch('http://localhost:5001/api/vehicle-bookings/my-bookings', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch owner vehicle bookings');
+    }
+    
+    const result = await response.json();
+    return result.data || result;
+  },
+
+  updateBookingStatus: async (bookingId: string, status?: "pending" | "confirmed" | "active" | "completed" | "cancelled", adminStatus?: "pending" | "completed", ownerStatus?: "pending" | "confirmed", cancellationReason?: string) => {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const requestBody: any = {};
+    if (status) requestBody.status = status;
+    if (adminStatus) requestBody.adminStatus = adminStatus;
+    if (ownerStatus) requestBody.ownerStatus = ownerStatus;
+    if (cancellationReason) requestBody.cancellationReason = cancellationReason;
+    
+    const response = await fetch(`http://localhost:5001/api/vehicle-bookings/${bookingId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw new Error(errorData.message || `HTTP ${response.status}: Failed to update booking status`);
+    }
+    
+    const result = await response.json();
+    return result;
+  },
+};
 
 const Bookings = () => {
+  const [bookings, setBookings] = useState<VehicleBooking[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const bookings = [
-    {
-      id: 'BK001',
-      customer: {
-        name: 'John Smith',
-        email: 'john.smith@email.com',
-        phone: '+94 77 123 4567'
-      },
-      vehicle: {
-        name: 'Toyota Corolla 2020',
-        licensePlate: 'CAR-1234'
-      },
-      booking: {
-        startDate: '2024-08-15',
-        endDate: '2024-08-18',
-        duration: '3 days',
-        pickupLocation: 'Colombo Airport',
-        dropoffLocation: 'Galle Hotel',
-        amount: 15000,
-        status: 'active'
-      }
-    },
-    {
-      id: 'BK002',
-      customer: {
-        name: 'Maria Garcia',
-        email: 'maria.garcia@email.com',
-        phone: '+94 71 987 6543'
-      },
-      vehicle: {
-        name: 'Honda CR-V 2019',
-        licensePlate: 'SUV-5678'
-      },
-      booking: {
-        startDate: '2024-08-12',
-        endDate: '2024-08-12',
-        duration: '1 day',
-        pickupLocation: 'Kandy City Center',
-        dropoffLocation: 'Kandy City Center',
-        amount: 8000,
-        status: 'completed'
-      }
-    },
-    {
-      id: 'BK003',
-      customer: {
-        name: 'David Chen',
-        email: 'david.chen@email.com',
-        phone: '+94 76 456 7890'
-      },
-      vehicle: {
-        name: 'Nissan Sunny 2021',
-        licensePlate: 'CAR-9012'
-      },
-      booking: {
-        startDate: '2024-08-20',
-        endDate: '2024-08-25',
-        duration: '5 days',
-        pickupLocation: 'Negombo Hotel',
-        dropoffLocation: 'Colombo Airport',
-        amount: 25000,
-        status: 'upcoming'
-      }
-    },
-    {
-      id: 'BK004',
-      customer: {
-        name: 'Sarah Johnson',
-        email: 'sarah.johnson@email.com',
-        phone: '+94 77 234 5678'
-      },
-      vehicle: {
-        name: 'Toyota Hiace Van',
-        licensePlate: 'VAN-3456'
-      },
-      booking: {
-        startDate: '2024-08-10',
-        endDate: '2024-08-11',
-        duration: '2 days',
-        pickupLocation: 'Ella Station',
-        dropoffLocation: 'Mirissa Beach',
-        amount: 18000,
-        status: 'cancelled'
-      }
+  // Fetch owner bookings from API
+  const fetchBookings = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const data = await vehicleBookingAPI.getOwnerBookings();
+      setBookings(data);
+    } catch (err: any) {
+      console.error('Failed to fetch owner bookings:', err);
+      setError(err.message);
+      message.error('Failed to load bookings');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  // Handle owner status change
+  const handleOwnerStatusChange = async (bookingId: string, newOwnerStatus: 'pending' | 'confirmed') => {
+    try {
+      console.log('🔄 OwnerBookings - Owner status change:', { bookingId, newOwnerStatus });
+      
+      // Call API to update owner status
+      const result = await vehicleBookingAPI.updateBookingStatus(bookingId, undefined, undefined, newOwnerStatus);
+      console.log('✅ OwnerBookings - Owner status change API response:', result);
+      
+      // Update the booking in local state
+      setBookings((prev) => 
+        prev.map((booking) => 
+          booking._id === bookingId 
+            ? { 
+                ...booking, 
+                ownerStatus: newOwnerStatus,
+                updatedAt: new Date()
+              }
+            : booking
+        )
+      );
+      
+      message.success(`Owner status updated to ${newOwnerStatus}`);
+      
+      // Refresh data to ensure consistency
+      setTimeout(() => {
+        fetchBookings();
+      }, 1000);
+    } catch (err: any) {
+      console.error("❌ OwnerBookings - Owner status change failed:", err);
+      message.error('Failed to update owner status');
+      fetchBookings();
+    }
+  };
+
+  // Format date function
+  const formatDate = (date: Date | string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Filter bookings based on active tab and search term
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesTab = activeTab === 'all' || 
+      (activeTab === 'pending' && booking.adminStatus === 'completed' && booking.ownerStatus === 'pending') ||
+      (activeTab === 'confirmed' && booking.ownerStatus === 'confirmed') ||
+      (activeTab === 'completed' && booking.status === 'completed') ||
+      (activeTab === 'cancelled' && booking.status === 'cancelled');
+    
+    const matchesSearch = booking.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.bookingId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesTab && matchesSearch;
+  });
+
+  const getTabCount = (tab: string) => {
+    if (tab === 'all') return bookings.length;
+    if (tab === 'pending') return bookings.filter(b => b.adminStatus === 'completed' && b.ownerStatus === 'pending').length;
+    if (tab === 'confirmed') return bookings.filter(b => b.ownerStatus === 'confirmed').length;
+    if (tab === 'completed') return bookings.filter(b => b.status === 'completed').length;
+    if (tab === 'cancelled') return bookings.filter(b => b.status === 'cancelled').length;
+    return 0;
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -97,70 +212,63 @@ const Bookings = () => {
         return 'bg-green-100 text-green-800';
       case 'completed':
         return 'bg-blue-100 text-blue-800';
-      case 'upcoming':
+      case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'confirmed':
+        return 'bg-green-100 text-green-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'approved':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const filteredBookings = bookings.filter(booking => {
-    const matchesTab = activeTab === 'all' || booking.booking.status === activeTab;
-    const matchesSearch = booking.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         booking.vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         booking.id.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesTab && matchesSearch;
-  });
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
-  const getTabCount = (status: string) => {
-    if (status === 'all') return bookings.length;
-    return bookings.filter(booking => booking.booking.status === status).length;
-  };
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-500">Error: {error}</div>
+        <button 
+          onClick={fetchBookings}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vehicle Bookings</h1>
-          <p className="text-gray-600">Manage all your vehicle rental bookings</p>
+          <h1 className="text-2xl font-bold text-gray-900">My Vehicle Bookings</h1>
+          <p className="text-gray-600">Manage bookings for your vehicles</p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
-          Export Report
-        </button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center space-x-4">
-          <div className="flex-1">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search by customer name, vehicle, or booking ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+        
+        <div className="flex gap-4 items-center">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search bookings..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
-          <select className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="">All Vehicles</option>
-            <option value="car">Cars</option>
-            <option value="van">Vans</option>
-            <option value="suv">SUVs</option>
-          </select>
-          <select className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="">All Dates</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-          </select>
         </div>
       </div>
 
@@ -170,8 +278,8 @@ const Bookings = () => {
           <nav className="flex space-x-8 px-6">
             {[
               { key: 'all', label: 'All Bookings' },
-              { key: 'upcoming', label: 'Upcoming' },
-              { key: 'active', label: 'Active' },
+              { key: 'pending', label: 'Pending Review' },
+              { key: 'confirmed', label: 'Confirmed' },
               { key: 'completed', label: 'Completed' },
               { key: 'cancelled', label: 'Cancelled' }
             ].map((tab) => (
@@ -204,7 +312,7 @@ const Bookings = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking Info</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
@@ -216,28 +324,32 @@ const Bookings = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
+                  <tr key={booking._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{booking.id}</div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 font-mono">{booking.bookingId}</div>
+                        <div className="text-sm text-gray-500">{formatDate(booking.createdAt)}</div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{booking.customer.name}</div>
                         <div className="text-sm text-gray-500">{booking.customer.email}</div>
-                        <div className="text-sm text-gray-500">{booking.customer.phone}</div>
+                        <div className="text-sm text-blue-600 font-mono">{booking.customer.phone}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{booking.vehicle.name}</div>
                         <div className="text-sm text-gray-500">{booking.vehicle.licensePlate}</div>
+                        <div className="text-sm text-gray-500">{booking.vehicle.category}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm text-gray-900">{booking.booking.startDate}</div>
-                        <div className="text-sm text-gray-500">to {booking.booking.endDate}</div>
-                        <div className="text-sm text-gray-500">({booking.booking.duration})</div>
+                        <div className="text-sm text-gray-900">{formatDate(booking.booking.startDate)}</div>
+                        <div className="text-sm text-gray-500">to {formatDate(booking.booking.endDate)}</div>
+                        <div className="text-sm text-gray-500">({booking.booking.duration} days)</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -247,19 +359,53 @@ const Bookings = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">Rs. {booking.booking.amount.toLocaleString()}</div>
+                      <div className="text-sm font-medium text-green-600">Rs. {booking.pricing.totalAmount.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">{booking.payment.method}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${getStatusColor(booking.booking.status)}`}>
-                        {booking.booking.status}
-                      </span>
+                      <div className="flex flex-col space-y-2">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
+                          {booking.status.toUpperCase()}
+                        </span>
+                        
+                        {/* Admin Status Display */}
+                        <div className="text-xs text-gray-500">
+                          Admin: <span className={`font-medium ${booking.adminStatus === 'completed' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {booking.adminStatus === 'completed' ? 'Completed' : 'Pending'}
+                          </span>
+                        </div>
+                        
+                        {/* Owner Status Dropdown */}
+                        {booking.adminStatus === 'completed' && (
+                          <div className="text-xs">
+                            <label className="block text-gray-500 mb-1">Owner Status:</label>
+                            <select
+                              value={booking.ownerStatus || 'pending'}
+                              onChange={(e) => handleOwnerStatusChange(booking._id, e.target.value as 'pending' | 'confirmed')}
+                              className={`w-full px-2 py-1 text-xs rounded border focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                                booking.ownerStatus === 'confirmed' 
+                                  ? 'bg-green-50 border-green-300 text-green-700' 
+                                  : 'bg-yellow-50 border-yellow-300 text-yellow-700'
+                              }`}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="confirmed">Confirmed</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">View</button>
-                        <button className="text-green-600 hover:text-green-900">Contact</button>
-                        {booking.booking.status === 'upcoming' && (
-                          <button className="text-red-600 hover:text-red-900">Cancel</button>
+                      <div className="flex flex-col space-y-2">
+                        <button className="text-blue-600 hover:text-blue-900">View Details</button>
+                        <button className="text-green-600 hover:text-green-900">Contact Customer</button>
+                        {booking.ownerStatus === 'pending' && booking.adminStatus === 'completed' && (
+                          <button 
+                            onClick={() => handleOwnerStatusChange(booking._id, 'confirmed')}
+                            className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded text-xs"
+                          >
+                            Confirm Booking
+                          </button>
                         )}
                       </div>
                     </td>
@@ -296,7 +442,7 @@ const Bookings = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">Rs. {bookings.reduce((sum, booking) => sum + booking.booking.amount, 0).toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900">Rs. {bookings.reduce((sum, booking) => sum + booking.pricing.totalAmount, 0).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -309,8 +455,8 @@ const Bookings = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Bookings</p>
-              <p className="text-2xl font-bold text-gray-900">{getTabCount('active')}</p>
+              <p className="text-sm font-medium text-gray-600">Pending Review</p>
+              <p className="text-2xl font-bold text-gray-900">{getTabCount('pending')}</p>
             </div>
           </div>
         </div>
@@ -323,8 +469,8 @@ const Bookings = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Upcoming</p>
-              <p className="text-2xl font-bold text-gray-900">{getTabCount('upcoming')}</p>
+              <p className="text-sm font-medium text-gray-600">Confirmed</p>
+              <p className="text-2xl font-bold text-gray-900">{getTabCount('confirmed')}</p>
             </div>
           </div>
         </div>

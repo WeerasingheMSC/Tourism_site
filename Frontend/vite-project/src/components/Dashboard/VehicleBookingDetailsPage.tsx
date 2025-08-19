@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { vehicleBookingService } from '../../api/vehicleBookings';
 import type { VehicleBooking } from '../../api/vehicleBookings';
 import { isAuthenticated } from '../../utils/authHelper';
+import { message } from 'antd';
 
 const VehicleBookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -38,6 +39,32 @@ const VehicleBookingDetailsPage: React.FC = () => {
       setError('Failed to load booking details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOwnerConfirmBooking = async () => {
+    if (!booking) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5001/api/vehicle-bookings/${booking._id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ownerStatus: 'confirmed' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to confirm booking');
+      }
+
+      // Update local state
+      setBooking(prev => prev ? { ...prev, ownerStatus: 'confirmed' as any } : null);
+      message.success('Booking confirmed successfully! Customer will be notified.');
+    } catch (error: any) {
+      console.error('Error confirming booking:', error);
+      message.error('Failed to confirm booking');
     }
   };
 
@@ -112,15 +139,49 @@ const VehicleBookingDetailsPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
-                  booking.status === 'active' ? 'bg-green-100 text-green-800' :
-                  booking.status === 'completed' ? 'bg-purple-100 text-purple-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1)}
-                </span>
+                {/* Status Badges */}
+                <div className="flex flex-col space-y-2">
+                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                    booking.status === 'active' ? 'bg-green-100 text-green-800' :
+                    booking.status === 'completed' ? 'bg-purple-100 text-purple-800' :
+                    booking.status === 'approved' ? 'bg-green-100 text-green-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    Overall: {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1)}
+                  </span>
+                  
+                  <div className="flex space-x-2 text-xs">
+                    <span className={`px-2 py-1 rounded ${
+                      (booking as any).adminStatus === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      Admin: {(booking as any).adminStatus || 'pending'}
+                    </span>
+                    <span className={`px-2 py-1 rounded ${
+                      (booking as any).ownerStatus === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      Owner: {(booking as any).ownerStatus || 'pending'}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Owner Action Button */}
+                {(booking as any).ownerStatus === 'pending' && (booking as any).adminStatus === 'completed' && (
+                  <button
+                    onClick={handleOwnerConfirmBooking}
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  >
+                    Confirm Booking
+                  </button>
+                )}
+                
+                {(booking as any).ownerStatus === 'confirmed' && (
+                  <div className="text-center">
+                    <div className="text-green-600 font-medium">✅ Confirmed</div>
+                    <div className="text-xs text-gray-500">Ready for trip</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

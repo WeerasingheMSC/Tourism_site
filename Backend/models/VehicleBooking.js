@@ -71,7 +71,17 @@ const vehicleBookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled'],
+    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled', 'approved'],
+    default: 'pending'
+  },
+  adminStatus: {
+    type: String,
+    enum: ['pending', 'completed'],
+    default: 'pending'
+  },
+  ownerStatus: {
+    type: String,
+    enum: ['pending', 'confirmed'],
     default: 'pending'
   },
   notes: { type: String },
@@ -94,7 +104,7 @@ vehicleBookingSchema.index({ status: 1 });
 vehicleBookingSchema.index({ 'customer.email': 1 });
 vehicleBookingSchema.index({ bookingId: 1 });
 
-// Calculate duration automatically
+// Calculate duration automatically and update overall status
 vehicleBookingSchema.pre('save', function(next) {
   if (this.booking.startDate && this.booking.endDate) {
     const start = new Date(this.booking.startDate);
@@ -104,6 +114,18 @@ vehicleBookingSchema.pre('save', function(next) {
     this.booking.duration = `${diffDays} day${diffDays > 1 ? 's' : ''}`;
     this.pricing.totalDays = diffDays;
   }
+  
+  // Auto-update overall status based on admin and owner status
+  if (this.adminStatus === 'completed' && this.ownerStatus === 'confirmed') {
+    this.status = 'approved';
+  } else if (this.status === 'cancelled') {
+    // Keep cancelled status
+    this.status = 'cancelled';
+  } else {
+    // Keep as pending if either admin or owner hasn't completed their part
+    this.status = 'pending';
+  }
+  
   next();
 });
 

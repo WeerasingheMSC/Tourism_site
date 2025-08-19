@@ -57,6 +57,44 @@ const VehicleOwner: React.FC = () => {
     navigate(`/vehicle-booking-details/${booking._id}`);
   };
 
+  const handleOwnerStatusChange = async (bookingId: string, newStatus: string) => {
+    try {
+      let updateData: any = {};
+      
+      if (newStatus === 'approved') {
+        updateData.ownerStatus = 'confirmed';
+        // Don't automatically set main status - let backend decide based on both admin and owner status
+      } else if (newStatus === 'cancel') {
+        updateData.status = 'cancelled';
+        updateData.ownerStatus = 'pending';
+      } else {
+        updateData.ownerStatus = 'pending';
+      }
+
+      const response = await vehicleBookingService.updateBookingStatus(
+        bookingId, 
+        updateData.status, 
+        newStatus === 'cancel' ? 'Cancelled by owner' : null,
+        undefined, // adminStatus
+        updateData.ownerStatus
+      );
+
+      // Update local state with the response data from backend
+      setBookings(prevBookings => 
+        prevBookings.map(booking => 
+          booking._id === bookingId 
+            ? { ...booking, ...response.data }
+            : booking
+        )
+      );
+
+      message.success(`Booking status updated to ${newStatus === 'approved' ? 'approved' : newStatus === 'cancel' ? 'cancelled' : 'pending'}`);
+    } catch (error: any) {
+      console.error('Error updating booking status:', error);
+      message.error(error?.message || 'Failed to update booking status');
+    }
+  };
+
   const checkOwnerProfile = async () => {
     try {
       const profileCheck = await vehicleOwnerService.checkProfileExists();
@@ -112,7 +150,9 @@ const VehicleOwner: React.FC = () => {
       setLoadingBookings(true);
       // Use getMyBookings to get bookings for owner's vehicles only
       const response = await vehicleBookingService.getMyBookings();
-      setBookings(response.data || []);
+      // Filter out cancelled bookings
+      const filteredBookings = (response.data || []).filter((booking: any) => booking.status !== 'cancelled');
+      setBookings(filteredBookings);
       setErrorBookings(null);
     } catch (error: any) {
       console.error('Error loading bookings:', error);
@@ -468,6 +508,9 @@ const VehicleOwner: React.FC = () => {
                         Amount
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                        Admin Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
@@ -499,17 +542,34 @@ const VehicleOwner: React.FC = () => {
                         <td className="px-6 py-4 text-sm">
                           <span
                             className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              booking.status === "pending"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : booking.status === "confirmed" || booking.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : booking.status === "completed"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-red-100 text-red-800"
+                              booking.status === 'approved' || booking.status === 'confirmed'
+                                ? 'bg-green-100 text-green-800'
+                                : booking.status === 'cancelled'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-yellow-100 text-yellow-800'
                             }`}
                           >
-                            {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1) || "Unknown"}
+                            {booking.status === 'approved' ? 'Approved' : 
+                             booking.status === 'confirmed' ? 'Confirmed' :
+                             booking.status === 'cancelled' ? 'Cancelled' : 'Pending'}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <select
+                            value={booking.ownerStatus === 'confirmed' ? 'approved' : booking.status === 'cancelled' ? 'cancel' : 'pending'}
+                            onChange={(e) => handleOwnerStatusChange(booking._id, e.target.value)}
+                            className={`px-3 py-1 text-xs font-semibold rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                              booking.ownerStatus === 'confirmed'
+                                ? 'bg-green-100 text-green-800'
+                                : booking.status === 'cancelled'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="cancel">Cancel</option>
+                          </select>
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <button

@@ -2,6 +2,7 @@ import express from 'express';
 import { body } from 'express-validator';
 import {
   getAllVehicleBookings,
+  getCustomerVehicleBookings,
   getVehicleBookingById,
   createVehicleBooking,
   updateVehicleBooking,
@@ -29,8 +30,14 @@ const createBookingValidation = [
 
 // Validation rules for updating booking status
 const statusUpdateValidation = [
-  body('status').isIn(['pending', 'confirmed', 'active', 'completed', 'cancelled'])
-    .withMessage('Invalid status value')
+  body('status').optional().isIn(['pending', 'confirmed', 'active', 'completed', 'cancelled', 'approved'])
+    .withMessage('Invalid status value'),
+  body('adminStatus').optional().isIn(['pending', 'completed'])
+    .withMessage('Invalid admin status value'),
+  body('ownerStatus').optional().isIn(['pending', 'confirmed'])
+    .withMessage('Invalid owner status value'),
+  body('cancellationReason').optional().isString()
+    .withMessage('Cancellation reason must be a string')
 ];
 
 // GET /api/vehicle-bookings - Get all vehicle bookings with filtering (public access for viewing)
@@ -38,6 +45,9 @@ router.get('/', getAllVehicleBookings);
 
 // GET /api/vehicle-bookings/my-bookings - Get bookings for current owner's vehicles (protected)
 router.get('/my-bookings', auth, getAllVehicleBookings);
+
+// GET /api/vehicle-bookings/customer-bookings - Get customer's own vehicle bookings (protected)
+router.get('/customer-bookings', auth, getCustomerVehicleBookings);
 
 // GET /api/vehicle-bookings/statistics - Get booking statistics
 router.get('/statistics', auth, getBookingStatistics);

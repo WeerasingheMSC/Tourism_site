@@ -49,7 +49,9 @@ export interface VehicleBooking {
     remainingAmount?: number;
     transactionId?: string;
   };
-  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'approved';
+  adminStatus?: 'pending' | 'completed';
+  ownerStatus?: 'pending' | 'confirmed';
   notes?: string;
   rating?: number;
   review?: string;
@@ -162,7 +164,14 @@ const vehicleBookingAPI = axios.create({
 
 // Add auth token to requests
 vehicleBookingAPI.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  // First try to get the main auth token
+  let token = localStorage.getItem('authToken');
+  
+  // If no main token, try to get customer token or any other token
+  if (!token) {
+    token = localStorage.getItem('token'); // fallback token name
+  }
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -185,7 +194,24 @@ export const vehicleBookingService = {
   // Get owner's vehicle bookings (authenticated)
   getMyBookings: async (params: BookingFilters = {}) => {
     try {
-      const response = await vehicleBookingAPI.get('/my-bookings', { params });
+      const response = await vehicleBookingAPI.get('/my-bookings', { 
+        params,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      throw axiosError.response?.data || axiosError.message;
+    }
+  },
+
+  // Get customer's own vehicle bookings (authenticated)
+  getCustomerBookings: async (params: BookingFilters = {}) => {
+    try {
+      const response = await vehicleBookingAPI.get('/customer-bookings', { params });
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -227,12 +253,15 @@ export const vehicleBookingService = {
   },
 
   // Update booking status
-  updateBookingStatus: async (id: string, status: string, cancellationReason: string | null = null) => {
+  updateBookingStatus: async (id: string, status?: string, cancellationReason: string | null = null, adminStatus?: string, ownerStatus?: string) => {
     try {
-      const response = await vehicleBookingAPI.patch(`/${id}/status`, {
-        status,
-        cancellationReason,
-      });
+      const requestBody: any = {};
+      if (status) requestBody.status = status;
+      if (cancellationReason) requestBody.cancellationReason = cancellationReason;
+      if (adminStatus) requestBody.adminStatus = adminStatus;
+      if (ownerStatus) requestBody.ownerStatus = ownerStatus;
+      
+      const response = await vehicleBookingAPI.patch(`/${id}/status`, requestBody);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;

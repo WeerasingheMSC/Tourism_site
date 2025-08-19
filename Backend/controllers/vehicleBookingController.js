@@ -117,6 +117,128 @@ export const getAllVehicleBookings = async (req, res) => {
   }
 };
 
+// Get customer's own vehicle bookings (for tourists)
+export const getCustomerVehicleBookings = async (req, res) => {
+  try {
+    const { 
+      status, 
+      page = 1, 
+      limit = 10, 
+      search, 
+      startDate, 
+      endDate,
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    // Get customer info from user token
+    const userId = req.user?.userId || req.user?.id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID not found in token'
+      });
+    }
+
+    // Get user details to find email
+    const User = (await import('../models/User.js')).default;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const customerEmail = user.email;
+
+    console.log('🔍 Customer VehicleBooking Debug - Customer request:', { 
+      customerEmail, 
+      userId: userId 
+    });
+
+    // Build filter object for customer's bookings
+    const filter = {
+      'customer.email': customerEmail
+    };
+    
+    if (status && status !== 'all') {
+      filter.status = status;
+    }
+    
+    if (search) {
+      filter.$or = [
+        { 'vehicle.name': { $regex: search, $options: 'i' } },
+        { 'vehicle.licensePlate': { $regex: search, $options: 'i' } },
+        { bookingId: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    if (startDate || endDate) {
+      filter['booking.startDate'] = {};
+      if (startDate) filter['booking.startDate'].$gte = new Date(startDate);
+      if (endDate) filter['booking.startDate'].$lte = new Date(endDate);
+    }
+
+    // Calculate pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    // Sort object
+    const sort = {};
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    const bookings = await VehicleBooking.find(filter)
+      .populate('vehicle.vehicleId', 'name licensePlate category images')
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    console.log('🔍 Customer VehicleBooking Debug - Found bookings:', bookings.length);
+
+    const total = await VehicleBooking.countDocuments(filter);
+
+    // Get summary statistics for this customer
+    const stats = await VehicleBooking.aggregate([
+      { $match: { 'customer.email': customerEmail } },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+          totalRevenue: { $sum: '$pricing.totalAmount' }
+        }
+      }
+    ]);
+
+    const summary = {
+      total,
+      totalSpent: stats.reduce((sum, stat) => sum + stat.totalRevenue, 0),
+      statusCounts: stats.reduce((acc, stat) => {
+        acc[stat._id] = stat.count;
+        return acc;
+      }, {})
+    };
+
+    res.json({
+      success: true,
+      data: bookings,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      },
+      summary
+    });
+  } catch (error) {
+    console.error('Get customer vehicle bookings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch customer vehicle bookings',
+      error: error.message
+    });
+  }
+};
+
 // Get single vehicle booking
 export const getVehicleBookingById = async (req, res) => {
   try {
@@ -289,7 +411,7 @@ export const updateBookingStatus = async (req, res) => {
     });
 
     const { id } = req.params;
-    const { status, cancellationReason } = req.body;
+    const { status, adminStatus, ownerStatus, cancellationReason } = req.body;
 
     const booking = await VehicleBooking.findById(id);
     if (!booking) {
@@ -300,12 +422,20 @@ export const updateBookingStatus = async (req, res) => {
       });
     }
 
-    console.log('✅ Backend - Booking found, updating status from', booking.status, 'to', status);
+    console.log('✅ Backend - Booking found, current statuses:', {
+      status: booking.status,
+      adminStatus: booking.adminStatus,
+      ownerStatus: booking.ownerStatus
+    });
 
     const updateData = { 
-      status,
       updatedBy: req.user?.id || req.user?.userId
     };
+
+    // Update specific status fields based on what's provided
+    if (status) updateData.status = status;
+    if (adminStatus) updateData.adminStatus = adminStatus;
+    if (ownerStatus) updateData.ownerStatus = ownerStatus;
 
     if (status === 'cancelled' && cancellationReason) {
       updateData.cancellationReason = cancellationReason;
@@ -319,13 +449,25 @@ export const updateBookingStatus = async (req, res) => {
 
     console.log('✅ Backend - Booking updated successfully:', {
       id: updatedBooking._id,
-      oldStatus: booking.status,
-      newStatus: updatedBooking.status
+      status: updatedBooking.status,
+      adminStatus: updatedBooking.adminStatus,
+      ownerStatus: updatedBooking.ownerStatus
     });
+
+    // Check if both admin and owner have approved to send email
+    if (((updatedBooking.status === 'approved' || updatedBooking.status === 'confirmed') && 
+         updatedBooking.ownerStatus === 'confirmed')) {
+      try {
+        await sendBookingApprovalEmail(updatedBooking);
+        console.log('✅ Approval email sent to customer');
+      } catch (emailError) {
+        console.error('❌ Failed to send approval email:', emailError);
+      }
+    }
 
     res.json({
       success: true,
-      message: `Booking ${status} successfully`,
+      message: `Booking updated successfully`,
       data: updatedBooking
     });
   } catch (error) {
@@ -336,6 +478,34 @@ export const updateBookingStatus = async (req, res) => {
       error: error.message
     });
   }
+};
+
+// Send booking approval email to customer
+const sendBookingApprovalEmail = async (booking) => {
+  const { sendEmail } = await import('../services/emailService.js');
+  
+  const subject = `Vehicle Booking Approved - ${booking.bookingId}`;
+  const emailText = `
+Dear ${booking.customer.name},
+
+Great news! Your vehicle booking has been approved and is ready for your trip.
+
+Booking Details:
+- Booking ID: ${booking.bookingId}
+- Vehicle: ${booking.vehicle.name}
+- Pickup: ${booking.booking.pickupLocation}
+- Drop-off: ${booking.booking.dropoffLocation}
+- Start Date: ${new Date(booking.booking.startDate).toLocaleDateString()}
+- End Date: ${new Date(booking.booking.endDate).toLocaleDateString()}
+- Total Amount: $${booking.pricing.totalAmount}
+
+Your booking is now confirmed. Please prepare for your upcoming trip!
+
+Best regards,
+Tourism Platform Team
+  `;
+
+  await sendEmail(booking.customer.email, subject, emailText);
 };
 
 // Delete vehicle booking

@@ -49,7 +49,9 @@ interface VehicleBooking {
     remainingAmount?: number;
     transactionId?: string;
   };
-  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'approved';
+  adminStatus: 'pending' | 'completed';
+  ownerStatus: 'pending' | 'confirmed';
   notes?: string;
   rating?: number;
   review?: string;
@@ -78,14 +80,20 @@ const vehicleBookingAPI = {
     return result.data || result;
   },
 
-  updateBookingStatus: async (bookingId: string, status: "pending" | "confirmed" | "active" | "completed" | "cancelled", cancellationReason?: string) => {
+  updateBookingStatus: async (bookingId: string, status?: "pending" | "confirmed" | "active" | "completed" | "cancelled" | "approved", adminStatus?: "pending" | "completed", ownerStatus?: "pending" | "confirmed", cancellationReason?: string) => {
     const token = localStorage.getItem('authToken');
     
     if (!token) {
       throw new Error('No authentication token found');
     }
     
-    console.log('Making API call to update booking status:', { bookingId, status, token: token.substring(0, 20) + '...' });
+    console.log('Making API call to update booking status:', { bookingId, status, adminStatus, ownerStatus, token: token.substring(0, 20) + '...' });
+    
+    const requestBody: any = {};
+    if (status) requestBody.status = status;
+    if (adminStatus) requestBody.adminStatus = adminStatus;
+    if (ownerStatus) requestBody.ownerStatus = ownerStatus;
+    if (cancellationReason) requestBody.cancellationReason = cancellationReason;
     
     const response = await fetch(`http://localhost:5001/api/vehicle-bookings/${bookingId}/status`, {
       method: 'PATCH',
@@ -93,7 +101,7 @@ const vehicleBookingAPI = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status, cancellationReason }),
+      body: JSON.stringify(requestBody),
     });
     
     console.log('API response status:', response.status);
@@ -111,7 +119,7 @@ const vehicleBookingAPI = {
 };
 
 interface AdminVehicleBookingTableProps {
-  onCountsChange?: (counts: { total: number; pending: number; confirmed: number; completed: number; cancelled: number }) => void;
+  onCountsChange?: (counts: { total: number; pending: number; confirmed: number; completed: number; cancelled: number; approved: number }) => void;
 }
 
 const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onCountsChange }) => {
@@ -132,33 +140,37 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
       // Always fetch all bookings first for counting purposes
       const allData = await vehicleBookingAPI.getAllBookings();
       
-      // Update allBookings for counting (always keep the full list)
-      setAllBookings(allData);
+      // Filter out cancelled bookings from allData
+      const filteredData = allData.filter(booking => booking.status !== 'cancelled');
+      
+      // Update allBookings for counting (excluding cancelled bookings)
+      setAllBookings(filteredData);
       
       // Filter the displayed bookings based on current filter
-      let displayedBookings = allData;
+      let displayedBookings = filteredData;
       
       if (filter === "pending") {
-        displayedBookings = allData.filter(booking => booking.status === 'pending');
+        displayedBookings = filteredData.filter(booking => booking.status === 'pending');
       } else if (filter === "confirmed") {
-        displayedBookings = allData.filter(booking => booking.status === 'confirmed');
+        displayedBookings = filteredData.filter(booking => booking.status === 'confirmed');
       } else if (filter === "completed") {
-        displayedBookings = allData.filter(booking => booking.status === 'completed');
+        displayedBookings = filteredData.filter(booking => booking.status === 'completed');
       } else if (filter === "cancelled") {
-        displayedBookings = allData.filter(booking => booking.status === 'cancelled');
+        displayedBookings = filteredData.filter(booking => booking.status === 'cancelled');
       }
-      // For "all", displayedBookings remains as allData
+      // For "all", displayedBookings remains as filteredData
       
       setBookings(displayedBookings);
       
-      // Calculate and send counts to parent component
+      // Calculate and send counts to parent component (excluding cancelled bookings)
       if (onCountsChange) {
         const counts = {
-          total: allData.length,
-          pending: allData.filter(b => b.status === 'pending').length,
-          confirmed: allData.filter(b => b.status === 'confirmed').length,
-          completed: allData.filter(b => b.status === 'completed').length,
-          cancelled: allData.filter(b => b.status === 'cancelled').length,
+          total: filteredData.length,
+          pending: filteredData.filter(b => b.status === 'pending').length,
+          confirmed: filteredData.filter(b => b.status === 'confirmed').length,
+          completed: filteredData.filter(b => b.status === 'completed').length,
+          cancelled: 0, // Always 0 since we're filtering out cancelled bookings
+          approved: filteredData.filter(b => b.status === 'approved').length,
         };
         onCountsChange(counts);
       }
@@ -176,14 +188,77 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
     fetchBookings();
   }, [filter]);
 
-  // Handle status change from dropdown (matching AdminVehicleTable pattern)
-  const handleStatusChange = async (bookingId: string, newStatus: "pending" | "confirmed" | "active" | "completed" | "cancelled") => {
+  // Handle admin status change - update adminStatus with dropdown or button
+  const handleAdminStatusChange = async (bookingId: string, newAdminStatus?: 'pending' | 'completed') => {
+    try {
+      console.log('🔄 AdminVehicleBookingTable - Admin status change:', { bookingId, newAdminStatus });
+      
+      // Default to 'completed' if no status specified (for backwards compatibility with the button)
+      const adminStatus = newAdminStatus || 'completed';
+      
+      // Call API to update admin status
+      const result = await vehicleBookingAPI.updateBookingStatus(bookingId, undefined, adminStatus);
+      console.log('✅ AdminVehicleBookingTable - Admin status change API response:', result);
+      
+      // Update the booking in local state
+      setBookings((prev) => 
+        prev.map((booking) => 
+          booking._id === bookingId 
+            ? { 
+                ...booking, 
+                adminStatus: adminStatus,
+                updatedAt: new Date()
+              }
+            : booking
+        )
+      );
+      
+      // Also update the allBookings array for correct counts
+      setAllBookings((prev) =>
+        prev.map((booking) =>
+          booking._id === bookingId
+            ? {
+                ...booking,
+                adminStatus: adminStatus,
+                updatedAt: new Date()
+              }
+            : booking
+        )
+      );
+      
+      message.success(`Admin status updated to ${adminStatus}`);
+      
+      // Optionally refresh the data to ensure consistency
+      setTimeout(() => {
+        fetchBookings();
+      }, 1000);
+    } catch (err: any) {
+      console.error("❌ AdminVehicleBookingTable - Admin status change failed:", err);
+      message.error('Failed to update admin status');
+      fetchBookings();
+    }
+  };
+
+  // Handle legacy status change from dropdown (for backwards compatibility)
+  const handleStatusChange = async (bookingId: string, newStatus: "pending" | "confirmed" | "cancelled" | "approved") => {
     try {
       console.log('🔄 AdminVehicleBookingTable - Starting status change:', { bookingId, newStatus });
       console.log('🔄 AdminVehicleBookingTable - Current auth token:', localStorage.getItem('authToken') ? 'Present' : 'Missing');
       
-      // Call API for status change
-      const result = await vehicleBookingAPI.updateBookingStatus(bookingId, newStatus);
+      // Determine adminStatus based on the new status
+      let adminStatus: "pending" | "completed" = 'pending';
+      if (newStatus === 'approved' || newStatus === 'confirmed') {
+        adminStatus = 'completed';
+      }
+      
+      // Call API for status change with both status and adminStatus
+      const result = await vehicleBookingAPI.updateBookingStatus(
+        bookingId, 
+        newStatus, 
+        adminStatus, // adminStatus
+        undefined, // ownerStatus
+        undefined // cancellationReason
+      );
       console.log('✅ AdminVehicleBookingTable - Status change API response:', result);
       
       // Update the booking status in the local state
@@ -193,6 +268,7 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
             ? { 
                 ...booking, 
                 status: newStatus,
+                adminStatus: adminStatus,
                 updatedAt: new Date()
               }
             : booking
@@ -206,23 +282,27 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
             ? { 
                 ...booking, 
                 status: newStatus,
+                adminStatus: adminStatus,
                 updatedAt: new Date()
               }
             : booking
         )
       );
       
-      // Update counts
+      // Update counts (excluding cancelled bookings)
       if (onCountsChange) {
         const updatedBookings = allBookings.map(b =>
           b._id === bookingId ? { ...b, status: newStatus } : b
         );
+        // Filter out cancelled bookings for counts
+        const filteredUpdatedBookings = updatedBookings.filter(b => b.status !== 'cancelled');
         const counts = {
-          total: updatedBookings.length,
-          pending: updatedBookings.filter(b => b.status === 'pending').length,
-          confirmed: updatedBookings.filter(b => b.status === 'confirmed').length,
-          completed: updatedBookings.filter(b => b.status === 'completed').length,
-          cancelled: updatedBookings.filter(b => b.status === 'cancelled').length,
+          total: filteredUpdatedBookings.length,
+          pending: filteredUpdatedBookings.filter(b => b.status === 'pending').length,
+          confirmed: filteredUpdatedBookings.filter(b => b.status === 'confirmed').length,
+          completed: filteredUpdatedBookings.filter(b => b.status === 'completed').length,
+          cancelled: 0, // Always 0 since we're filtering out cancelled bookings
+          approved: filteredUpdatedBookings.filter(b => b.status === 'approved').length,
         };
         onCountsChange(counts);
       }
@@ -285,6 +365,7 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
       case 'active': return 'bg-green-100 text-green-800';
       case 'completed': return 'bg-purple-100 text-purple-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
+      case 'approved': return 'bg-emerald-100 text-emerald-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -321,7 +402,7 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
             { key: "pending", label: "Pending", count: allBookings.filter(b => b.status === 'pending').length },
             { key: "confirmed", label: "Confirmed", count: allBookings.filter(b => b.status === 'confirmed').length },
             { key: "completed", label: "Completed", count: allBookings.filter(b => b.status === 'completed').length },
-            { key: "cancelled", label: "Cancelled", count: allBookings.filter(b => b.status === 'cancelled').length },
+            { key: "cancelled", label: "Cancelled", count: 0 }, // Always 0 since we filter out cancelled bookings
           ].map((tab) => (
             <button
               key={tab.key}
@@ -362,7 +443,7 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+                View
               </th>
             </tr>
           </thead>
@@ -427,43 +508,28 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
-                    {booking.status.toUpperCase()}
-                  </span>
+                  <select
+                    value={booking.status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value as "pending" | "confirmed" | "cancelled" | "approved";
+                      handleStatusChange(booking._id, newStatus);
+                    }}
+                    className={`px-3 py-1 text-xs font-semibold rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${getStatusColor(booking.status)}`}
+                  >
+                    <option value="pending">PENDING</option>
+                    <option value="confirmed">CONFIRMED</option>
+                    <option value="cancelled">CANCELLED</option>
+                    <option value="approved">APPROVED</option>
+                  </select>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm space-y-2">
-                  <div>
-                    <button
-                      onClick={() => handleViewDetails(booking)}
-                      className="text-blue-600 hover:text-blue-900 flex items-center"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      View
-                    </button>
-                  </div>
-                  <div>
-                    <select
-                      value={booking.status}
-                      onChange={(e) => handleStatusChange(booking._id, e.target.value as "pending" | "confirmed" | "active" | "completed" | "cancelled")}
-                      className={`px-2 py-1 rounded-md border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        booking.status === 'confirmed'
-                          ? 'bg-blue-100 text-blue-800 border-blue-200'
-                          : booking.status === 'completed'
-                          ? 'bg-purple-100 text-purple-800 border-purple-200'
-                          : booking.status === 'cancelled'
-                          ? 'bg-red-100 text-red-800 border-red-200'
-                          : booking.status === 'active'
-                          ? 'bg-green-100 text-green-800 border-green-200'
-                          : 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                      }`}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="active">Active</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </div>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <button
+                    onClick={() => handleViewDetails(booking)}
+                    className="text-blue-600 hover:text-blue-900 flex items-center"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-1" />
+                    View
+                  </button>
                 </td>
               </tr>
             ))}
