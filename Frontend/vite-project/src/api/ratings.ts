@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface Rating {
   _id: string;
@@ -46,13 +46,16 @@ export const submitRating = async (
   review?: string
 ): Promise<{ success: boolean; message: string; data: Rating }> => {
   const token = localStorage.getItem("authToken");
-  
+
   if (!token) {
     throw new Error("You must be logged in to submit a rating");
   }
 
-  console.log("🔐 Submitting rating with token:", token ? "Token exists" : "No token");
-  
+  console.log(
+    "🔐 Submitting rating with token:",
+    token ? "Token exists" : "No token"
+  );
+
   const response = await fetch(`${API_BASE_URL}/ratings/vehicle/${vehicleId}`, {
     method: "POST",
     headers: {
@@ -71,13 +74,13 @@ export const submitRating = async (
       // If we can't parse the error response, use status text
       errorMessage = `${response.status}: ${response.statusText}`;
     }
-    
+
     console.error("🚨 Rating submission failed:", {
       status: response.status,
       statusText: response.statusText,
-      error: errorMessage
+      error: errorMessage,
     });
-    
+
     throw new Error(errorMessage);
   }
 
@@ -102,8 +105,12 @@ export const getVehicleRatings = async (
 };
 
 // Get vehicle rating summary (for vehicle cards)
-export const getVehicleRatingSummary = async (vehicleId: string): Promise<RatingSummaryResponse> => {
-  const response = await fetch(`${API_BASE_URL}/ratings/vehicle/${vehicleId}/summary`);
+export const getVehicleRatingSummary = async (
+  vehicleId: string
+): Promise<RatingSummaryResponse> => {
+  const response = await fetch(
+    `${API_BASE_URL}/ratings/vehicle/${vehicleId}/summary`
+  );
 
   if (!response.ok) {
     throw new Error("Failed to get vehicle rating summary");
@@ -113,14 +120,19 @@ export const getVehicleRatingSummary = async (vehicleId: string): Promise<Rating
 };
 
 // Get user's rating for a specific vehicle
-export const getUserRating = async (vehicleId: string): Promise<UserRatingResponse> => {
+export const getUserRating = async (
+  vehicleId: string
+): Promise<UserRatingResponse> => {
   const token = localStorage.getItem("authToken");
-  
-  const response = await fetch(`${API_BASE_URL}/ratings/vehicle/${vehicleId}/user`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+
+  const response = await fetch(
+    `${API_BASE_URL}/ratings/vehicle/${vehicleId}/user`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to get user rating");
@@ -130,9 +142,11 @@ export const getUserRating = async (vehicleId: string): Promise<UserRatingRespon
 };
 
 // Delete user's rating
-export const deleteRating = async (vehicleId: string): Promise<{ success: boolean; message: string }> => {
+export const deleteRating = async (
+  vehicleId: string
+): Promise<{ success: boolean; message: string }> => {
   const token = localStorage.getItem("authToken");
-  
+
   const response = await fetch(`${API_BASE_URL}/ratings/vehicle/${vehicleId}`, {
     method: "DELETE",
     headers: {
