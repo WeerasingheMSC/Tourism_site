@@ -233,25 +233,7 @@ const EditVehicle = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const validateStep = (step: number): boolean => {
-    // Function for future step validation if needed
-    switch (step) {
-      case 1:
-        return !!(formData.name && formData.vehicleType && formData.brand && formData.model && formData.year && formData.licensePlate);
-      case 2:
-        return !!(formData.seatingCapacity && formData.fuelType && formData.transmission);
-      case 3:
-        return !!(formData.location.city && formData.location.area);
-      case 4:
-        return true; // FAQs are optional but we want at least basic ones
-      case 5:
-        return !!(formData.pricing.pricePerDay && formData.description);
-      case 6:
-        return true; // Final step
-      default:
-        return false;
-    }
-  };
+  
 
   const updateVehicle = async () => {
     try {

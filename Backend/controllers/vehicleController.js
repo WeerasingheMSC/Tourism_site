@@ -469,11 +469,10 @@ export const approveRejectVehicle = async (req, res, next) => {
       vehicle.approvalStatus = {};
     }
 
-    // Set the approval status fields
     vehicle.approvalStatus.status = status;
     vehicle.approvalStatus.adminNotes = adminNotes || "";
     vehicle.approvalStatus.reviewedAt = new Date();
-    vehicle.approvalStatus.reviewedBy = req.user.userId;
+    vehicle.approvalStatus.reviewedBy = req.user.id;
 
     await vehicle.save();
 

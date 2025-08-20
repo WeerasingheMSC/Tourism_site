@@ -43,15 +43,21 @@ interface VehicleBooking {
     totalAmount: number;
   };
   payment: {
-    method: 'cash' | 'card' | 'bank_transfer' | 'online';
-    status: 'pending' | 'partial' | 'paid' | 'refunded';
+    method: "cash" | "card" | "bank_transfer" | "online";
+    status: "pending" | "partial" | "paid" | "refunded";
     advanceAmount?: number;
     remainingAmount?: number;
     transactionId?: string;
   };
-  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'approved';
-  adminStatus: 'pending' | 'completed';
-  ownerStatus: 'pending' | 'confirmed';
+  status:
+    | "pending"
+    | "confirmed"
+    | "active"
+    | "completed"
+    | "cancelled"
+    | "approved";
+  adminStatus: "pending" | "completed";
+  ownerStatus: "pending" | "confirmed";
   notes?: string;
   rating?: number;
   review?: string;
@@ -63,122 +69,172 @@ interface VehicleBooking {
 // API functions for vehicle booking management
 const vehicleBookingAPI = {
   getAllBookings: async (): Promise<VehicleBooking[]> => {
-    const token = localStorage.getItem('authToken');
-    
-    const response = await fetch('http://localhost:5000/api/vehicle-bookings', {
+    const token = localStorage.getItem("authToken");
+
+    const response = await fetch("http://localhost:5000/api/vehicle-bookings", {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     });
-    
+
     if (!response.ok) {
-      throw new Error('Failed to fetch vehicle bookings');
+      throw new Error("Failed to fetch vehicle bookings");
     }
-    
+
     const result = await response.json();
     return result.data || result;
   },
 
-  updateBookingStatus: async (bookingId: string, status?: "pending" | "confirmed" | "active" | "completed" | "cancelled" | "approved", adminStatus?: "pending" | "completed", ownerStatus?: "pending" | "confirmed", cancellationReason?: string) => {
-    const token = localStorage.getItem('authToken');
-    
+  updateBookingStatus: async (
+    bookingId: string,
+    status?:
+      | "pending"
+      | "confirmed"
+      | "active"
+      | "completed"
+      | "cancelled"
+      | "approved",
+    adminStatus?: "pending" | "completed",
+    ownerStatus?: "pending" | "confirmed",
+    cancellationReason?: string
+  ) => {
+    const token = localStorage.getItem("authToken");
+
     if (!token) {
-      throw new Error('No authentication token found');
+      throw new Error("No authentication token found");
     }
-    
-    console.log('Making API call to update booking status:', { bookingId, status, adminStatus, ownerStatus, token: token.substring(0, 20) + '...' });
-    
+
+    console.log("Making API call to update booking status:", {
+      bookingId,
+      status,
+      adminStatus,
+      ownerStatus,
+      token: token.substring(0, 20) + "...",
+    });
+
     const requestBody: any = {};
     if (status) requestBody.status = status;
     if (adminStatus) requestBody.adminStatus = adminStatus;
     if (ownerStatus) requestBody.ownerStatus = ownerStatus;
     if (cancellationReason) requestBody.cancellationReason = cancellationReason;
-    
-    const response = await fetch(`http://localhost:5000/api/vehicle-bookings/${bookingId}/status`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-    
-    console.log('API response status:', response.status);
-    
+
+    const response = await fetch(
+      `http://localhost:5000/api/vehicle-bookings/${bookingId}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    console.log("API response status:", response.status);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      console.log('API error response:', errorData);
-      throw new Error(errorData.message || `HTTP ${response.status}: Failed to update booking status`);
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: "Unknown error" }));
+      console.log("API error response:", errorData);
+      throw new Error(
+        errorData.message ||
+          `HTTP ${response.status}: Failed to update booking status`
+      );
     }
-    
+
     const result = await response.json();
-    console.log('API success response:', result);
+    console.log("API success response:", result);
     return result;
   },
 };
 
 interface AdminVehicleBookingTableProps {
-  onCountsChange?: (counts: { total: number; pending: number; confirmed: number; completed: number; cancelled: number; approved: number }) => void;
+  onCountsChange?: (counts: {
+    total: number;
+    pending: number;
+    confirmed: number;
+    completed: number;
+    cancelled: number;
+    approved: number;
+  }) => void;
 }
 
-const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onCountsChange }) => {
+const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({
+  onCountsChange,
+}) => {
   const [bookings, setBookings] = useState<VehicleBooking[]>([]);
   const [allBookings, setAllBookings] = useState<VehicleBooking[]>([]); // For counting purposes
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "completed" | "cancelled">("all");
-  const [selectedBooking, setSelectedBooking] = useState<VehicleBooking | null>(null);
+  const [filter, setFilter] = useState<
+    "all" | "pending" | "confirmed" | "completed" | "cancelled"
+  >("all");
+  const [selectedBooking, setSelectedBooking] = useState<VehicleBooking | null>(
+    null
+  );
   const [showModal, setShowModal] = useState<boolean>(false);
 
   // Fetch bookings based on filter
   const fetchBookings = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Always fetch all bookings first for counting purposes
       const allData = await vehicleBookingAPI.getAllBookings();
-      
+
       // Filter out cancelled bookings from allData
-      const filteredData = allData.filter(booking => booking.status !== 'cancelled');
-      
+      const filteredData = allData.filter(
+        (booking) => booking.status !== "cancelled"
+      );
+
       // Update allBookings for counting (excluding cancelled bookings)
       setAllBookings(filteredData);
-      
+
       // Filter the displayed bookings based on current filter
       let displayedBookings = filteredData;
-      
+
       if (filter === "pending") {
-        displayedBookings = filteredData.filter(booking => booking.status === 'pending');
+        displayedBookings = filteredData.filter(
+          (booking) => booking.status === "pending"
+        );
       } else if (filter === "confirmed") {
-        displayedBookings = filteredData.filter(booking => booking.status === 'confirmed');
+        displayedBookings = filteredData.filter(
+          (booking) => booking.status === "confirmed"
+        );
       } else if (filter === "completed") {
-        displayedBookings = filteredData.filter(booking => booking.status === 'completed');
+        displayedBookings = filteredData.filter(
+          (booking) => booking.status === "completed"
+        );
       } else if (filter === "cancelled") {
-        displayedBookings = filteredData.filter(booking => booking.status === 'cancelled');
+        displayedBookings = filteredData.filter(
+          (booking) => booking.status === "cancelled"
+        );
       }
       // For "all", displayedBookings remains as filteredData
-      
+
       setBookings(displayedBookings);
-      
+
       // Calculate and send counts to parent component (excluding cancelled bookings)
       if (onCountsChange) {
         const counts = {
           total: filteredData.length,
-          pending: filteredData.filter(b => b.status === 'pending').length,
-          confirmed: filteredData.filter(b => b.status === 'confirmed').length,
-          completed: filteredData.filter(b => b.status === 'completed').length,
+          pending: filteredData.filter((b) => b.status === "pending").length,
+          confirmed: filteredData.filter((b) => b.status === "confirmed")
+            .length,
+          completed: filteredData.filter((b) => b.status === "completed")
+            .length,
           cancelled: 0, // Always 0 since we're filtering out cancelled bookings
-          approved: filteredData.filter(b => b.status === 'approved').length,
+          approved: filteredData.filter((b) => b.status === "approved").length,
         };
         onCountsChange(counts);
       }
-      
     } catch (err) {
-      console.error('Error fetching bookings:', err);
-      setError('Failed to fetch vehicle bookings. Please try again.');
-      message.error('Failed to fetch vehicle bookings');
+      console.error("Error fetching bookings:", err);
+      setError("Failed to fetch vehicle bookings. Please try again.");
+      message.error("Failed to fetch vehicle bookings");
     } finally {
       setLoading(false);
     }
@@ -188,148 +244,117 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
     fetchBookings();
   }, [filter]);
 
-  // Handle admin status change - update adminStatus with dropdown or button
-  const handleAdminStatusChange = async (bookingId: string, newAdminStatus?: 'pending' | 'completed') => {
+  // Handle legacy status change from dropdown (for backwards compatibility)
+  const handleStatusChange = async (
+    bookingId: string,
+    newStatus: "pending" | "confirmed" | "cancelled" | "approved"
+  ) => {
     try {
-      console.log('🔄 AdminVehicleBookingTable - Admin status change:', { bookingId, newAdminStatus });
-      
-      // Default to 'completed' if no status specified (for backwards compatibility with the button)
-      const adminStatus = newAdminStatus || 'completed';
-      
-      // Call API to update admin status
-      const result = await vehicleBookingAPI.updateBookingStatus(bookingId, undefined, adminStatus);
-      console.log('✅ AdminVehicleBookingTable - Admin status change API response:', result);
-      
-      // Update the booking in local state
-      setBookings((prev) => 
-        prev.map((booking) => 
-          booking._id === bookingId 
-            ? { 
-                ...booking, 
+      console.log("🔄 AdminVehicleBookingTable - Starting status change:", {
+        bookingId,
+        newStatus,
+      });
+      console.log(
+        "🔄 AdminVehicleBookingTable - Current auth token:",
+        localStorage.getItem("authToken") ? "Present" : "Missing"
+      );
+
+      // Determine adminStatus based on the new status
+      let adminStatus: "pending" | "completed" = "pending";
+      if (newStatus === "approved" || newStatus === "confirmed") {
+        adminStatus = "completed";
+      }
+
+      // Call API for status change with both status and adminStatus
+      const result = await vehicleBookingAPI.updateBookingStatus(
+        bookingId,
+        newStatus,
+        adminStatus, // adminStatus
+        undefined, // ownerStatus
+        undefined // cancellationReason
+      );
+      console.log(
+        "✅ AdminVehicleBookingTable - Status change API response:",
+        result
+      );
+
+      // Update the booking status in the local state
+      setBookings((prev) =>
+        prev.map((booking) =>
+          booking._id === bookingId
+            ? {
+                ...booking,
+                status: newStatus,
                 adminStatus: adminStatus,
-                updatedAt: new Date()
+                updatedAt: new Date(),
               }
             : booking
         )
       );
-      
+
       // Also update the allBookings array for correct counts
       setAllBookings((prev) =>
         prev.map((booking) =>
           booking._id === bookingId
             ? {
                 ...booking,
+                status: newStatus,
                 adminStatus: adminStatus,
-                updatedAt: new Date()
+                updatedAt: new Date(),
               }
             : booking
         )
       );
-      
-      message.success(`Admin status updated to ${adminStatus}`);
-      
-      // Optionally refresh the data to ensure consistency
-      setTimeout(() => {
-        fetchBookings();
-      }, 1000);
-    } catch (err: any) {
-      console.error("❌ AdminVehicleBookingTable - Admin status change failed:", err);
-      message.error('Failed to update admin status');
-      fetchBookings();
-    }
-  };
 
-  // Handle legacy status change from dropdown (for backwards compatibility)
-  const handleStatusChange = async (bookingId: string, newStatus: "pending" | "confirmed" | "cancelled" | "approved") => {
-    try {
-      console.log('🔄 AdminVehicleBookingTable - Starting status change:', { bookingId, newStatus });
-      console.log('🔄 AdminVehicleBookingTable - Current auth token:', localStorage.getItem('authToken') ? 'Present' : 'Missing');
-      
-      // Determine adminStatus based on the new status
-      let adminStatus: "pending" | "completed" = 'pending';
-      if (newStatus === 'approved' || newStatus === 'confirmed') {
-        adminStatus = 'completed';
-      }
-      
-      // Call API for status change with both status and adminStatus
-      const result = await vehicleBookingAPI.updateBookingStatus(
-        bookingId, 
-        newStatus, 
-        adminStatus, // adminStatus
-        undefined, // ownerStatus
-        undefined // cancellationReason
-      );
-      console.log('✅ AdminVehicleBookingTable - Status change API response:', result);
-      
-      // Update the booking status in the local state
-      setBookings((prev) => 
-        prev.map((booking) => 
-          booking._id === bookingId 
-            ? { 
-                ...booking, 
-                status: newStatus,
-                adminStatus: adminStatus,
-                updatedAt: new Date()
-              }
-            : booking
-        )
-      );
-      
-      // Also update the allBookings array for correct counts
-      setAllBookings((prev) => 
-        prev.map((booking) => 
-          booking._id === bookingId 
-            ? { 
-                ...booking, 
-                status: newStatus,
-                adminStatus: adminStatus,
-                updatedAt: new Date()
-              }
-            : booking
-        )
-      );
-      
       // Update counts (excluding cancelled bookings)
       if (onCountsChange) {
-        const updatedBookings = allBookings.map(b =>
+        const updatedBookings = allBookings.map((b) =>
           b._id === bookingId ? { ...b, status: newStatus } : b
         );
         // Filter out cancelled bookings for counts
-        const filteredUpdatedBookings = updatedBookings.filter(b => b.status !== 'cancelled');
+        const filteredUpdatedBookings = updatedBookings.filter(
+          (b) => b.status !== "cancelled"
+        );
         const counts = {
           total: filteredUpdatedBookings.length,
-          pending: filteredUpdatedBookings.filter(b => b.status === 'pending').length,
-          confirmed: filteredUpdatedBookings.filter(b => b.status === 'confirmed').length,
-          completed: filteredUpdatedBookings.filter(b => b.status === 'completed').length,
+          pending: filteredUpdatedBookings.filter((b) => b.status === "pending")
+            .length,
+          confirmed: filteredUpdatedBookings.filter(
+            (b) => b.status === "confirmed"
+          ).length,
+          completed: filteredUpdatedBookings.filter(
+            (b) => b.status === "completed"
+          ).length,
           cancelled: 0, // Always 0 since we're filtering out cancelled bookings
-          approved: filteredUpdatedBookings.filter(b => b.status === 'approved').length,
+          approved: filteredUpdatedBookings.filter(
+            (b) => b.status === "approved"
+          ).length,
         };
         onCountsChange(counts);
       }
-      
+
       message.success(`Booking status changed to ${newStatus} successfully`);
-      
+
       // Optionally refresh the data to ensure consistency (matching AdminVehicleTable pattern)
       setTimeout(() => {
         fetchBookings();
       }, 1000);
-      
     } catch (err: any) {
       console.error("❌ AdminVehicleBookingTable - Status change failed:", err);
-      console.error("❌ AdminVehicleBookingTable - Error details:", { 
-        message: err.message, 
+      console.error("❌ AdminVehicleBookingTable - Error details:", {
+        message: err.message,
         stack: err.stack,
-        response: err.response 
+        response: err.response,
       });
-      
+
       // More detailed error message (matching AdminVehicleTable pattern)
       let errorMessage = `Failed to change status to ${newStatus}`;
       if (err.message) {
         errorMessage += `: ${err.message}`;
       }
-      
+
       message.error(errorMessage);
-      
+
       // Refresh data in case of error to show correct state (matching AdminVehicleTable pattern)
       fetchBookings();
     }
@@ -341,32 +366,39 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
   };
 
   const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatDateTime = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'confirmed': return 'bg-blue-100 text-blue-800';
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-purple-100 text-purple-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      case 'approved': return 'bg-emerald-100 text-emerald-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmed":
+        return "bg-blue-100 text-blue-800";
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "completed":
+        return "bg-purple-100 text-purple-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "approved":
+        return "bg-emerald-100 text-emerald-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -399,9 +431,21 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
         <nav className="-mb-px flex space-x-8 px-6">
           {[
             { key: "all", label: "All Bookings", count: allBookings.length },
-            { key: "pending", label: "Pending", count: allBookings.filter(b => b.status === 'pending').length },
-            { key: "confirmed", label: "Confirmed", count: allBookings.filter(b => b.status === 'confirmed').length },
-            { key: "completed", label: "Completed", count: allBookings.filter(b => b.status === 'completed').length },
+            {
+              key: "pending",
+              label: "Pending",
+              count: allBookings.filter((b) => b.status === "pending").length,
+            },
+            {
+              key: "confirmed",
+              label: "Confirmed",
+              count: allBookings.filter((b) => b.status === "confirmed").length,
+            },
+            {
+              key: "completed",
+              label: "Completed",
+              count: allBookings.filter((b) => b.status === "completed").length,
+            },
             { key: "cancelled", label: "Cancelled", count: 0 }, // Always 0 since we filter out cancelled bookings
           ].map((tab) => (
             <button
@@ -511,10 +555,16 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
                   <select
                     value={booking.status}
                     onChange={(e) => {
-                      const newStatus = e.target.value as "pending" | "confirmed" | "cancelled" | "approved";
+                      const newStatus = e.target.value as
+                        | "pending"
+                        | "confirmed"
+                        | "cancelled"
+                        | "approved";
                       handleStatusChange(booking._id, newStatus);
                     }}
-                    className={`px-3 py-1 text-xs font-semibold rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${getStatusColor(booking.status)}`}
+                    className={`px-3 py-1 text-xs font-semibold rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${getStatusColor(
+                      booking.status
+                    )}`}
                   >
                     <option value="pending">PENDING</option>
                     <option value="confirmed">CONFIRMED</option>
@@ -558,8 +608,18 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <span className="sr-only">Close</span>
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -568,60 +628,126 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Information */}
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">Customer Information</h4>
+                  <h4 className="font-medium text-gray-900 mb-3">
+                    Customer Information
+                  </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Name:</span> {selectedBooking.customer.name}</p>
-                    <p><span className="font-medium">Email:</span> {selectedBooking.customer.email}</p>
-                    <p><span className="font-medium">Phone:</span> {selectedBooking.customer.phone}</p>
-                    <p><span className="font-medium">Address:</span> {selectedBooking.customer.address || 'Not provided'}</p>
+                    <p>
+                      <span className="font-medium">Name:</span>{" "}
+                      {selectedBooking.customer.name}
+                    </p>
+                    <p>
+                      <span className="font-medium">Email:</span>{" "}
+                      {selectedBooking.customer.email}
+                    </p>
+                    <p>
+                      <span className="font-medium">Phone:</span>{" "}
+                      {selectedBooking.customer.phone}
+                    </p>
+                    <p>
+                      <span className="font-medium">Address:</span>{" "}
+                      {selectedBooking.customer.address || "Not provided"}
+                    </p>
                     {selectedBooking.customer.driverLicense && (
-                      <p><span className="font-medium">Driver License:</span> {selectedBooking.customer.driverLicense}</p>
+                      <p>
+                        <span className="font-medium">Driver License:</span>{" "}
+                        {selectedBooking.customer.driverLicense}
+                      </p>
                     )}
                     {selectedBooking.customer.idNumber && (
-                      <p><span className="font-medium">ID Number:</span> {selectedBooking.customer.idNumber}</p>
+                      <p>
+                        <span className="font-medium">ID Number:</span>{" "}
+                        {selectedBooking.customer.idNumber}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 {/* Vehicle Information */}
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">Vehicle Information</h4>
+                  <h4 className="font-medium text-gray-900 mb-3">
+                    Vehicle Information
+                  </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Vehicle:</span> {selectedBooking.vehicle.name}</p>
-                    <p><span className="font-medium">License Plate:</span> {selectedBooking.vehicle.licensePlate}</p>
-                    <p><span className="font-medium">Category:</span> {selectedBooking.vehicle.category}</p>
+                    <p>
+                      <span className="font-medium">Vehicle:</span>{" "}
+                      {selectedBooking.vehicle.name}
+                    </p>
+                    <p>
+                      <span className="font-medium">License Plate:</span>{" "}
+                      {selectedBooking.vehicle.licensePlate}
+                    </p>
+                    <p>
+                      <span className="font-medium">Category:</span>{" "}
+                      {selectedBooking.vehicle.category}
+                    </p>
                   </div>
                 </div>
 
                 {/* Booking Details */}
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">Booking Details</h4>
+                  <h4 className="font-medium text-gray-900 mb-3">
+                    Booking Details
+                  </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Start Date:</span> {formatDateTime(selectedBooking.booking.startDate)}</p>
-                    <p><span className="font-medium">End Date:</span> {formatDateTime(selectedBooking.booking.endDate)}</p>
-                    <p><span className="font-medium">Duration:</span> {selectedBooking.booking.duration} days</p>
-                    <p><span className="font-medium">Pickup:</span> {selectedBooking.booking.pickupLocation}</p>
-                    <p><span className="font-medium">Drop-off:</span> {selectedBooking.booking.dropoffLocation}</p>
-                    <p><span className="font-medium">With Driver:</span> {selectedBooking.booking.driverRequired ? 'Yes' : 'No'}</p>
+                    <p>
+                      <span className="font-medium">Start Date:</span>{" "}
+                      {formatDateTime(selectedBooking.booking.startDate)}
+                    </p>
+                    <p>
+                      <span className="font-medium">End Date:</span>{" "}
+                      {formatDateTime(selectedBooking.booking.endDate)}
+                    </p>
+                    <p>
+                      <span className="font-medium">Duration:</span>{" "}
+                      {selectedBooking.booking.duration} days
+                    </p>
+                    <p>
+                      <span className="font-medium">Pickup:</span>{" "}
+                      {selectedBooking.booking.pickupLocation}
+                    </p>
+                    <p>
+                      <span className="font-medium">Drop-off:</span>{" "}
+                      {selectedBooking.booking.dropoffLocation}
+                    </p>
+                    <p>
+                      <span className="font-medium">With Driver:</span>{" "}
+                      {selectedBooking.booking.driverRequired ? "Yes" : "No"}
+                    </p>
                   </div>
                 </div>
 
                 {/* Pricing Information */}
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">Pricing Information</h4>
+                  <h4 className="font-medium text-gray-900 mb-3">
+                    Pricing Information
+                  </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Base Price:</span> ${selectedBooking.pricing.basePrice}</p>
+                    <p>
+                      <span className="font-medium">Base Price:</span> $
+                      {selectedBooking.pricing.basePrice}
+                    </p>
                     {selectedBooking.pricing.driverCharge && (
-                      <p><span className="font-medium">Driver Charge:</span> ${selectedBooking.pricing.driverCharge}</p>
+                      <p>
+                        <span className="font-medium">Driver Charge:</span> $
+                        {selectedBooking.pricing.driverCharge}
+                      </p>
                     )}
                     {selectedBooking.pricing.insurance && (
-                      <p><span className="font-medium">Insurance:</span> ${selectedBooking.pricing.insurance}</p>
+                      <p>
+                        <span className="font-medium">Insurance:</span> $
+                        {selectedBooking.pricing.insurance}
+                      </p>
                     )}
                     {selectedBooking.pricing.tax && (
-                      <p><span className="font-medium">Tax:</span> ${selectedBooking.pricing.tax}</p>
+                      <p>
+                        <span className="font-medium">Tax:</span> $
+                        {selectedBooking.pricing.tax}
+                      </p>
                     )}
                     <p className="font-medium text-green-600">
-                      <span className="font-medium text-gray-900">Total:</span> ${selectedBooking.pricing.totalAmount}
+                      <span className="font-medium text-gray-900">Total:</span>{" "}
+                      ${selectedBooking.pricing.totalAmount}
                     </p>
                   </div>
                 </div>
@@ -629,40 +755,61 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
 
               {/* Status and Notes */}
               <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-3">Status & Additional Information</h4>
+                <h4 className="font-medium text-gray-900 mb-3">
+                  Status & Additional Information
+                </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p><span className="font-medium">Status:</span> 
-                      <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedBooking.status)}`}>
+                    <p>
+                      <span className="font-medium">Status:</span>
+                      <span
+                        className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                          selectedBooking.status
+                        )}`}
+                      >
                         {selectedBooking.status.toUpperCase()}
                       </span>
                     </p>
-                    <p className="mt-2"><span className="font-medium">Payment Status:</span> 
-                      <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                        selectedBooking.payment.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
-                      }`}>
+                    <p className="mt-2">
+                      <span className="font-medium">Payment Status:</span>
+                      <span
+                        className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                          selectedBooking.payment.status === "paid"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-orange-100 text-orange-800"
+                        }`}
+                      >
                         {selectedBooking.payment.status.toUpperCase()}
                       </span>
                     </p>
                   </div>
                   <div>
-                    <p><span className="font-medium">Created:</span> {formatDateTime(selectedBooking.createdAt)}</p>
-                    <p><span className="font-medium">Updated:</span> {formatDateTime(selectedBooking.updatedAt)}</p>
+                    <p>
+                      <span className="font-medium">Created:</span>{" "}
+                      {formatDateTime(selectedBooking.createdAt)}
+                    </p>
+                    <p>
+                      <span className="font-medium">Updated:</span>{" "}
+                      {formatDateTime(selectedBooking.updatedAt)}
+                    </p>
                   </div>
                 </div>
                 {selectedBooking.notes && (
                   <div className="mt-3">
-                    <p><span className="font-medium">Notes:</span> {selectedBooking.notes}</p>
+                    <p>
+                      <span className="font-medium">Notes:</span>{" "}
+                      {selectedBooking.notes}
+                    </p>
                   </div>
                 )}
               </div>
 
               {/* Action Buttons */}
-              {selectedBooking.status === 'pending' && (
+              {selectedBooking.status === "pending" && (
                 <div className="mt-6 flex justify-end space-x-3 pt-4 border-t">
                   <button
                     onClick={() => {
-                      handleStatusChange(selectedBooking._id, 'confirmed');
+                      handleStatusChange(selectedBooking._id, "confirmed");
                       setShowModal(false);
                     }}
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
@@ -671,7 +818,7 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
                   </button>
                   <button
                     onClick={() => {
-                      handleStatusChange(selectedBooking._id, 'cancelled');
+                      handleStatusChange(selectedBooking._id, "cancelled");
                       setShowModal(false);
                     }}
                     className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"

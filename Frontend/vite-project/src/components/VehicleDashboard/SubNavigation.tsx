@@ -5,7 +5,7 @@ interface SubNavigationProps {
   type: 'hotel' | 'vehicle';
 }
 
-const SubNavigation: React.FC<SubNavigationProps> = ({ type }) => {
+const SubNavigation: React.FC<SubNavigationProps> = ({ }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
