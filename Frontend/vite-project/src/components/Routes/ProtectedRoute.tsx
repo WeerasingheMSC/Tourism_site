@@ -8,12 +8,12 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}'); // Get user from localStorage
 
-  // If the user is not an admin, redirect them to the login page
-  if (!user || user.role !== 'admin') {
+  // If the user is not authenticated or doesn't have a valid role, redirect them to the login page
+  if (!user || !user.role || !['admin', 'transport-owner', 'hotel-owner'].includes(user.role)) {
     return <Navigate to="/login" replace />;
   }
 
-  // If the user is an admin, render the children (protected content)
+  // If the user has a valid role, render the children (protected content)
   return <>{children}</>;
 };
 

@@ -42,13 +42,13 @@ const AuthNavBar: React.FC = () => {
     {
       label: (
         <span
-          onClick={() => navigate("/CustomPackageForm")}
+          onClick={() => navigate("/admin/vehicles")}
           className="cursor-pointer hover:text-orange-500"
         >
-          Customize Package
+          Vehicles
         </span>
       ),
-      key: "custom-package",
+      key: "vehicles",
     },
   ];
 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicle API Test</title>
+</head>
+<body>
+    <h1>Vehicle API Test</h1>
+    <div id="result"></div>
+    
+    <script>
+        async function testVehicleAPI() {
+            try {
+                const response = await fetch('http://localhost:5001/api/vehicles/689daf267d811e3d1ad70552', {
+                    headers: {
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YjhmOWUxMjM0NTY3ODlhYmNkZWYwMSIsImVtYWlsIjoidGVzdEB2ZWhpY2xlb3duZXIuY29tIiwicm9sZSI6InZlaGljbGUtb3duZXIiLCJpYXQiOjE3NTUxNjE1ODcsImV4cCI6MTc1NTI0Nzk4N30.u1ly8bVESS3EvLwH1OnApZvp3limjanAC8RzuV_kQ5M',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                document.getElementById('result').innerHTML = `
+                    <h2>Vehicle: ${data.data.title}</h2>
+                    <p>Images: ${JSON.stringify(data.data.images)}</p>
+                    <div>
+                        ${data.data.images.map(img => `<img src="${img}" style="width: 200px; margin: 10px;" alt="Vehicle Image">`).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        testVehicleAPI();
+    </script>
+</body>
+</html>

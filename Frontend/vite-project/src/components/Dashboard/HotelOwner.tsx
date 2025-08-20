@@ -17,6 +17,10 @@ const AdminDashboardPage: React.FC = () => {
       .finally(() => setLoadingHotels(false));
   }, []);
 
+  const handleDashboardNavigation = () => {
+    navigate("/hotel-partner-dashboard");
+  };
+
   return (
     <div className=" min-h-screen flex flex-col relative z-10">
       {/* Main Content */}
