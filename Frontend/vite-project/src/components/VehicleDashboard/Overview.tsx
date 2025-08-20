@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Overview = () => {
   const stats = [
     { label: 'Total Vehicles', value: '3', color: 'bg-blue-500' },

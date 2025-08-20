@@ -39,7 +39,7 @@ const AdminDashboardPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Hotel Bookings</h2>
         <p className="text-gray-500 mb-4">View and manage hotel bookings</p>
         <div className="rounded-2xl border border-gray-300 overflow-hidden mb-12 bg-white">
-          <HotelOwnerBookingTable />  
+          <HotelOwnerBookingTable hotelId={''} />  
         </div>
 
         
