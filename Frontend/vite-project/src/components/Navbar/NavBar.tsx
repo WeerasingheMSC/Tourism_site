@@ -173,7 +173,7 @@ const NavBar = () => {
             </li>
             <li>
               <Button 
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/signup")}
                 type="primary" 
                 block
                 style={{ background: "#faad14" }}>
