@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import { ExternalLink } from "lucide-react";
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface VehicleBooking {
   _id: string;
@@ -71,7 +73,7 @@ const vehicleBookingAPI = {
   getAllBookings: async (): Promise<VehicleBooking[]> => {
     const token = localStorage.getItem("authToken");
 
-    const response = await fetch("http://localhost:5000/api/vehicle-bookings", {
+    const response = await fetch(`${API_BASE_URL}/api/vehicle-bookings`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -120,7 +122,7 @@ const vehicleBookingAPI = {
     if (cancellationReason) requestBody.cancellationReason = cancellationReason;
 
     const response = await fetch(
-      `http://localhost:5000/api/vehicle-bookings/${bookingId}/status`,
+      `${API_BASE_URL}/api/vehicle-bookings/${bookingId}/status`,
       {
         method: "PATCH",
         headers: {

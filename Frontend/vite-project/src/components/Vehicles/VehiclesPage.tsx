@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import VehicleCard from './VehicleCard';
 import { FilterSection, type Filters } from './FilterSection';
 import vehicleBg from '../../assets/vehiclebg.png';
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Define types
 interface Vehicle {
@@ -46,7 +48,7 @@ interface Vehicle {
 // API function to fetch vehicles
 const fetchVehicles = async (): Promise<Vehicle[]> => {
   try {
-    const response = await fetch('http://localhost:5000/api/vehicles', {
+    const response = await fetch(`${API_BASE_URL}/api/vehicles`, {
       headers: {
         'Content-Type': 'application/json',
       },

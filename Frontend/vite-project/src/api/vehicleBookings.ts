@@ -1,6 +1,7 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
-const API_BASE_URL = 'http://localhost:5000/api';
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 // Type definitions
 export interface VehicleBooking {
@@ -11,8 +12,8 @@ export interface VehicleBooking {
     email: string;
     phone: string;
     address?: string;
-    driverLicense?: string;  // Made optional to match backend validation
-    idNumber?: string;       // Made optional to match backend validation
+    driverLicense?: string; // Made optional to match backend validation
+    idNumber?: string; // Made optional to match backend validation
   };
   vehicle: {
     vehicleId: string;
@@ -23,16 +24,16 @@ export interface VehicleBooking {
   booking: {
     startDate: Date | string;
     endDate: Date | string;
-    duration: string | number;  // Can be string or number
+    duration: string | number; // Can be string or number
     pickupLocation: string;
     dropoffLocation: string;
     pickupTime?: string;
     dropoffTime?: string;
     withDriver?: boolean;
-    driverRequired?: boolean;  // Added for backend compatibility
+    driverRequired?: boolean; // Added for backend compatibility
   };
   pricing: {
-    basePrice: number;        // Required by backend validation
+    basePrice: number; // Required by backend validation
     dailyRate?: number;
     totalDays?: number;
     subtotal?: number;
@@ -40,18 +41,24 @@ export interface VehicleBooking {
     insurance?: number;
     tax?: number;
     discount?: number;
-    totalAmount: number;      // Required by backend validation
+    totalAmount: number; // Required by backend validation
   };
   payment: {
-    method: 'cash' | 'card' | 'bank_transfer' | 'online';
-    status: 'pending' | 'partial' | 'paid' | 'refunded';
+    method: "cash" | "card" | "bank_transfer" | "online";
+    status: "pending" | "partial" | "paid" | "refunded";
     advanceAmount?: number;
     remainingAmount?: number;
     transactionId?: string;
   };
-  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'approved';
-  adminStatus?: 'pending' | 'completed';
-  ownerStatus?: 'pending' | 'confirmed';
+  status:
+    | "pending"
+    | "confirmed"
+    | "active"
+    | "completed"
+    | "cancelled"
+    | "approved";
+  adminStatus?: "pending" | "completed";
+  ownerStatus?: "pending" | "confirmed";
   notes?: string;
   rating?: number;
   review?: string;
@@ -139,7 +146,7 @@ export interface BookingFilters {
   endDate?: string;
   vehicleType?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface VehicleFilters {
@@ -151,27 +158,27 @@ export interface VehicleFilters {
   location?: string;
   priceRange?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 // Create axios instance with default config
 const vehicleBookingAPI = axios.create({
   baseURL: `${API_BASE_URL}/vehicle-bookings`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 // Add auth token to requests
 vehicleBookingAPI.interceptors.request.use((config) => {
   // First try to get the main auth token
-  let token = localStorage.getItem('authToken');
-  
+  let token = localStorage.getItem("authToken");
+
   // If no main token, try to get customer token or any other token
   if (!token) {
-    token = localStorage.getItem('token'); // fallback token name
+    token = localStorage.getItem("token"); // fallback token name
   }
-  
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -183,7 +190,7 @@ export const vehicleBookingService = {
   // Get all vehicle bookings with filtering
   getAllBookings: async (params: BookingFilters = {}) => {
     try {
-      const response = await vehicleBookingAPI.get('/', { params });
+      const response = await vehicleBookingAPI.get("/", { params });
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -194,12 +201,12 @@ export const vehicleBookingService = {
   // Get owner's vehicle bookings (authenticated)
   getMyBookings: async (params: BookingFilters = {}) => {
     try {
-      const response = await vehicleBookingAPI.get('/my-bookings', { 
+      const response = await vehicleBookingAPI.get("/my-bookings", {
         params,
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
       });
       return response.data;
     } catch (error) {
@@ -211,7 +218,9 @@ export const vehicleBookingService = {
   // Get customer's own vehicle bookings (authenticated)
   getCustomerBookings: async (params: BookingFilters = {}) => {
     try {
-      const response = await vehicleBookingAPI.get('/customer-bookings', { params });
+      const response = await vehicleBookingAPI.get("/customer-bookings", {
+        params,
+      });
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -233,7 +242,7 @@ export const vehicleBookingService = {
   // Create new vehicle booking
   createBooking: async (bookingData: Partial<VehicleBooking>) => {
     try {
-      const response = await vehicleBookingAPI.post('/', bookingData);
+      const response = await vehicleBookingAPI.post("/", bookingData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -253,15 +262,25 @@ export const vehicleBookingService = {
   },
 
   // Update booking status
-  updateBookingStatus: async (id: string, status?: string, cancellationReason: string | null = null, adminStatus?: string, ownerStatus?: string) => {
+  updateBookingStatus: async (
+    id: string,
+    status?: string,
+    cancellationReason: string | null = null,
+    adminStatus?: string,
+    ownerStatus?: string
+  ) => {
     try {
       const requestBody: any = {};
       if (status) requestBody.status = status;
-      if (cancellationReason) requestBody.cancellationReason = cancellationReason;
+      if (cancellationReason)
+        requestBody.cancellationReason = cancellationReason;
       if (adminStatus) requestBody.adminStatus = adminStatus;
       if (ownerStatus) requestBody.ownerStatus = ownerStatus;
-      
-      const response = await vehicleBookingAPI.patch(`/${id}/status`, requestBody);
+
+      const response = await vehicleBookingAPI.patch(
+        `/${id}/status`,
+        requestBody
+      );
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -281,9 +300,9 @@ export const vehicleBookingService = {
   },
 
   // Get booking statistics
-  getStatistics: async (period: string = 'month') => {
+  getStatistics: async (period: string = "month") => {
     try {
-      const response = await vehicleBookingAPI.get('/statistics', {
+      const response = await vehicleBookingAPI.get("/statistics", {
         params: { period },
       });
       return response.data;
@@ -298,12 +317,12 @@ export const vehicleBookingService = {
 const vehicleAPI = axios.create({
   baseURL: `${API_BASE_URL}/vehicles`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 vehicleAPI.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -314,7 +333,7 @@ export const vehicleService = {
   // Get all vehicles with filtering
   getAllVehicles: async (params: VehicleFilters = {}) => {
     try {
-      const response = await vehicleAPI.get('/', { params });
+      const response = await vehicleAPI.get("/", { params });
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -325,7 +344,7 @@ export const vehicleService = {
   // Get owner's vehicles (authenticated)
   getMyVehicles: async (params: VehicleFilters = {}) => {
     try {
-      const response = await vehicleAPI.get('/my-vehicles', { params });
+      const response = await vehicleAPI.get("/my-vehicles", { params });
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -334,7 +353,10 @@ export const vehicleService = {
   },
 
   // Get single vehicle
-  getVehicleById: async (id: string, params: { startDate?: string; endDate?: string } = {}) => {
+  getVehicleById: async (
+    id: string,
+    params: { startDate?: string; endDate?: string } = {}
+  ) => {
     try {
       const response = await vehicleAPI.get(`/${id}`, { params });
       return response.data;
@@ -347,7 +369,7 @@ export const vehicleService = {
   // Create new vehicle
   createVehicle: async (vehicleData: Partial<Vehicle>) => {
     try {
-      const response = await vehicleAPI.post('/', vehicleData);
+      const response = await vehicleAPI.post("/", vehicleData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -367,7 +389,11 @@ export const vehicleService = {
   },
 
   // Toggle vehicle availability
-  toggleAvailability: async (id: string, available: boolean, reason: string | null = null) => {
+  toggleAvailability: async (
+    id: string,
+    available: boolean,
+    reason: string | null = null
+  ) => {
     try {
       const response = await vehicleAPI.patch(`/${id}/availability`, {
         available,
@@ -394,7 +420,7 @@ export const vehicleService = {
   // Get vehicle statistics
   getStatistics: async () => {
     try {
-      const response = await vehicleAPI.get('/statistics');
+      const response = await vehicleAPI.get("/statistics");
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -403,9 +429,14 @@ export const vehicleService = {
   },
 
   // Get available vehicles for specific dates
-  getAvailableVehicles: async (params: { startDate: string; endDate: string; category?: string; location?: string }) => {
+  getAvailableVehicles: async (params: {
+    startDate: string;
+    endDate: string;
+    category?: string;
+    location?: string;
+  }) => {
     try {
-      const response = await vehicleAPI.get('/available', { params });
+      const response = await vehicleAPI.get("/available", { params });
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;

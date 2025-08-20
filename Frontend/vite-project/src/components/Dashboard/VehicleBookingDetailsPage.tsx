@@ -4,6 +4,8 @@ import { vehicleBookingService } from '../../api/vehicleBookings';
 import type { VehicleBooking } from '../../api/vehicleBookings';
 import { isAuthenticated } from '../../utils/authHelper';
 import { message } from 'antd';
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const VehicleBookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -46,7 +48,7 @@ const VehicleBookingDetailsPage: React.FC = () => {
     if (!booking) return;
     
     try {
-      const response = await fetch(`http://localhost:5001/api/vehicle-bookings/${booking._id}/status`, {
+      const response = await fetch(`${API_BASE_URL}/api/vehicle-bookings/${booking._id}/status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
