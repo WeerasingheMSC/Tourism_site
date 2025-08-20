@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import AdminVehicleTable from './AdminVehicleTable';
 import VehicleBookingsTable from './VehicleBookingsTable';
 import AdminVehicleBookingTable from './AdminVehicleBookingTable';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface Vehicle {
   _id: string;
@@ -28,7 +29,7 @@ const AdminVehiclesPage: React.FC = () => {
       // Try admin endpoint first
       let response;
       try {
-        response = await fetch('http://localhost:5000/api/vehicles/admin/all', {
+        response = await fetch(`${API_BASE_URL}/api/vehicles/admin/all`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ const AdminVehiclesPage: React.FC = () => {
         }
       } catch (error) {
         // Fallback to regular endpoint
-        response = await fetch('http://localhost:5000/api/vehicles', {
+        response = await fetch(`${API_BASE_URL}/api/vehicles`, {
           headers: {
             'Content-Type': 'application/json',
           },
