@@ -52,6 +52,28 @@ const NavBar = () => {
       ),
       key: "custom-package",
     },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/hotels")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Hotels
+        </span>
+      ),
+      key: "hotels",
+    },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/vehicles")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Vehicles
+        </span>
+      ),
+      key: "vehicles",
+    },
   ];
 
   const languageMenu = {
@@ -62,7 +84,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="z-100 p-3 fixed top-0 left-0 w-full bg-white shadow-lg backgroun-transparent">
+    <nav className="z-100 p-3 fixed top-0 left-0 w-full  bg-white shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo and Title */}
         <div
@@ -76,7 +98,7 @@ const NavBar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex lg:space-x-5 xl:space-x-20 md:space-x-2 items-center">
+        <ul className="hidden md:flex lg:space-x-2 xl:space-x-10 md:space-x-2 items-center">
           {menuItems.map((item) => (
             <li key={item.key} className="hover:text-orange-500">
               {item.label}
@@ -92,7 +114,7 @@ const NavBar = () => {
             
             
               <Button 
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/signup")}
                 type="primary" style={{ background: "#faad14" }}>
                 Sign Up
               </Button>
@@ -131,8 +153,8 @@ const NavBar = () => {
           }
           placement="right"
           onClose={() => setDrawerVisible(false)}
-          visible={drawerVisible}
-          bodyStyle={{ padding: 0 }}
+          open={drawerVisible}
+          styles={{ body: { padding: 0 } }}
         >
           <ul className="flex flex-col p-4 space-y-4">
             {menuItems.map((item) => (

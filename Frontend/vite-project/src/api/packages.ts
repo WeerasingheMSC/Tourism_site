@@ -3,7 +3,7 @@ import axios from "axios";
 // (1) Create an Axios instance with a base URL
 //     Adjust the baseURL to match where your backend is running.
 const api = axios.create({
-  baseURL: import.meta.env.REACT_APP_API_BASE_URL || 'https://tourism-site-6tl3.onrender.com',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000', 
   headers: {
     "Content-Type": "application/json",
   },
@@ -60,5 +60,18 @@ export function deletePackage(id: string) {
   const token = localStorage.getItem("authToken");
   return api.delete(`/api/packages/${id}`, {
     headers: { Authorization: `Bearer ${token}` }
+  });
+}
+/**
+ * Update (admin)
+ * Uses PUT /api/packages/:id as per your controller.
+ */
+export function updatePackage(id: string, payload: any) {
+  const token = localStorage.getItem("authToken");
+  return api.put(`/api/packages/${id}`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   });
 }

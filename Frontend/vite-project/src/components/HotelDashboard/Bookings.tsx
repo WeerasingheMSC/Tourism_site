@@ -1,42 +1,52 @@
-// src/components/hotelOwner/Bookings.tsx
 import React from 'react';
+import HotelOwnerBookingTable from './HotelOwnerBookingTable';
 
-const Bookings: React.FC = () => {
+const AdminDashboardPage: React.FC = () => {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">Manage Bookings</h1>
-      <div className="bg-white rounded-2xl shadow p-6">
-        <table className="w-full table-auto">
-          <thead>
-            <tr className="bg-sky-50">
-              <th className="px-4 py-2 text-left text-gray-700">Booking ID</th>
-              <th className="px-4 py-2 text-left text-gray-700">Guest Name</th>
-              <th className="px-4 py-2 text-left text-gray-700">Check-in</th>
-              <th className="px-4 py-2 text-left text-gray-700">Check-out</th>
-              <th className="px-4 py-2 text-left text-gray-700">Status</th>
-              <th className="px-4 py-2 text-left text-gray-700">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Example row; replace with dynamic data */}
-            <tr className="border-t">
-              <td className="px-4 py-3">#BKG12345</td>
-              <td className="px-4 py-3">Alice Johnson</td>
-              <td className="px-4 py-3">2025-06-15</td>
-              <td className="px-4 py-3">2025-06-18</td>
-              <td className="px-4 py-3">
-                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm">Confirmed</span>
-              </td>
-              <td className="px-4 py-3">
-                <button className="text-sky-600 hover:text-blue-600">View</button>
-              </td>
-            </tr>
-            {/* More rows... */}
-          </tbody>
-        </table>
-      </div>
+    <div className=" min-h-screen flex flex-col relative z-10">
+
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto w-full px-2 sm:px-6 lg:px-8 pt-24 pb-12 flex-1">
+        {/* Dashboard Title */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 mt-2">Hotel Owner Dashboard</h1>
+
+        {/* Dashboard Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+          <div className="bg-white/30 backdrop-blur border-2 border-blue-400 rounded-2xl p-6 flex flex-col items-center shadow-md ">
+            <span className="text-blue-500 font-semibold text-sm mb-2">Active Reservation</span>
+            <span className="text-3xl font-bold text-blue-500 mb-1">34</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">Total Packages</span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">10</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">cancel reservation</span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">6</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">Plan proposals</span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">12</span>
+          </div>
+          <div className="bg-white/30 backdrop-blur border border-gray-200 rounded-2xl p-6 flex flex-col items-center shadow-sm">
+            <span className="text-gray-500 font-semibold text-sm mb-2">Revenue</span>
+            <span className="text-3xl font-bold text-gray-900 mb-1">13450</span>
+          </div>
+        </div>
+
+        {/* Hotel Bookings Section */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 mt-8">Hotel Bookings</h2>
+        <p className="text-gray-500 mb-4">View and manage hotel bookings</p>
+        <div className="rounded-2xl border border-gray-300 overflow-hidden mb-12 bg-white">
+          <HotelOwnerBookingTable />  
+        </div>
+
+        
+      </main>
+
     </div>
   );
 };
 
-export default Bookings;
+export default AdminDashboardPage;

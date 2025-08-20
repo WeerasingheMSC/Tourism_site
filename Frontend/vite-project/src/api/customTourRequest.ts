@@ -3,7 +3,7 @@ import axios from "axios";
 // (1) Create an Axios instance with a base URL
 //     Adjust the baseURL to match where your backend is running.
 const api = axios.create({
-  baseURL: import.meta.env.REACT_APP_API_BASE_URL || 'https://tourism-site-6tl3.onrender.com',
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -38,7 +38,13 @@ export function updateCustomTourRequestStatus(id: string, status: string) {
   return api.put(
     `/api/tours/requests/${id}`,
     { status },
-    { headers: { Authorization: `Bearer ${token}` } }
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    }
   );
 }
 /**

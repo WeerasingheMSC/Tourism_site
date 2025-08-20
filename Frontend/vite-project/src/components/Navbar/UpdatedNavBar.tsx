@@ -50,6 +50,28 @@ const AuthNavBar: React.FC = () => {
       ),
       key: "custom-package",
     },
+    {
+      label: (
+        <span
+          onClick={() => navigate("/hotels")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Hotels
+        </span>
+      ),
+      key: "hotels",
+    },
+    {
+      label : (
+        <span
+          onClick={() => navigate("/vehicles")}
+          className="cursor-pointer hover:text-orange-500"
+        >
+          Vehicles
+        </span>
+      ),
+      key: "vehicles",
+    },
   ];
 
   // --- Language switcher (same as before) ---
@@ -92,7 +114,7 @@ const AuthNavBar: React.FC = () => {
   };
 
   return (
-    <nav className="p-3 fixed top-0 left-0 w-full z-100 bg-white shadow-lg backgroun-transparent">
+    <nav className="p-3 fixed top-0 left-0 w-full z-100  bg-white shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo & title (clickable) */}
         <div
@@ -106,7 +128,7 @@ const AuthNavBar: React.FC = () => {
         </div>
 
         {/* Desktop menu */}
-        <ul className="hidden md:flex lg:space-x-5 xl:space-x-20 md:space-x-2 items-center">
+        <ul className="hidden md:flex lg:space-x-5 xl:space-x-15 md:space-x-2 items-center">
           {/* site links */}
           {menuItems.map((item) => (
             <li key={item.key} className="hover:text-orange-500">
@@ -128,7 +150,7 @@ const AuthNavBar: React.FC = () => {
             <Dropdown menu={profileMenu} trigger={["click"]}>
               {/* container ensures a perfect circle, with a light border */}
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-400 text-white text-lg font-semibold cursor-pointer border-2 border-blue-800">
-                {user.name?.charAt(0).toUpperCase() || "?"}
+                {user?.name?.charAt(0).toUpperCase() || "?"}
               </div>
             </Dropdown>
           </li>
