@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ScrollToTop } from "../../components/ScrollToTop.tsx";
 //test 
-import Vehicle from "..//Dashboard/PartnerDashboard.tsx"
 
 
 
@@ -47,6 +46,7 @@ import VehicleOwnerDetails from "../VehicleDashboard/VehicleOwnerDetails.tsx";
 import PartnerDashboard from "../VehicleDashboard/PartnerDashboard.tsx";
 import VehicleBookingDetailsPage from "../Dashboard/VehicleBookingDetailsPage.tsx";
 import ContactPage from "../ContactPage/ContactPage.tsx";
+import type { SetStateAction } from "react";
 
 
 const router = () => {
@@ -256,7 +256,16 @@ const router = () => {
             <ProtectedRoute>
               <MainNav />
               <Decore />
-              <HotelOwnerDetails />
+              <HotelOwnerDetails profileData={{
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+                language: "",
+                profilePicture: null
+              }} setProfileData={function (value: SetStateAction<{ firstName: string; lastName: string; email: string; phone: string; language: string; profilePicture: File | null; }>): void {
+                throw new Error("Function not implemented.");
+              } } />
               <UpdatedFooter />
             </ProtectedRoute>
           }

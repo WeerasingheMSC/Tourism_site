@@ -225,18 +225,20 @@ const AdminVehicleTable: React.FC<AdminVehicleTableProps> = ({ onCountsChange })
           }
           return null;
         })
-        .filter((id): id is string => id !== null && !ownerPhones[id]);
+        .filter((id): id is string => id !== null);
 
       // Fetch phone numbers for user IDs that aren't already cached
       for (const userId of userIdsToFetch) {
-        fetchOwnerPhone(userId);
+        if (!ownerPhones[userId]) {
+          fetchOwnerPhone(userId);
+        }
       }
     };
 
     if (allVehicles.length > 0) {
       fetchPhoneNumbers();
     }
-  }, [allVehicles, ownerPhones]);
+  }, [allVehicles]); // Only depend on allVehicles, not ownerPhones
 
   // Notify parent component of count changes
   useEffect(() => {
