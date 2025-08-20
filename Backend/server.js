@@ -13,7 +13,7 @@ import vehicleBookingRoutes from "./routes/vehicleBookings.js";
 import vehicleOwnerRoutes from "./routes/vehicleOwners.js";
 import customTourRequestRoutes from "./routes/customTourRequests.js";
 import packageRoutes from "./routes/packageRoutes.js";
-import bookingRoutes from './routes/booking.js';
+import bookingRoutes from "./routes/booking.js";
 import hotelbookingRoutes from "./routes/hotelBooking.js";
 import ratingRoutes from "./routes/ratings.js";
 
@@ -23,10 +23,18 @@ connectDB(); // connect to MongoDB
 const app = express();
 
 app.use(express.json()); // parse JSON
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174','https://travelbookingsrilanka.com','https://travelbookingsrilanka.com'],
-  credentials: true
-})); // enable CORS for frontend
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://travelbookingsrilanka.com",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+); // enable CORS for frontend
 app.use(morgan("dev")); // request logging
 
 // mount our auth & user routes
@@ -44,21 +52,24 @@ app.use("/api/vehicle-bookings", vehicleBookingRoutes);
 app.use("/api/tours", customTourRequestRoutes);
 // Mount under /api/packages
 app.use("/api/packages", packageRoutes);
-app.use('/api/bookings', bookingRoutes);
+app.use("/api/bookings", bookingRoutes);
 // Register the HotelBooking routes
-app.use('/api/hotel-bookings',hotelbookingRoutes);
+app.use("/api/hotel-bookings", hotelbookingRoutes);
 // Register the Rating routes
-app.use('/api/ratings', ratingRoutes);
+app.use("/api/ratings", ratingRoutes);
 
 // global error handler (after routes)
 app.use(errorHandler);
-app.set('etag', false); // Disable ETag generation
+app.set("etag", false); // Disable ETag generation
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
+  if (req.path.startsWith("/api/")) {
     // Force revalidation and no stored copies
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
+    res.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
   }
   next();
 });
