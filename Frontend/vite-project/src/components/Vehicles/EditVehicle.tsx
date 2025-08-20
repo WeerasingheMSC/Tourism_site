@@ -295,10 +295,6 @@ const EditVehicle = () => {
     }
   };
 
-  const toggleFAQ = (index: number) => {
-    // This function can be used for collapsible FAQs in the future
-    console.log('Toggle FAQ:', index);
-  };
 
   // Helper function to get vehicle name
   const getVehicleName = () => {
