@@ -24,7 +24,7 @@ const app = express();
 
 app.use(express.json()); // parse JSON
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174','http://travelbookingsrilanka.com'],
   credentials: true
 })); // enable CORS for frontend
 app.use(morgan("dev")); // request logging
