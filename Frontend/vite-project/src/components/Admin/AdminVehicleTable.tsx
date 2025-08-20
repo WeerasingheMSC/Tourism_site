@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import { ExternalLink } from "lucide-react";
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface Vehicle {
   _id: string;
@@ -48,7 +50,7 @@ const vehicleAPI = {
     
     // Try admin endpoint first
     try {
-      const response = await fetch('http://localhost:5000/api/vehicles/admin/all', {
+      const response = await fetch(`${API_BASE_URL}/api/vehicles/admin/all`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -64,7 +66,7 @@ const vehicleAPI = {
     }
     
     // Fallback to regular endpoint
-    const response = await fetch('http://localhost:5000/api/vehicles', {
+    const response = await fetch(`${API_BASE_URL}/api/vehicles`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -80,7 +82,7 @@ const vehicleAPI = {
 
   getPendingVehicles: async (): Promise<Vehicle[]> => {
     const token = localStorage.getItem('authToken');
-    const response = await fetch('http://localhost:5000/api/vehicles/pending', {
+    const response = await fetch(`${API_BASE_URL}/api/vehicles/pending`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -103,8 +105,8 @@ const vehicleAPI = {
     }
     
     console.log('Making API call to update vehicle status:', { vehicleId, status, token: token.substring(0, 20) + '...' });
-    
-    const response = await fetch(`http://localhost:5000/api/vehicles/${vehicleId}/approve`, {
+
+    const response = await fetch(`${API_BASE_URL}/api/vehicles/${vehicleId}/approve`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -147,8 +149,8 @@ const AdminVehicleTable: React.FC<AdminVehicleTableProps> = ({ onCountsChange })
         return ownerPhones[userId];
       }
 
-      const response = await fetch(`http://localhost:5000/api/vehicle-owners/user/${userId}`);
-      
+      const response = await fetch(`${API_BASE_URL}/api/vehicle-owners/user/${userId}`);
+
       if (response.ok) {
         const result = await response.json();
         const phone = result.data?.phone || 'N/A';

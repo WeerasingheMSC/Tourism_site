@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface User {
   id: string;
@@ -57,7 +59,7 @@ const TouristDashboard: React.FC = () => {
     const fetchRequests = async () => {
       try {
         const res = await axios.get<Request[]>(
-          `http://localhost:5001/api/tours/requests?email=${encodeURIComponent(user.email)}`,
+          `${API_BASE_URL}/api/tours/requests?email=${encodeURIComponent(user.email)}`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
