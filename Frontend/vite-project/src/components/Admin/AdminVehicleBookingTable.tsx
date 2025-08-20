@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import { ExternalLink } from "lucide-react";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 interface VehicleBooking {
   _id: string;
   bookingId: string;
@@ -64,8 +64,8 @@ interface VehicleBooking {
 const vehicleBookingAPI = {
   getAllBookings: async (): Promise<VehicleBooking[]> => {
     const token = localStorage.getItem('authToken');
-    
-    const response = await fetch('http://localhost:5000/api/vehicle-bookings', {
+
+    const response = await fetch(`${API_BASE_URL}/api/vehicle-bookings`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -94,8 +94,8 @@ const vehicleBookingAPI = {
     if (adminStatus) requestBody.adminStatus = adminStatus;
     if (ownerStatus) requestBody.ownerStatus = ownerStatus;
     if (cancellationReason) requestBody.cancellationReason = cancellationReason;
-    
-    const response = await fetch(`http://localhost:5000/api/vehicle-bookings/${bookingId}/status`, {
+
+    const response = await fetch(`${API_BASE_URL}/api/vehicle-bookings/${bookingId}/status`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -188,56 +188,7 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({ onC
     fetchBookings();
   }, [filter]);
 
-  // Handle admin status change - update adminStatus with dropdown or button
-  const handleAdminStatusChange = async (bookingId: string, newAdminStatus?: 'pending' | 'completed') => {
-    try {
-      console.log('🔄 AdminVehicleBookingTable - Admin status change:', { bookingId, newAdminStatus });
-      
-      // Default to 'completed' if no status specified (for backwards compatibility with the button)
-      const adminStatus = newAdminStatus || 'completed';
-      
-      // Call API to update admin status
-      const result = await vehicleBookingAPI.updateBookingStatus(bookingId, undefined, adminStatus);
-      console.log('✅ AdminVehicleBookingTable - Admin status change API response:', result);
-      
-      // Update the booking in local state
-      setBookings((prev) => 
-        prev.map((booking) => 
-          booking._id === bookingId 
-            ? { 
-                ...booking, 
-                adminStatus: adminStatus,
-                updatedAt: new Date()
-              }
-            : booking
-        )
-      );
-      
-      // Also update the allBookings array for correct counts
-      setAllBookings((prev) =>
-        prev.map((booking) =>
-          booking._id === bookingId
-            ? {
-                ...booking,
-                adminStatus: adminStatus,
-                updatedAt: new Date()
-              }
-            : booking
-        )
-      );
-      
-      message.success(`Admin status updated to ${adminStatus}`);
-      
-      // Optionally refresh the data to ensure consistency
-      setTimeout(() => {
-        fetchBookings();
-      }, 1000);
-    } catch (err: any) {
-      console.error("❌ AdminVehicleBookingTable - Admin status change failed:", err);
-      message.error('Failed to update admin status');
-      fetchBookings();
-    }
-  };
+  
 
   // Handle legacy status change from dropdown (for backwards compatibility)
   const handleStatusChange = async (bookingId: string, newStatus: "pending" | "confirmed" | "cancelled" | "approved") => {

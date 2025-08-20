@@ -1,7 +1,7 @@
 // src/components/Booking/HotelOwnerBookingTable.tsx
-import React, { useState, useEffect, type JSX } from "react";
+import React, { useState, useEffect } from "react";
 import { getHotelBookings } from "../../api/hotelBooking";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface HotelBooking {
   _id: string;

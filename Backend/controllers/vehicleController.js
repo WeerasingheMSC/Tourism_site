@@ -468,6 +468,7 @@ export const approveRejectVehicle = async (req, res, next) => {
     if (!vehicle.approvalStatus) {
       vehicle.approvalStatus = {};
     }
+    // Set the approval status fields
 
     vehicle.approvalStatus.status = status;
     vehicle.approvalStatus.adminNotes = adminNotes || "";
