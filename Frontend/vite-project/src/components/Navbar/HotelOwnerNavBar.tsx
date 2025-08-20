@@ -42,18 +42,7 @@ const AuthNavBar: React.FC = () => {
         </span>
       ),
       key: "packages",
-    },
-    {
-      label: (
-        <span
-          onClick={() => navigate(`/owner/hotels/${hotelId}/bookings`)}
-          className="cursor-pointer hover:text-orange-500"
-        >
-          Bookings 
-        </span>
-      ),
-      key: "custom-package",
-    },
+    }
   ];
 
   // --- Language switcher (same as before) ---
