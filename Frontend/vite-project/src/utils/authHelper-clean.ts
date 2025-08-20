@@ -55,21 +55,3 @@ export const logout = (): void => {
   // Optionally redirect to login page
   window.location.href = '/login';
 };
-
-export const setAuthToken = (token: string): void => {
-  localStorage.setItem('token', token);
-};
-
-export const clearAuthToken = (): void => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('testUser');
-};
-
-export const ensureAuthForTesting = (): void => {
-  const existingToken = getAuthToken();
-  if (!existingToken) {
-    const testToken = createTestToken();
-    setAuthToken(testToken);
-    console.log('Created test authentication token for development');
-  }
-};

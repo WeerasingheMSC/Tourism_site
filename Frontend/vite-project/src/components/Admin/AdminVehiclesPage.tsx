@@ -1,5 +1,5 @@
 // src/components/Admin/AdminVehiclesPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminVehicleTable from './AdminVehicleTable';
 import VehicleBookingsTable from './VehicleBookingsTable';
 
@@ -73,10 +73,10 @@ const AdminVehiclesPage: React.FC = () => {
   }, []);
 
   // Handle count updates from AdminVehicleTable
-  const handleCountsChange = (counts: { total: number; pending: number; approved: number; rejected: number }) => {
+  const handleCountsChange = useCallback((counts: { total: number; pending: number; approved: number; rejected: number }) => {
     setVehicleCounts(counts);
     setLoading(false);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative z-10">

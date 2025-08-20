@@ -96,7 +96,7 @@ const VehicleBookingsTable: React.FC = () => {
       title: 'Booking ID',
       dataIndex: 'bookingId',
       key: 'bookingId',
-      width: 120,
+      width: 140,
       render: (bookingId: string) => (
         <span className="font-mono text-sm">{bookingId}</span>
       ),
