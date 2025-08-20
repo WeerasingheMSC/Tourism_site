@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     role: {
       type: String,
       enum: ["tourist", "admin", "hotel-owner", "transport-owner"],
@@ -25,6 +26,19 @@ const userSchema = new mongoose.Schema(
     },
     otp: String,
     otpExpiry: Date,
+    
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    googleId: {
+      // store Google sub
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    photo: String,
   },
   {
     timestamps: true, // adds createdAt & updatedAt
