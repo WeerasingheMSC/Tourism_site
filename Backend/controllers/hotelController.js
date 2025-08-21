@@ -264,3 +264,33 @@ export const getOwnerHotelById = async (req, res) => {
 };
 
 
+/**
+ * @desc    Admin: view a hotel by ID (any status)
+ * @route   GET /api/hotels/admin/view/:id
+ * @access  Admin only
+ */
+export const getHotelByIdAdmin = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid hotel ID" });
+    }
+
+    const hotel = await Hotel.findById(id)
+      // show reviewer names in reviews
+      .populate({ path: "reviews.user", select: "name" });
+
+    if (!hotel) {
+      return res.status(404).json({ message: "Hotel not found" });
+    }
+
+    // prevent client/proxy caching so you don’t get 304s
+    res.set("Cache-Control", "no-store");
+    return res.json(hotel);
+  } catch (err) {
+    next(err);
+  }
+};
+
+

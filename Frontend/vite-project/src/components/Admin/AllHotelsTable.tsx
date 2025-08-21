@@ -143,9 +143,7 @@ export default function AllHotelsTable(): JSX.Element {
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <a
-                    href={`/owner/hotels/${hotel._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={`/admin/hotels/view/${hotel._id}`}
                     className="inline-flex items-center text-blue-500 hover:text-blue-700 p-1"
                   >
                     <ExternalLink className="w-5 h-5" />

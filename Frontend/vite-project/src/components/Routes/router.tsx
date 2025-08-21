@@ -42,6 +42,7 @@ import PartnerDashboard from "../VehicleDashboard/PartnerDashboard.tsx";
 import VehicleBookingDetailsPage from "../Dashboard/VehicleBookingDetailsPage.tsx";
 import ContactPage from "../ContactPage/ContactPage.tsx";
 import HotelOwnerDetailsPage from "../Hotels/HotelOwnerDetailsPage.tsx";
+import AdminHotelViewPage from "../Admin/AdminHotelViewPage.tsx";
 
 
 const router = () => {
@@ -139,6 +140,17 @@ const router = () => {
             </>
           }
         />
+        <Route
+          path="/admin/hotels/view/:id"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <AdminHotelViewPage />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/vehicle-booking-details/:bookingId"
           element={

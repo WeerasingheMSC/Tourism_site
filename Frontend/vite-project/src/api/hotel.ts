@@ -147,3 +147,13 @@ export async function getOwnerHotelDetails(id: string): Promise<any> {
   return response.data;
 }
 
+// --- Admin: get a hotel by ID (no caching) ---
+export async function getHotelByIdAdmin(id: string): Promise<any> {
+  const { data } = await api.get(`/api/hotels/admin/view/${id}`, {
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+    },
+  });
+  return data;
+}
