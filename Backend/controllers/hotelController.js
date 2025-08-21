@@ -240,3 +240,27 @@ export const getOwnerHotels = async (req, res, next) => {
 };
 
 
+
+
+export const getOwnerHotelById = async (req, res) => {
+  try {
+    const hotel = await Hotel.findById(req.params.id);
+    if (!hotel) {
+      return res.status(404).json({ message: 'Hotel not found' });
+    }
+
+    const hotelOwnerId = hotel.ownerId || hotel.owner;
+    if (
+      hotelOwnerId.toString() !== req.user.userId.toString() &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    res.json(hotel);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+

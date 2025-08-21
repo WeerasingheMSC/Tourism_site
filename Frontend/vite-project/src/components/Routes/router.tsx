@@ -41,6 +41,7 @@ import VehicleOwnerDetails from "../VehicleDashboard/VehicleOwnerDetails.tsx";
 import PartnerDashboard from "../VehicleDashboard/PartnerDashboard.tsx";
 import VehicleBookingDetailsPage from "../Dashboard/VehicleBookingDetailsPage.tsx";
 import ContactPage from "../ContactPage/ContactPage.tsx";
+import HotelOwnerDetailsPage from "../Hotels/HotelOwnerDetailsPage.tsx";
 
 
 const router = () => {
@@ -115,6 +116,17 @@ const router = () => {
               <HotelOwner />
               <UpdatedFooter />
             </>
+          }
+        />
+        <Route
+          path="/owner/hotels/:id/details"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <HotelOwnerDetailsPage />
+              <UpdatedFooter />
+            </ProtectedRoute>
           }
         />
         <Route

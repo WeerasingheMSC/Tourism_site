@@ -142,3 +142,8 @@ export async function getOwnerHotels(): Promise<any[]> {
   return response.data;
 }
 
+export async function getOwnerHotelDetails(id: string): Promise<any> {
+  const response = await api.get<any>(`/api/hotels/owner/${id}`);
+  return response.data;
+}
+
