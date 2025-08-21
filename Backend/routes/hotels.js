@@ -9,7 +9,8 @@ import {
   getApprovedHotelById,
   addReviewToHotel,
   getAllHotels,
-  getOwnerHotels
+  getOwnerHotels,
+  getOwnerHotelById
 } from "../controllers/hotelController.js";
 import auth from "../middleware/auth.js";
 import { authorizeRoles } from "../middleware/roles.js";
@@ -103,6 +104,7 @@ router.post(
   }
 );
 
+router.get('/owner/:id', auth, getOwnerHotelById);
 
 
 export default router;
