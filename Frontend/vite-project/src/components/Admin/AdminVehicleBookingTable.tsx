@@ -21,6 +21,15 @@ interface VehicleBooking {
     name: string;
     licensePlate: string;
     category: string;
+    owner?: {
+      name: string;
+      email: string;
+      phone: string;
+      businessName?: string;
+      businessAddress?: string;
+      licenseNumber?: string;
+      rating?: number;
+    };
   };
   booking: {
     startDate: Date | string;
@@ -43,6 +52,8 @@ interface VehicleBooking {
     tax?: number;
     discount?: number;
     totalAmount: number;
+    rentalType?: string;
+    unit?: string;
   };
   payment: {
     method: "cash" | "card" | "bank_transfer" | "online";
@@ -547,9 +558,16 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-green-600">
-                    ${booking.pricing.totalAmount}
+                     {booking.pricing.totalAmount}$
                   </div>
                   <div className="text-sm text-gray-500">
+                    {booking.pricing.rentalType && booking.pricing.basePrice ? (
+                      <span> {booking.pricing.basePrice}$/{booking.pricing.unit || 'day'}</span>
+                    ) : (
+                      <span> {booking.pricing.basePrice}$/day</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400">
                     {booking.payment.method}
                   </div>
                 </td>
@@ -627,208 +645,328 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({
               </div>
 
               {/* Modal Content */}
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Customer Information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Customer Information
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="font-medium">Name:</span>{" "}
-                      {selectedBooking.customer.name}
-                    </p>
-                    <p>
-                      <span className="font-medium">Email:</span>{" "}
-                      {selectedBooking.customer.email}
-                    </p>
-                    <p>
-                      <span className="font-medium">Phone:</span>{" "}
-                      {selectedBooking.customer.phone}
-                    </p>
-                    <p>
-                      <span className="font-medium">Address:</span>{" "}
-                      {selectedBooking.customer.address || "Not provided"}
-                    </p>
-                    {selectedBooking.customer.driverLicense && (
+              <div className="mt-4">
+                {/* Top Row - Customer and Vehicle Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  {/* Customer Information */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Customer Information
+                    </h4>
+                    <div className="space-y-2 text-sm">
                       <p>
-                        <span className="font-medium">Driver License:</span>{" "}
-                        {selectedBooking.customer.driverLicense}
+                        <span className="font-medium">Name:</span>{" "}
+                        {selectedBooking.customer.name}
                       </p>
-                    )}
-                    {selectedBooking.customer.idNumber && (
                       <p>
-                        <span className="font-medium">ID Number:</span>{" "}
-                        {selectedBooking.customer.idNumber}
+                        <span className="font-medium">Email:</span>{" "}
+                        {selectedBooking.customer.email}
                       </p>
-                    )}
+                      <p>
+                        <span className="font-medium">Phone:</span>{" "}
+                        {selectedBooking.customer.phone}
+                      </p>
+                      <p>
+                        <span className="font-medium">Address:</span>{" "}
+                        {selectedBooking.customer.address || "Not provided"}
+                      </p>
+                      {selectedBooking.customer.driverLicense && (
+                        <p>
+                          <span className="font-medium">Driver License:</span>{" "}
+                          {selectedBooking.customer.driverLicense}
+                        </p>
+                      )}
+                      {selectedBooking.customer.idNumber && (
+                        <p>
+                          <span className="font-medium">ID Number:</span>{" "}
+                          {selectedBooking.customer.idNumber}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Vehicle Information */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Vehicle Information
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <p>
+                        <span className="font-medium">Vehicle:</span>{" "}
+                        {selectedBooking.vehicle.name}
+                      </p>
+                      <p>
+                        <span className="font-medium">License Plate:</span>{" "}
+                        {selectedBooking.vehicle.licensePlate}
+                      </p>
+                      <p>
+                        <span className="font-medium">Category:</span>{" "}
+                        {selectedBooking.vehicle.category}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Vehicle Information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Vehicle Information
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="font-medium">Vehicle:</span>{" "}
-                      {selectedBooking.vehicle.name}
-                    </p>
-                    <p>
-                      <span className="font-medium">License Plate:</span>{" "}
-                      {selectedBooking.vehicle.licensePlate}
-                    </p>
-                    <p>
-                      <span className="font-medium">Category:</span>{" "}
-                      {selectedBooking.vehicle.category}
-                    </p>
+                {/* Second Row - Vehicle Owner Details (Full Width) */}
+                <div className="mb-6">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      Vehicle Owner Details
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      {/* Owner Contact Details */}
+                      <div>
+                        <h5 className="font-medium text-gray-700 mb-2">Contact Information</h5>
+                        <div className="space-y-1">
+                          <p>
+                            <span className="font-medium">Owner Name:</span>{" "}
+                            <span className="text-gray-600">
+                              {selectedBooking.vehicle.owner?.name || "Not Available"}
+                            </span>
+                          </p>
+                          <p>
+                            <span className="font-medium">Email:</span>{" "}
+                            <span className="text-gray-600">
+                              {selectedBooking.vehicle.owner?.email || "Not Available"}
+                            </span>
+                          </p>
+                          <p>
+                            <span className="font-medium">Phone:</span>{" "}
+                            <span className="text-gray-600">
+                              {selectedBooking.vehicle.owner?.phone || "Not Available"}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Business Details */}
+                      <div>
+                        <h5 className="font-medium text-gray-700 mb-2">Business Information</h5>
+                        <div className="space-y-1">
+                          <p>
+                            <span className="font-medium">Business Name:</span>{" "}
+                            <span className="text-gray-600">
+                              {selectedBooking.vehicle.owner?.businessName || "Not Available"}
+                            </span>
+                          </p>
+                          <p>
+                            <span className="font-medium">Business Address:</span>{" "}
+                            <span className="text-gray-600">
+                              {selectedBooking.vehicle.owner?.businessAddress || "Not Available"}
+                            </span>
+                          </p>
+                          <p>
+                            <span className="font-medium">License Number:</span>{" "}
+                            <span className="text-gray-600">
+                              {selectedBooking.vehicle.owner?.licenseNumber || "Not Available"}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Rating & Status */}
+                      <div>
+                        <h5 className="font-medium text-gray-700 mb-2">Owner Rating</h5>
+                        <div className="space-y-1">
+                          <div className="flex items-center">
+                            {selectedBooking.vehicle.owner?.rating ? (
+                              <>
+                                <span className="text-gray-600">{selectedBooking.vehicle.owner?.rating || 0}/5</span>
+                                <div className="flex ml-2">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <svg 
+                                      key={star} 
+                                      className={`w-4 h-4 ${star <= (selectedBooking.vehicle.owner?.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                                      fill="currentColor" 
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                  ))}
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-gray-600">Not Rated</span>
+                                <div className="flex ml-2">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <svg key={star} className="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          {selectedBooking.vehicle.owner ? (
+                            <p className="text-xs text-green-600 italic">
+                              ✓ Owner details loaded successfully
+                            </p>
+                          ) : (
+                            <p className="text-xs text-orange-500 italic">
+                              ⚠ Owner details not available in this booking
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Booking Details */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Booking Details
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="font-medium">Start Date:</span>{" "}
-                      {formatDateTime(selectedBooking.booking.startDate)}
-                    </p>
-                    <p>
-                      <span className="font-medium">End Date:</span>{" "}
-                      {formatDateTime(selectedBooking.booking.endDate)}
-                    </p>
-                    <p>
-                      <span className="font-medium">Duration:</span>{" "}
-                      {selectedBooking.booking.duration} days
-                    </p>
-                    <p>
-                      <span className="font-medium">Pickup:</span>{" "}
-                      {selectedBooking.booking.pickupLocation}
-                    </p>
-                    <p>
-                      <span className="font-medium">Drop-off:</span>{" "}
-                      {selectedBooking.booking.dropoffLocation}
-                    </p>
-                    <p>
-                      <span className="font-medium">With Driver:</span>{" "}
-                      {selectedBooking.booking.driverRequired ? "Yes" : "No"}
-                    </p>
+                {/* Third Row - Booking and Pricing Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Booking Details */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Booking Details
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <p>
+                        <span className="font-medium">Start Date:</span>{" "}
+                        {formatDateTime(selectedBooking.booking.startDate)}
+                      </p>
+                      <p>
+                        <span className="font-medium">End Date:</span>{" "}
+                        {formatDateTime(selectedBooking.booking.endDate)}
+                      </p>
+                      <p>
+                        <span className="font-medium">Duration:</span>{" "}
+                        {selectedBooking.booking.duration} days
+                      </p>
+                      <p>
+                        <span className="font-medium">Pickup:</span>{" "}
+                        {selectedBooking.booking.pickupLocation}
+                      </p>
+                      <p>
+                        <span className="font-medium">Drop-off:</span>{" "}
+                        {selectedBooking.booking.dropoffLocation}
+                      </p>
+                      <p>
+                        <span className="font-medium">With Driver:</span>{" "}
+                        {selectedBooking.booking.driverRequired ? "Yes" : "No"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Pricing Information */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Pricing Information
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <p>
+                        <span className="font-medium">
+                          {selectedBooking.pricing.rentalType === 'hourly' ? 'Hourly Rate:' :
+                           selectedBooking.pricing.rentalType === 'kilometer' ? 'Per Km Rate:' :
+                           'Daily Rate:'}
+                        </span> {selectedBooking.pricing.basePrice}$
+                        {selectedBooking.pricing.unit && `/${selectedBooking.pricing.unit}`}
+                      </p>
+                      {selectedBooking.pricing.rentalType && (
+                        <p>
+                          <span className="font-medium">Rental Type:</span>{" "}
+                          {selectedBooking.pricing.rentalType === 'daily' ? 'Daily Rental' :
+                           selectedBooking.pricing.rentalType === 'hourly' ? 'Hourly Rental' :
+                           selectedBooking.pricing.rentalType === 'kilometer' ? 'Per Kilometer' :
+                           'Daily Rental'}
+                        </p>
+                      )}
+                      {selectedBooking.pricing.driverCharge && (
+                        <p>
+                          <span className="font-medium">Driver Charge:</span> {selectedBooking.pricing.driverCharge}$
+                        </p>
+                      )}
+                      {selectedBooking.pricing.insurance && (
+                        <p>
+                          <span className="font-medium">Insurance:</span> {selectedBooking.pricing.insurance}$
+                        </p>
+                      )}
+                      <p className="font-medium text-green-600">
+                        <span className="font-medium text-gray-900">Total:</span>{" "}
+                         {selectedBooking.pricing.totalAmount}$
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Pricing Information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
+                {/* Status and Notes */}
+                <div className="mt-6 bg-gray-50 p-4 rounded-lg">
                   <h4 className="font-medium text-gray-900 mb-3">
-                    Pricing Information
+                    Status & Additional Information
                   </h4>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="font-medium">Base Price:</span> $
-                      {selectedBooking.pricing.basePrice}
-                    </p>
-                    {selectedBooking.pricing.driverCharge && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
                       <p>
-                        <span className="font-medium">Driver Charge:</span> $
-                        {selectedBooking.pricing.driverCharge}
+                        <span className="font-medium">Status:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                            selectedBooking.status
+                          )}`}
+                        >
+                          {selectedBooking.status.toUpperCase()}
+                        </span>
                       </p>
-                    )}
-                    {selectedBooking.pricing.insurance && (
+                      <p className="mt-2">
+                        <span className="font-medium">Payment Status:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                            selectedBooking.payment.status === "paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-orange-100 text-orange-800"
+                          }`}
+                        >
+                          {selectedBooking.payment.status.toUpperCase()}
+                        </span>
+                      </p>
+                    </div>
+                    <div>
                       <p>
-                        <span className="font-medium">Insurance:</span> $
-                        {selectedBooking.pricing.insurance}
+                        <span className="font-medium">Created:</span>{" "}
+                        {formatDateTime(selectedBooking.createdAt)}
                       </p>
-                    )}
-                    {selectedBooking.pricing.tax && (
                       <p>
-                        <span className="font-medium">Tax:</span> $
-                        {selectedBooking.pricing.tax}
+                        <span className="font-medium">Updated:</span>{" "}
+                        {formatDateTime(selectedBooking.updatedAt)}
                       </p>
-                    )}
-                    <p className="font-medium text-green-600">
-                      <span className="font-medium text-gray-900">Total:</span>{" "}
-                      ${selectedBooking.pricing.totalAmount}
-                    </p>
+                    </div>
                   </div>
+                  {selectedBooking.notes && (
+                    <div className="mt-3">
+                      <p>
+                        <span className="font-medium">Notes:</span>{" "}
+                        {selectedBooking.notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              </div>
 
-              {/* Status and Notes */}
-              <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-3">
-                  Status & Additional Information
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p>
-                      <span className="font-medium">Status:</span>
-                      <span
-                        className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                          selectedBooking.status
-                        )}`}
-                      >
-                        {selectedBooking.status.toUpperCase()}
-                      </span>
-                    </p>
-                    <p className="mt-2">
-                      <span className="font-medium">Payment Status:</span>
-                      <span
-                        className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                          selectedBooking.payment.status === "paid"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-orange-100 text-orange-800"
-                        }`}
-                      >
-                        {selectedBooking.payment.status.toUpperCase()}
-                      </span>
-                    </p>
-                  </div>
-                  <div>
-                    <p>
-                      <span className="font-medium">Created:</span>{" "}
-                      {formatDateTime(selectedBooking.createdAt)}
-                    </p>
-                    <p>
-                      <span className="font-medium">Updated:</span>{" "}
-                      {formatDateTime(selectedBooking.updatedAt)}
-                    </p>
-                  </div>
-                </div>
-                {selectedBooking.notes && (
-                  <div className="mt-3">
-                    <p>
-                      <span className="font-medium">Notes:</span>{" "}
-                      {selectedBooking.notes}
-                    </p>
+                {/* Action Buttons */}
+                {selectedBooking.status === "pending" && (
+                  <div className="mt-6 flex justify-end space-x-3 pt-4 border-t">
+                    <button
+                      onClick={() => {
+                        handleStatusChange(selectedBooking._id, "confirmed");
+                        setShowModal(false);
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                      Approve Booking
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleStatusChange(selectedBooking._id, "cancelled");
+                        setShowModal(false);
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                      Reject Booking
+                    </button>
                   </div>
                 )}
               </div>
-
-              {/* Action Buttons */}
-              {selectedBooking.status === "pending" && (
-                <div className="mt-6 flex justify-end space-x-3 pt-4 border-t">
-                  <button
-                    onClick={() => {
-                      handleStatusChange(selectedBooking._id, "confirmed");
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                  >
-                    Approve Booking
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleStatusChange(selectedBooking._id, "cancelled");
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Reject Booking
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>

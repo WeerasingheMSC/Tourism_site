@@ -29,6 +29,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://tourism-site-z3p5.onrender.com",
+      "https://travelbookingsrilanka.com"
     ],
     credentials: true,
   })

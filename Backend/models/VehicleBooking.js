@@ -102,7 +102,7 @@ const vehicleBookingSchema = new mongoose.Schema({
 vehicleBookingSchema.index({ 'booking.startDate': 1, 'booking.endDate': 1 });
 vehicleBookingSchema.index({ status: 1 });
 vehicleBookingSchema.index({ 'customer.email': 1 });
-//vehicleBookingSchema.index({ bookingId: 1 });
+vehicleBookingSchema.index({ bookingId: 1 });
 
 // Calculate duration automatically and update overall status
 vehicleBookingSchema.pre('save', function(next) {

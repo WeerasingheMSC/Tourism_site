@@ -37,7 +37,9 @@ const EditVehicle = () => {
     },
     // Pricing & Description
     pricing: {
-      pricePerDay: ''
+      pricePerDay: '',
+      pricePerHour: '',
+      pricePerKilometer: ''
     },
     description: '',
     // FAQs
@@ -83,7 +85,9 @@ const EditVehicle = () => {
           coordinates: vehicleData.location?.coordinates || [0, 0]
         },
         pricing: {
-          pricePerDay: (vehicleData.price?.perDay || vehicleData.pricing?.pricePerDay || '').toString()
+          pricePerDay: (vehicleData.price?.perDay || vehicleData.pricing?.pricePerDay || '').toString(),
+          pricePerHour: (vehicleData.price?.perHour || vehicleData.pricing?.pricePerHour || '').toString(),
+          pricePerKilometer: (vehicleData.price?.perKilometer || vehicleData.pricing?.pricePerKilometer || '').toString()
         },
         description: vehicleData.description || '',
         faqs: vehicleData.faqs && vehicleData.faqs.length > 0 ? vehicleData.faqs : [{ question: '', answer: '' }],
@@ -292,9 +296,13 @@ const EditVehicle = () => {
         images: formData.images,
         pricing: {
           pricePerDay: parseFloat(formData.pricing.pricePerDay),
+          pricePerHour: formData.pricing.pricePerHour ? parseFloat(formData.pricing.pricePerHour) : undefined,
+          pricePerKilometer: formData.pricing.pricePerKilometer ? parseFloat(formData.pricing.pricePerKilometer) : undefined,
         },
         price: {
           perDay: parseFloat(formData.pricing.pricePerDay),
+          perHour: formData.pricing.pricePerHour ? parseFloat(formData.pricing.pricePerHour) : undefined,
+          perKilometer: formData.pricing.pricePerKilometer ? parseFloat(formData.pricing.pricePerKilometer) : undefined,
         },
         faqs: formData.faqs.filter(faq => faq.question && faq.answer),
         available: true
@@ -743,7 +751,7 @@ const EditVehicle = () => {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price per Day ($) *
+                  Price per Day (Rs.) *
                 </label>
                 <input
                   type="number"
@@ -754,6 +762,36 @@ const EditVehicle = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="0.00"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Price per Hour (Rs.)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.pricing.pricePerHour}
+                  onChange={(e) => handleInputChange('pricing.pricePerHour', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rental Per Kilometer (Rs.)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.pricing.pricePerKilometer}
+                  onChange={(e) => handleInputChange('pricing.pricePerKilometer', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="0.00"
                 />
               </div>
             </div>
@@ -848,7 +886,13 @@ const EditVehicle = () => {
                 <div><strong>Location:</strong> {formData.location.city}, {formData.location.area}</div>
                 <div><strong>Features:</strong> {formData.features.length} selected</div>
                 <div><strong>FAQs:</strong> {formData.faqs.filter(faq => faq.question && faq.answer).length} added</div>
-                <div><strong>Price:</strong> $ {formData.pricing.pricePerDay}</div>
+                <div><strong>Price Per Day:</strong> Rs. {formData.pricing.pricePerDay}</div>
+                {formData.pricing.pricePerHour && (
+                  <div><strong>Price Per Hour:</strong> Rs. {formData.pricing.pricePerHour}</div>
+                )}
+                {formData.pricing.pricePerKilometer && (
+                  <div><strong>Rental Per Kilometer:</strong> Rs. {formData.pricing.pricePerKilometer}</div>
+                )}
                 <div><strong>Air Conditioning:</strong> {formData.airConditioning ? 'Yes' : 'No'}</div>
                 <div><strong>Images:</strong> {formData.images.length} uploaded</div>
               </div>

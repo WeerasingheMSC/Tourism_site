@@ -369,10 +369,9 @@ const VehicleBookingsTable: React.FC = () => {
                 <Descriptions.Item label="Driver Charge">
                   ${selectedBooking.pricing.driverCharge || 0}
                 </Descriptions.Item>
-                <Descriptions.Item label="Tax & Insurance">
+                <Descriptions.Item label="Insurance">
                   $
-                  {(selectedBooking.pricing.tax || 0) +
-                    (selectedBooking.pricing.insurance || 0)}
+                  {(selectedBooking.pricing.insurance || 0)}
                 </Descriptions.Item>
                 <Descriptions.Item label="Discount">
                   -${selectedBooking.pricing.discount || 0}

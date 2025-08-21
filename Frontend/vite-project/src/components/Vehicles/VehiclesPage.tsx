@@ -24,6 +24,7 @@ interface Vehicle {
   price?: {
     perDay?: number;
     perHour?: number;
+    perKilometer?: number;
   };
   images?: string[];
   features?: string[];
@@ -120,9 +121,11 @@ const VehiclesPage: React.FC = () => {
 
   const getVehiclePrice = (vehicle: Vehicle) => {
     if (vehicle.price?.perDay) {
-      return `$${vehicle.price.perDay}/day`;
+      return `${vehicle.price.perDay}$/day`;
     } else if (vehicle.price?.perHour) {
-      return `$${vehicle.price.perHour}/hour`;
+      return `${vehicle.price.perHour}$/hour`;
+    } else if (vehicle.price?.perKilometer) {
+      return `${vehicle.price.perKilometer}$/km`;
     }
     return 'Price on request';
   };
@@ -248,6 +251,8 @@ const VehiclesPage: React.FC = () => {
         if (filters.rentalType === 'Per Day' && !vehicle.price?.perDay) {
           matches = false;
         } else if (filters.rentalType === 'Per Hour' && !vehicle.price?.perHour) {
+          matches = false;
+        } else if (filters.rentalType === 'Per Kilometer' && !vehicle.price?.perKilometer) {
           matches = false;
         }
       }

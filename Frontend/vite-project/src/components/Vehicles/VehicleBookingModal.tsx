@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, DatePicker, Switch, message, Button } from 'antd';
 import { CalendarOutlined, UserOutlined, PhoneOutlined, EnvironmentOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { vehicleBookingService } from '../../api/vehicleBookings';
@@ -24,17 +24,59 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [withDriver, setWithDriver] = useState(false);
+  const [rentalType, setRentalType] = useState('daily'); // 'daily', 'hourly', 'kilometer'
 
-  const currentUser = getCurrentUser();
+    // Enhanced user data retrieval
+  const getUserDetails = () => {
+    // Try localStorage first since it has more complete user info
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser.name && parsedUser.email) {
+          return parsedUser;
+        }
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+      }
+    }
+    
+    // Fallback to JWT token
+    const tokenUser = getCurrentUser();
+    return tokenUser;
+  };
+
+  const currentUser = getUserDetails();
+
+  // Helper function to get available rental types for the vehicle
+  const getAvailableRentalTypes = () => {
+    const types = [];
+    if (vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay) {
+      types.push({ value: 'daily', label: 'Daily Rental', rate: vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay });
+    }
+    if (vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour) {
+      types.push({ value: 'hourly', label: 'Hourly Rental', rate: vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour });
+    }
+    if (vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer) {
+      types.push({ value: 'kilometer', label: 'Per Kilometer', rate: vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer });
+    }
+    return types;
+  };
+
+  // Initialize rental type with the first available option
+  useEffect(() => {
+    const availableTypes = getAvailableRentalTypes();
+    if (availableTypes.length > 0 && !rentalType) {
+      setRentalType(availableTypes[0].value);
+    }
+  }, [vehicle, rentalType]);
 
   const handleSubmit = async (values: any) => {
     try {
       setLoading(true);
 
-      // Debug authentication
+      // Check authentication
       const token = localStorage.getItem('authToken');
-      console.log('🔐 Auth token exists:', !!token);
-      console.log('🔐 Current user:', currentUser);
       
       if (!token) {
         // Try to ensure authentication for development/testing
@@ -47,17 +89,34 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
         }
       }
 
-      // Calculate pricing
+      // Calculate pricing based on rental type
       const startDate = dayjs(values.dateRange[0]);
       const endDate = dayjs(values.dateRange[1]);
       const totalDays = endDate.diff(startDate, 'day') + 1;
       
-      const dailyRate = vehicle.pricing?.pricePerDay || vehicle.price?.perDay || 0;
-      const subtotal = dailyRate * totalDays;
+      let baseRate = 0;
+      let subtotal = 0;
+      let unit = '';
+
+      if (rentalType === 'daily') {
+        baseRate = vehicle.pricing?.pricePerDay || vehicle.price?.perDay || 0;
+        subtotal = baseRate * totalDays;
+        unit = 'day';
+      } else if (rentalType === 'hourly') {
+        baseRate = vehicle.pricing?.pricePerHour || vehicle.price?.perHour || 0;
+        const estimatedHours = values.estimatedHours || totalDays * 8; // Default 8 hours per day
+        subtotal = baseRate * estimatedHours;
+        unit = 'hour';
+      } else if (rentalType === 'kilometer') {
+        baseRate = vehicle.pricing?.pricePerKilometer || vehicle.price?.perKilometer || 0;
+        const estimatedKm = values.estimatedKilometers || 100; // Default 100 km
+        subtotal = baseRate * estimatedKm;
+        unit = 'km';
+      }
+
       const driverCharge = withDriver ? (vehicle.pricing?.driverFee || 20) * totalDays : 0;
       const insurance = subtotal * 0.05; // 5% insurance
-      const tax = (subtotal + driverCharge + insurance) * 0.08; // 8% tax
-      const totalAmount = subtotal + driverCharge + insurance + tax;
+      const totalAmount = subtotal + driverCharge + insurance;
 
       const bookingData = {
         customer: {
@@ -76,21 +135,36 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
           driverRequired: withDriver,
         },
         pricing: {
-          basePrice: dailyRate,  // Backend expects basePrice
+          basePrice: baseRate,  // Backend expects basePrice
           totalAmount: totalAmount,  // Backend expects totalAmount
+          rentalType: rentalType,
+          unit: unit,
         },
         payment: {
           method: 'cash' as const,  // Valid payment method type
           status: 'pending' as const,
         },
         notes: values.notes || '',  // Fixed: use correct form field name
-      };      console.log('📤 Submitting booking data:', JSON.stringify(bookingData, null, 2));
+      };
 
       const response = await vehicleBookingService.createBooking(bookingData);
       
       if (response.success) {
-        message.success('Vehicle booking submitted successfully! You will receive a confirmation shortly.');
+        const customerEmail = values.customerEmail;
+        message.success(`Vehicle booking submitted successfully! Booking confirmation and tracking updates will be sent to ${customerEmail}`, 6);
         form.resetFields();
+        
+        // Re-populate user data after successful booking
+        if (currentUser) {
+          setTimeout(() => {
+            form.setFieldsValue({
+              customerName: currentUser.name || '',
+              customerEmail: currentUser.email || '',
+              customerPhone: currentUser.phone || '',
+            });
+          }, 100);
+        }
+        
         onCancel();
         if (onBookingSuccess) {
           onBookingSuccess();
@@ -121,6 +195,18 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
   const handleCancel = () => {
     form.resetFields();
     setWithDriver(false);
+    
+    // Re-populate user data after reset
+    if (currentUser) {
+      setTimeout(() => {
+        form.setFieldsValue({
+          customerName: currentUser.name || '',
+          customerEmail: currentUser.email || '',
+          customerPhone: currentUser.phone || '',
+        });
+      }, 0);
+    }
+    
     onCancel();
   };
 
@@ -134,10 +220,38 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
 
   // Pre-fill form with user data if available
   const initialValues = currentUser ? {
-    customerName: currentUser.name,
-    customerEmail: currentUser.email,
+    customerName: currentUser.name || '',
+    customerEmail: currentUser.email || '',
     customerPhone: currentUser.phone || '',
   } : {};
+
+  // Auto-fill form when user data becomes available
+  useEffect(() => {
+    if (currentUser && visible) {
+      const formData = {
+        customerName: currentUser.name || '',
+        customerEmail: currentUser.email || '',
+        customerPhone: currentUser.phone || '',
+      };
+      
+      form.setFieldsValue(formData);
+    }
+  }, [currentUser, visible, form]);
+
+  // Additional effect to force form update when modal becomes visible
+  useEffect(() => {
+    if (visible && currentUser) {
+      // Small delay to ensure form is fully rendered
+      setTimeout(() => {
+        const userData = {
+          customerName: currentUser.name || '',
+          customerEmail: currentUser.email || '',
+          customerPhone: currentUser.phone || '',
+        };
+        form.setFieldsValue(userData);
+      }, 100);
+    }
+  }, [visible]);
 
   return (
     <Modal
@@ -176,14 +290,31 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
           <h3 className="text-lg font-semibold mb-4 flex items-center text-blue-800">
             <UserOutlined className="mr-2 text-blue-600" />
             Customer Information
+            
           </h3>
+          {!currentUser && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center text-yellow-700">
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm font-medium">
+                  You are not logged in. Please enter your details manually or <a href="/login" className="text-blue-600 underline">log in</a> to auto-fill this form.
+                </span>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Form.Item
               name="customerName"
               label="Full Name"
               rules={[{ required: true, message: 'Please enter your full name' }]}
-            >
-              <Input placeholder="Enter full name" className="rounded-lg" />
+              >
+              <Input 
+                placeholder="Enter full name" 
+                className="rounded-lg"
+                style={currentUser ? { backgroundColor: '#f0f9ff' } : {}}
+              />
             </Form.Item>
 
             <Form.Item
@@ -204,8 +335,13 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
                 { required: true, message: 'Please enter your email' },
                 { type: 'email', message: 'Please enter a valid email' }
               ]}
-            >
-              <Input placeholder="Enter email address" className="rounded-lg" />
+             >
+              <Input 
+                placeholder="Enter email address" 
+                className="rounded-lg"
+                style={currentUser ? { backgroundColor: '#f0f9ff' } : {}}
+                disabled={!!currentUser} // Disable if user is logged in
+              />
             </Form.Item>
 
             <Form.Item
@@ -246,6 +382,60 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
                 placeholder={['Start Date', 'End Date']}
               />
             </Form.Item>
+
+            {/* Rental Type Selection */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rental Type
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {getAvailableRentalTypes().map((type) => (
+                  <div
+                    key={type.value}
+                    onClick={() => setRentalType(type.value)}
+                    className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                      rentalType === type.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="font-medium">{type.label}</div>
+                    <div className="text-sm text-gray-600">{type.rate}$/{type.value === 'daily' ? 'day' : type.value === 'hourly' ? 'hour' : 'km'}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Additional inputs based on rental type */}
+            {rentalType === 'hourly' && (
+              <Form.Item
+                name="estimatedHours"
+                label="Estimated Hours"
+                rules={[{ required: true, message: 'Please enter estimated hours' }]}
+              >
+                <Input 
+                  type="number" 
+                  placeholder="Enter estimated hours" 
+                  className="rounded-lg"
+                  min={1}
+                />
+              </Form.Item>
+            )}
+
+            {rentalType === 'kilometer' && (
+              <Form.Item
+                name="estimatedKilometers"
+                label="Estimated Kilometers"
+                rules={[{ required: true, message: 'Please enter estimated kilometers' }]}
+              >
+                <Input 
+                  type="number" 
+                  placeholder="Enter estimated kilometers" 
+                  className="rounded-lg"
+                  min={1}
+                />
+              </Form.Item>
+            )}
 
             <Form.Item
               name="pickupLocation"
@@ -335,17 +525,47 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
           </h3>
           
           <div className="space-y-4">
-            {/* Daily Rate */}
+            {/* Base Rate - Dynamic based on rental type */}
             <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
               <div>
-                <span className="text-sm font-medium text-gray-700">Daily Rate</span>
-                <div className="text-xs text-gray-500">Per day rental cost</div>
+                <span className="text-sm font-medium text-gray-700">
+                  {rentalType === 'daily' ? 'Daily Rate' : 
+                   rentalType === 'hourly' ? 'Hourly Rate' : 
+                   'Per Kilometer Rate'}
+                </span>
+                <div className="text-xs text-gray-500">
+                  {rentalType === 'daily' ? 'Per day rental cost' : 
+                   rentalType === 'hourly' ? 'Per hour rental cost' : 
+                   'Per kilometer rental cost'}
+                </div>
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-blue-600">
-                  ${vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay || 0}
+                   {
+                    rentalType === 'daily' ? (vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay || 0) :
+                    rentalType === 'hourly' ? (vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour || 0) :
+                    (vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer || 0)
+                  }$
                 </span>
-                <div className="text-xs text-gray-500">/day</div>
+                <div className="text-xs text-gray-500">
+                  /{rentalType === 'daily' ? 'day' : rentalType === 'hourly' ? 'hour' : 'km'}
+                </div>
+              </div>
+            </div>
+
+            {/* Available Pricing Options */}
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="text-sm font-medium text-gray-700 mb-2">Available Pricing Options:</div>
+              <div className="space-y-1">
+                {(vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay) && (
+                  <div className="text-xs text-gray-600">Daily: {vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay}$/day</div>
+                )}
+                {(vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour) && (
+                  <div className="text-xs text-gray-600">Hourly: {vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour}$/hour</div>
+                )}
+                {(vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer) && (
+                  <div className="text-xs text-gray-600">Per Km: {vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer}$/km</div>
+                )}
               </div>
             </div>
 

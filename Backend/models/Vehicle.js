@@ -35,6 +35,7 @@ const priceSchema = new mongoose.Schema(
   {
     perHour: Number,
     perDay: Number,
+    perKilometer: Number,
   },
   { _id: false }
 );
@@ -73,7 +74,7 @@ const vehicleSchema = new mongoose.Schema(
     description: String,
     vehicleType: {
       type: String,
-      enum: ["car", "van", "bus", "minibus", "coach"],
+      enum: ["car", "van", "bus", "suv", "motorcycle","truck"],
       required: true,
     },
     make: String,
