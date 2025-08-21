@@ -39,8 +39,16 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    if (onClick) {
+  const handleClick = (e?: React.MouseEvent) => {
+    if (title === "Customization") {
+      e?.preventDefault();
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        navigate("/CustomPackageForm");
+      } else {
+        navigate("/login");
+      }
+    } else if (onClick) {
       onClick();
     } else if (link) {
       // Handle different types of links
