@@ -123,7 +123,7 @@ const createTestUserAndLogin = async (): Promise<void> => {
     console.log('🔧 Attempting to register test user...');
     
     // Try to register the test user
-    const registerResponse = await fetch('http://localhost:5001/api/auth/register', {
+    const registerResponse = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ const createTestUserAndLogin = async (): Promise<void> => {
 
   // Try to login with the test user
   try {
-    const loginResponse = await fetch('http://localhost:5001/api/auth/login', {
+    const loginResponse = await fetch('http://localhost:5000/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

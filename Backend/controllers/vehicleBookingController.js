@@ -1,5 +1,6 @@
 import VehicleBooking from '../models/VehicleBooking.js';
 import Vehicle from '../models/Vehicle.js';
+import VehicleOwner from '../models/VehicleOwner.js';
 import { validationResult } from 'express-validator';
 
 // Get all vehicle bookings with filtering and pagination
@@ -65,14 +66,51 @@ export const getAllVehicleBookings = async (req, res) => {
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     const bookings = await VehicleBooking.find(filter)
-      .populate('vehicle.vehicleId', 'name licensePlate category images')
+      .populate({
+        path: 'vehicle.vehicleId',
+        select: 'name licensePlate category images ownerId',
+        populate: {
+          path: 'ownerId',
+          select: 'name email phone'
+        }
+      })
       .populate('createdBy', 'name email')
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit));
 
-    console.log('🔍 VehicleBooking Debug - Found bookings:', bookings.length);
-    console.log('🔍 VehicleBooking Debug - First booking customer:', bookings[0]?.customer);
+    // Enhance bookings with owner details from VehicleOwner collection
+    const enhancedBookings = await Promise.all(
+      bookings.map(async (booking) => {
+        const bookingObj = booking.toObject();
+        
+        if (bookingObj.vehicle?.vehicleId?.ownerId) {
+          try {
+            const ownerDetails = await VehicleOwner.findOne({
+              userId: bookingObj.vehicle.vehicleId.ownerId
+            }).select('ownerName businessName email phone businessRegistrationNumber');
+            
+            if (ownerDetails) {
+              bookingObj.vehicle.owner = {
+                name: ownerDetails.ownerName,
+                email: ownerDetails.email,
+                phone: ownerDetails.phone,
+                businessName: ownerDetails.businessName,
+                licenseNumber: ownerDetails.businessRegistrationNumber
+              };
+            }
+          } catch (error) {
+            console.error('Error fetching owner details:', error);
+          }
+        }
+        
+        return bookingObj;
+      })
+    );
+
+    console.log('🔍 VehicleBooking Debug - Found bookings:', enhancedBookings.length);
+    console.log('🔍 VehicleBooking Debug - First booking customer:', enhancedBookings[0]?.customer);
+    console.log('🔍 VehicleBooking Debug - First booking owner:', enhancedBookings[0]?.vehicle?.owner);
 
     const total = await VehicleBooking.countDocuments(filter);
 
@@ -98,7 +136,7 @@ export const getAllVehicleBookings = async (req, res) => {
 
     res.json({
       success: true,
-      data: bookings,
+      data: enhancedBookings,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -188,12 +226,48 @@ export const getCustomerVehicleBookings = async (req, res) => {
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     const bookings = await VehicleBooking.find(filter)
-      .populate('vehicle.vehicleId', 'name licensePlate category images')
+      .populate({
+        path: 'vehicle.vehicleId',
+        select: 'name licensePlate category images ownerId',
+        populate: {
+          path: 'ownerId',
+          select: 'name email phone'
+        }
+      })
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit));
 
-    console.log('🔍 Customer VehicleBooking Debug - Found bookings:', bookings.length);
+    // Enhance customer bookings with owner details too
+    const enhancedCustomerBookings = await Promise.all(
+      bookings.map(async (booking) => {
+        const bookingObj = booking.toObject();
+        
+        if (bookingObj.vehicle?.vehicleId?.ownerId) {
+          try {
+            const ownerDetails = await VehicleOwner.findOne({
+              userId: bookingObj.vehicle.vehicleId.ownerId
+            }).select('ownerName businessName email phone businessRegistrationNumber');
+            
+            if (ownerDetails) {
+              bookingObj.vehicle.owner = {
+                name: ownerDetails.ownerName,
+                email: ownerDetails.email,
+                phone: ownerDetails.phone,
+                businessName: ownerDetails.businessName,
+                licenseNumber: ownerDetails.businessRegistrationNumber
+              };
+            }
+          } catch (error) {
+            console.error('Error fetching customer booking owner details:', error);
+          }
+        }
+        
+        return bookingObj;
+      })
+    );
+
+    console.log('🔍 Customer VehicleBooking Debug - Found bookings:', enhancedCustomerBookings.length);
 
     const total = await VehicleBooking.countDocuments(filter);
 
@@ -220,7 +294,7 @@ export const getCustomerVehicleBookings = async (req, res) => {
 
     res.json({
       success: true,
-      data: bookings,
+      data: enhancedCustomerBookings,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

@@ -41,6 +41,8 @@ interface VehicleBooking {
     tax?: number;
     discount?: number;
     totalAmount: number;
+    rentalType?: string;
+    unit?: string;
   };
   payment: {
     method: 'cash' | 'card' | 'bank_transfer' | 'online';
@@ -362,7 +364,14 @@ const Bookings = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-green-600">Rs. {booking.pricing.totalAmount.toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">{booking.payment.method}</div>
+                      <div className="text-sm text-gray-500">
+                        {booking.pricing.rentalType && booking.pricing.basePrice ? (
+                          <span>Rs. {booking.pricing.basePrice}/{booking.pricing.unit || 'day'}</span>
+                        ) : (
+                          <span>Rs. {booking.pricing.basePrice}/day</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-400">{booking.payment.method}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-2">

@@ -279,9 +279,21 @@ const CustomerVehicleBookingTable: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        ${booking.pricing.totalAmount.toLocaleString()}
+                        Rs. {booking.pricing.totalAmount.toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500">
+                        {booking.pricing.basePrice ? (
+                          <span>
+                            Rs. {booking.pricing.basePrice}/day
+                            {booking.pricing.dailyRate && booking.pricing.dailyRate !== booking.pricing.basePrice && (
+                              ` (Daily: Rs. ${booking.pricing.dailyRate})`
+                            )}
+                          </span>
+                        ) : (
+                          <span>Base rate included</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-400">
                         {booking.payment.status === 'paid' ? '✓ Paid' : 'Pending payment'}
                       </div>
                     </td>
@@ -364,7 +376,7 @@ const CustomerVehicleBookingTable: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => navigate(`/vehicle-booking/${booking._id}`)}
+                          onClick={() => navigate(`/vehicle-booking-details/${booking._id}`)}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           View Details
