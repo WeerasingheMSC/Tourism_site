@@ -33,7 +33,9 @@ const RegisterVehicle = () => {
     },
     // Pricing & Details (Step 5)
     pricing: {
-      pricePerDay: ''
+      pricePerDay: '',
+      pricePerHour: '',
+      pricePerKilometer: ''
     },
     description: '',
     rentalType: 'Per day',
@@ -158,16 +160,16 @@ const RegisterVehicle = () => {
         }
       }
 
-      // Prepare vehicle data for backend (matching backend controller expectations)
+      // Prepare vehicle data for backend (matching backend Vehicle model schema)
       const vehicleData = {
-        name: formData.name, // Backend maps this to 'title'
+        title: formData.name, // Backend expects 'title'
         description: formData.description,
-        category: formData.category, // Backend maps this to 'vehicleType'
-        brand: formData.brand, // Backend maps this to 'make'
+        vehicleType: formData.category, // Backend expects 'vehicleType'
+        make: formData.brand, // Backend expects 'make'
         model: formData.model,
         year: parseInt(formData.year),
-        licensePlate: formData.licensePlate, // Backend maps this to 'registrationNumber'
-        seatingCapacity: parseInt(formData.seatingCapacity), // Backend maps this to 'seatCapacity'
+        registrationNumber: formData.licensePlate, // Backend expects 'registrationNumber'
+        seatCapacity: parseInt(formData.seatingCapacity), // Backend expects 'seatCapacity'
         fuelType: formData.fuelType,
         transmission: formData.transmission,
         color: formData.color,
@@ -179,9 +181,10 @@ const RegisterVehicle = () => {
           address: formData.location.address,
           coordinates: formData.location.coordinates
         },
-        pricing: {
-          pricePerDay: parseFloat(formData.pricing.pricePerDay),
-          pricePerHour: undefined // Optional field for backend
+        price: {
+          perDay: parseFloat(formData.pricing.pricePerDay),
+          perHour: formData.pricing.pricePerHour ? parseFloat(formData.pricing.pricePerHour) : undefined,
+          perKilometer: formData.pricing.pricePerKilometer ? parseFloat(formData.pricing.pricePerKilometer) : undefined
         },
         features: formData.features,
         images: imageUrls, // Now contains Firebase URLs
@@ -633,7 +636,7 @@ const RegisterVehicle = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (Rs.) *
+                  Price Per Day *
                 </label>
                 <input
                   type="number"
@@ -644,6 +647,36 @@ const RegisterVehicle = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="0.00"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Price Per Hour
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.pricing.pricePerHour}
+                  onChange={(e) => handleInputChange('pricing.pricePerHour', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rental Per Kilometer
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.pricing.pricePerKilometer}
+                  onChange={(e) => handleInputChange('pricing.pricePerKilometer', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="0.00"
                 />
               </div>
 
@@ -740,7 +773,13 @@ const RegisterVehicle = () => {
                 <div><strong>Features:</strong> {formData.features.length} selected</div>
                 <div><strong>FAQs:</strong> {formData.faqs.filter(faq => faq.question && faq.answer).length} added</div>
                 <div><strong>Rental Type:</strong> {formData.rentalType}</div>
-                <div><strong>Price:</strong> {formData.pricing.pricePerDay} $</div>
+                <div><strong>Price Per Day:</strong> {formData.pricing.pricePerDay}</div>
+                {formData.pricing.pricePerHour && (
+                  <div><strong>Price Per Hour:</strong>{formData.pricing.pricePerHour}</div>
+                )}
+                {formData.pricing.pricePerKilometer && (
+                  <div><strong>Rental Per Kilometer:</strong>{formData.pricing.pricePerKilometer}</div>
+                )}
                 <div><strong>Air Conditioning:</strong> {formData.airConditioning ? 'Yes' : 'No'}</div>
               </div>
               {formData.location.address && (

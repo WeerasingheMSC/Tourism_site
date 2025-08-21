@@ -195,28 +195,28 @@ export const createVehicle = async (req, res) => {
       });
     }
 
-    // Check if license plate already exists
+    // Check if registration number already exists
     const existingVehicle = await Vehicle.findOne({
-      registrationNumber: req.body.licensePlate,
+      registrationNumber: req.body.registrationNumber,
     });
 
     if (existingVehicle) {
       return res.status(400).json({
         success: false,
-        message: "Vehicle with this license plate already exists",
+        message: "Vehicle with this registration number already exists",
       });
     }
 
-    // Map modern API fields to legacy model fields
+    // Use the correct field names from frontend
     const vehicleData = {
-      title: req.body.name,
+      title: req.body.title,
       description: req.body.description,
-      vehicleType: req.body.category,
-      make: req.body.brand,
+      vehicleType: req.body.vehicleType,
+      make: req.body.make,
       model: req.body.model,
       year: req.body.year,
-      registrationNumber: req.body.licensePlate,
-      seatCapacity: req.body.seatingCapacity,
+      registrationNumber: req.body.registrationNumber,
+      seatCapacity: req.body.seatCapacity,
       transmission: req.body.transmission,
       fuelType: req.body.fuelType,
       color: req.body.color,
@@ -228,8 +228,9 @@ export const createVehicle = async (req, res) => {
       images: req.body.images || [],
       faqs: req.body.faqs || [],
       price: {
-        perDay: req.body.pricing?.pricePerDay || 0,
-        perHour: req.body.pricing?.pricePerHour || 0,
+        perDay: req.body.price?.perDay || 0,
+        perHour: req.body.price?.perHour || 0,
+        perKilometer: req.body.price?.perKilometer || 0,
       },
       pickupLocations: req.body.pickupLocations || [],
       policies: req.body.policies || {

@@ -123,9 +123,21 @@ const VehicleDetailsPage = () => {
       return `$ ${vehicle.pricing.pricePerDay}/Day`;
     }
     if (vehicle.price?.perDay) {
-      return ` ${vehicle.price.perDay} $/Day`;
+      return `$ ${vehicle.price.perDay}/Day`;
     }
-    return '$ 0/Day';
+    if (vehicle.pricing?.pricePerHour) {
+      return `$ ${vehicle.pricing.pricePerHour}/Hour`;
+    }
+    if (vehicle.price?.perHour) {
+      return `$ ${vehicle.price.perHour}/Hour`;
+    }
+    if (vehicle.pricing?.pricePerKilometer) {
+      return `$ ${vehicle.pricing.pricePerKilometer}/Km`;
+    }
+    if (vehicle.price?.perKilometer) {
+      return `$ ${vehicle.price.perKilometer}/Km`;
+    }
+    return 'Price on request';
   };
 
   // Helper function to get vehicle images or use fallbacks
@@ -561,10 +573,32 @@ const VehicleDetailsPage = () => {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">Pricing</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Price per Day:</span>
-                    <span className="font-semibold">{getVehiclePrice()}</span>
-                  </div>
+                  {(vehicle.pricing?.pricePerDay || vehicle.price?.perDay) && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Price per Day:</span>
+                      <span className="font-semibold"> {vehicle.pricing?.pricePerDay || vehicle.price?.perDay}$</span>
+                    </div>
+                  )}
+                  {(vehicle.pricing?.pricePerHour || vehicle.price?.perHour) && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Price per Hour:</span>
+                      <span className="font-semibold">{vehicle.pricing?.pricePerHour || vehicle.price?.perHour}$</span>
+                    </div>
+                  )}
+                  {(vehicle.pricing?.pricePerKilometer || vehicle.price?.perKilometer) && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Rental per Kilometer:</span>
+                      <span className="font-semibold">{vehicle.pricing?.pricePerKilometer || vehicle.price?.perKilometer}$</span>
+                    </div>
+                  )}
+                  {!vehicle.pricing?.pricePerDay && !vehicle.price?.perDay && 
+                   !vehicle.pricing?.pricePerHour && !vehicle.price?.perHour && 
+                   !vehicle.pricing?.pricePerKilometer && !vehicle.price?.perKilometer && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Pricing:</span>
+                      <span className="font-semibold">Price on request</span>
+                    </div>
+                  )}
                 </div>
               </div>
               

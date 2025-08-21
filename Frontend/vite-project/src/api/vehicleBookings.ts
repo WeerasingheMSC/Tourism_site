@@ -91,6 +91,8 @@ export interface Vehicle {
   // Modern pricing structure
   pricing?: {
     pricePerDay: number;
+    pricePerHour?: number;
+    pricePerKilometer?: number;
     pricePerKm?: number;
     driverFee?: number;
   };
@@ -98,6 +100,7 @@ export interface Vehicle {
   price?: {
     perDay: number;
     perHour?: number;
+    perKilometer?: number;
   };
   location?: {
     city: string;

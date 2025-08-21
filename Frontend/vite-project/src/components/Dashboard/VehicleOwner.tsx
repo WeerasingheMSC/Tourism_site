@@ -366,7 +366,7 @@ const VehicleOwner: React.FC = () => {
                       Type
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Price/Day
+                      Price/Rate
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                       Approval Status
@@ -392,7 +392,17 @@ const VehicleOwner: React.FC = () => {
                         <span className="capitalize">{(vehicle.vehicleType || vehicle.category) || 'Vehicle'}</span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        ${vehicle.price?.perDay || vehicle.pricing?.pricePerDay || 0}/day
+                        <div>
+                          {vehicle.price?.perDay || vehicle.pricing?.pricePerDay ? (
+                            <span>Rs. {vehicle.price?.perDay || vehicle.pricing?.pricePerDay}/day</span>
+                          ) : vehicle.price?.perHour || vehicle.pricing?.pricePerHour ? (
+                            <span>Rs. {vehicle.price?.perHour || vehicle.pricing?.pricePerHour}/hour</span>
+                          ) : vehicle.price?.perKilometer || vehicle.pricing?.pricePerKilometer ? (
+                            <span>Rs. {vehicle.price?.perKilometer || vehicle.pricing?.pricePerKilometer}/km</span>
+                          ) : (
+                            <span>Price on request</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span
@@ -537,7 +547,15 @@ const VehicleOwner: React.FC = () => {
                           {booking.booking?.endDate ? new Date(booking.booking.endDate).toLocaleDateString() : "-"}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
-                          Dollar {booking.pricing?.totalAmount || 0}
+                          <div>
+                            <div className="font-medium">Rs. {booking.pricing?.totalAmount || 0}</div>
+                            {(booking.pricing as any)?.rentalType && (booking.pricing as any)?.basePrice && (
+                              <div className="text-xs text-gray-500">
+                                {(booking.pricing as any).basePrice}$/{(booking.pricing as any).unit || 'day'}
+                                {(booking.pricing as any).rentalType !== 'daily' && ` (${(booking.pricing as any).rentalType})`}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <span

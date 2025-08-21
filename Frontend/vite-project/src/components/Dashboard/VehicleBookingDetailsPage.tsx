@@ -353,12 +353,6 @@ const VehicleBookingDetailsPage: React.FC = () => {
                   <span className="font-medium">${booking.pricing.insurance}</span>
                 </div>
               )}
-              {booking.pricing.tax && booking.pricing.tax > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">${booking.pricing.tax}</span>
-                </div>
-              )}
               {booking.pricing.discount && booking.pricing.discount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Discount</span>
