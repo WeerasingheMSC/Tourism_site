@@ -739,45 +739,6 @@ const HotelDetailsPage = () => {
               </div>
             </div>
           )}
-
-          {/* Review submission form */}
-          <div className="mb-6 bg-white rounded-lg shadow-sm p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-medium mb-4">Add Your Review</h3>
-            {reviewError && <p className="text-red-500 mb-2 text-sm">{reviewError}</p>}
-            <div className="flex flex-col sm:flex-row sm:items-center mb-4 gap-2">
-              <label className="text-sm font-medium">Rating:</label>
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star
-                    key={i}
-                    size={20}
-                    onClick={() => setNewRating(i)}
-                    onMouseEnter={() => setHoverRating(i)}
-                    onMouseLeave={() => setHoverRating(0)}
-                    className={`cursor-pointer transition-colors ${
-                      i <= (hoverRating || newRating)
-                        ? "text-yellow-400 fill-current"
-                        : "text-gray-300"
-                    } mr-1`}
-                  />
-                ))}
-              </div>
-            </div>
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              rows={3}
-              placeholder="Write your review..."
-              className="w-full border rounded p-2 mb-4 text-sm sm:text-base"
-            />
-            <button
-              onClick={handleReviewSubmit}
-              disabled={submitting}
-              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-all text-sm sm:text-base"
-            >
-              {submitting ? "Submitting..." : "Submit Review"}
-            </button>
-          </div>
         </div>
       </div>
     </div>
