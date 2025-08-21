@@ -169,8 +169,8 @@ const AuthNavBar: React.FC = () => {
           <div className="text-blue-600 text-sm sm:text-lg lg:text-xl font-bold mt-1 hidden sm:block">
             Travel Booking Sri Lanka
           </div>
-          <div className="text-blue-600 text-xs font-bold mt-1 sm:hidden">
-            Travel SL
+          <div className="text-blue-600 text-sm font-bold mt-1 sm:hidden">
+            Travel Booking SL
           </div>
         </div>
 

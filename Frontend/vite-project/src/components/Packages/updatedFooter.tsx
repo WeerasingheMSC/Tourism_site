@@ -69,7 +69,7 @@ const UpdatedFooter: React.FC = () => (
       </div>
     </div>
     <div className="text-center text-gray-400 text-sm">
-      All rights reserved@TravelBookingSrilanka.com
+      © 2025 TravelBookingSrilanka.com | All rights reserved
     </div>
   </footer>
 );

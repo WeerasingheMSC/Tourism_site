@@ -35,6 +35,20 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   description,
   link,
 }) => {
+  const navigate = useNavigate();
+  
+  const handleClick = (e: React.MouseEvent) => {
+    if (title === "Customization") {
+      e.preventDefault();
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        navigate("/CustomPackageForm");
+      } else {
+        navigate("/login");
+      }
+    }
+  };
+
   const CardContent = () => (
     <div className="text-center bg-white shadow-lg rounded-xl p-6 sm:p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl group cursor-pointer border border-gray-100 hover:border-blue-200">
       <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300 shadow-md group-hover:shadow-lg">
@@ -52,7 +66,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
   if (link) {
     return (
-      <a href={link} className="block">
+      <a href={title === "Customization" ? "#" : link} onClick={handleClick} className="block">
         <CardContent />
       </a>
     );
@@ -275,19 +289,19 @@ const TravelBookingSite: React.FC = () => {
               icon={carIcon}
               title="Travelling Partner"
               description="Explore Sri Lanka with our reliable vehicle booking service. Choose from a wide range of cars and experienced drivers."
-              link="http://localhost:5173/vehicles"
+              link="/vehicles"
             />
             <ServiceCard
               icon={hotelIcon}
               title="Hotel partner"
               description="Discover comfortable accommodations across Sri Lanka. Book the perfect hotel for your stay with our trusted partners."
-              link="http://localhost:5173/hotels"
+              link="/hotels"
             />
             <ServiceCard
               icon={settingsIcon}
               title="Customization"
               description="Create your perfect Sri Lankan adventure. Customize every detail of your trip to match your preferences and dreams."
-              link="http://localhost:5173/CustomPackageForm"
+              link="/CustomPackageForm"
             />
           </div>
         </div>
