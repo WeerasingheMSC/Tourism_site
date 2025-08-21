@@ -27,6 +27,7 @@ interface ServiceCardProps {
   title: string;
   description: string;
   link?: string;
+  onClick?: () => void;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
@@ -34,29 +35,45 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   title,
   description,
   link,
+  onClick,
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (link) {
+      // Handle different types of links
+      if (link.startsWith('/')) {
+        // Internal route - use navigate
+        navigate(link);
+      } else if (link.startsWith('http')) {
+        // External link - open in same tab but use window.location for SPA compatibility
+        window.location.href = link;
+      } else {
+        // Relative path - treat as internal route
+        navigate(`/${link}`);
+      }
+    }
+  };
+
   const CardContent = () => (
-    <div className="text-center bg-white shadow-lg rounded-xl p-6 sm:p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl group cursor-pointer border border-gray-100 hover:border-blue-200">
+    <div 
+      className="text-center bg-white shadow-lg rounded-xl p-6 sm:p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl group cursor-pointer border border-gray-100 hover:border-blue-200"
+      onClick={handleClick}
+    >
       <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300 shadow-md group-hover:shadow-lg">
         <img src={icon} alt={title} className="w-8 h-8 sm:w-10 sm:h-10 transition-transform duration-300 group-hover:scale-110" />
       </div>
       <h3 className="font-bold text-gray-800 mb-3 text-base sm:text-lg group-hover:text-blue-600 transition-colors duration-300">{title}</h3>
       <p className="text-sm sm:text-base text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">{description}</p>
-      {link && (
+      {(link || onClick) && (
         <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <span className="text-blue-500 text-sm font-medium">Learn More →</span>
         </div>
       )}
     </div>
   );
-
-  if (link) {
-    return (
-      <a href={link} className="block">
-        <CardContent />
-      </a>
-    );
-  }
 
   return <CardContent />;
 };
@@ -275,19 +292,19 @@ const TravelBookingSite: React.FC = () => {
               icon={carIcon}
               title="Travelling Partner"
               description="Explore Sri Lanka with our reliable vehicle booking service. Choose from a wide range of cars and experienced drivers."
-              link="http://localhost:5173/vehicles"
+              link="/vehicles"
             />
             <ServiceCard
               icon={hotelIcon}
               title="Hotel partner"
               description="Discover comfortable accommodations across Sri Lanka. Book the perfect hotel for your stay with our trusted partners."
-              link="http://localhost:5173/hotels"
+              link="/hotels"
             />
             <ServiceCard
               icon={settingsIcon}
               title="Customization"
               description="Create your perfect Sri Lankan adventure. Customize every detail of your trip to match your preferences and dreams."
-              link="http://localhost:5173/CustomPackageForm"
+              link="/CustomPackageForm"
             />
           </div>
         </div>
