@@ -14,7 +14,7 @@ import {
   Phone,
 } from "lucide-react";
 import HotelMap from "../Map/location";
-import { getOwnerHotelDetails, addReviewToHotel } from "../../api/hotel";
+import { getOwnerHotelDetails } from "../../api/hotel";
 import { createBooking } from "../../api/hotelBooking";
 
 interface FAQ {
@@ -79,12 +79,6 @@ const HotelDetailsPage = () => {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  // Review form state
-  const [newRating, setNewRating] = useState<number>(5);
-  const [newComment, setNewComment] = useState<string>("");
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [reviewError, setReviewError] = useState<string | null>(null);
-  const [hoverRating, setHoverRating] = useState<number>(0);
 
   // Booking modal state
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -142,23 +136,6 @@ const HotelDetailsPage = () => {
     loadHotel();
   }, [id]);
 
-  const handleReviewSubmit = async () => {
-    if (!id) return;
-    if (!ensureAuth()) return; // ⬅️  NEW
-    setSubmitting(true);
-    setReviewError(null);
-    try {
-      await addReviewToHotel(id, { rating: newRating, comment: newComment });
-      // reload hotel reviews
-      loadHotel();
-      setNewRating(5);
-      setNewComment("");
-    } catch (err: any) {
-      setReviewError(err.response?.data?.message || err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const openBookingModal = (roomTypeName: string) => {
     if (!ensureAuth()) return; // ⬅️  NEW
