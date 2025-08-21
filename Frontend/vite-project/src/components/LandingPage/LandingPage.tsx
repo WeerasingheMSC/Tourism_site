@@ -39,16 +39,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleClick = (e?: React.MouseEvent) => {
-    if (title === "Customization") {
-      e?.preventDefault();
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        navigate("/CustomPackageForm");
-      } else {
-        navigate("/login");
-      }
-    } else if (onClick) {
+  const handleClick = () => {
+    if (onClick) {
       onClick();
     } else if (link) {
       // Handle different types of links
@@ -312,7 +304,14 @@ const TravelBookingSite: React.FC = () => {
               icon={settingsIcon}
               title="Customization"
               description="Create your perfect Sri Lankan adventure. Customize every detail of your trip to match your preferences and dreams."
-              link="/CustomPackageForm"
+              onClick={() => {
+                const token = localStorage.getItem("authToken");
+                if (token) {
+                  navigate("/CustomPackageForm");
+                } else {
+                  navigate("/login");
+                }
+              }}
             />
           </div>
         </div>
