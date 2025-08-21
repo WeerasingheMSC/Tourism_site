@@ -102,7 +102,7 @@ export const updateBookingStatus = async (req, res, next) => {
     ;
     if (status === "confirmed") {
       const subject = "Your booking has been confirmed!";
-      const text = `Hello,\n\nYour booking has been ${status}. We will contact you on WhatsApp—please check your WhatsApp messages.\n\nThank you for choosing us!`;
+      const text = `Hello,\n\nYour booking has been ${status}. We will contact you on WhatsApp please check your WhatsApp messages.\n\nThank you for choosing us!`;
       await sendEmail(booking.email, subject, text);
     }else if (status === "cancelled") {
       const subject = "Your booking has been cancelled";

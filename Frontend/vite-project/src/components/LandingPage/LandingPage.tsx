@@ -213,7 +213,7 @@ const TravelBookingSite: React.FC = () => {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 mt-auto">
                       <span className="text-xs sm:text-sm text-gray-600">From</span>
                       <span className="text-lg sm:text-xl font-bold text-gray-800">
-                        {pkg.startingPrice}$
+                        ${pkg.startingPrice}
                       </span>
                       <span className="text-xs sm:text-sm text-gray-600">
                         {pkg.dailyPlans?.length || 0} Days
@@ -255,7 +255,7 @@ const TravelBookingSite: React.FC = () => {
                   Customize Now
                 </h3>
                 <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base leading-relaxed">
-                  Customize your trip easily—choose places, dates, and
+                  Customize your trip easily choose places, dates, and
                   activities to create the perfect travel plan just for you.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
