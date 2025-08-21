@@ -405,12 +405,12 @@ const HotelDetailsPage = () => {
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
                       <span className="text-sm sm:text-lg leading-none text-gray-700 flex items-center justify-center h-full">
-                        {review.user.name.charAt(0)}
+                        {(review.user?.name?.charAt(0) || "U")}
                       </span>
                     </div>
                     <div className="flex-1 text-right">
                       <h4 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1 truncate">
-                        {review.user.name}
+                        {review.user?.name || "Unknown"}
                       </h4>
                       <div className="flex items-center justify-end gap-1">
                         <Star className="w-3 h-3 fill-blue-400 text-blue-400" />
