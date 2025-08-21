@@ -58,7 +58,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-1">
           <span className="text-gray-500 text-sm">From</span>
-          <span className="text-2xl font-bold text-blue-500">{startingPrice}$</span>
+          <span className="text-2xl font-bold text-blue-500">${startingPrice}</span>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-gray-900">{dalyPlans}</div>
