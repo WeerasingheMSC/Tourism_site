@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ScrollToTop } from "../../components/ScrollToTop.tsx";
 //test 
-import Vehicle from "..//Dashboard/PartnerDashboard.tsx"
+
 
 
 
@@ -47,6 +47,7 @@ import VehicleOwnerDetails from "../VehicleDashboard/VehicleOwnerDetails.tsx";
 import PartnerDashboard from "../VehicleDashboard/PartnerDashboard.tsx";
 import VehicleBookingDetailsPage from "../Dashboard/VehicleBookingDetailsPage.tsx";
 import ContactPage from "../ContactPage/ContactPage.tsx";
+import AdminHotelViewPage from "../Admin/AdminHotelViewPage.tsx";
 import type { SetStateAction } from "react";
 
 
@@ -476,7 +477,18 @@ const router = () => {
             </>
           }
         />
-        
+        <Route
+          path="/admin/hotels/view/:id"
+          element={
+            <ProtectedRoute>
+              <MainNav />
+              <Decore />
+              <AdminHotelViewPage />
+              <UpdatedFooter />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </Router>
   );

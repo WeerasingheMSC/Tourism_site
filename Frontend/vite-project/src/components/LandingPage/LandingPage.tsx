@@ -68,8 +68,8 @@ const TravelBookingSite: React.FC = () => {
         const response = await getPackages();
         setPackages(response.data);
       } catch (err) {
-        console.error('Error fetching packages:', err);
-        setError('Failed to load packages. Please try again later.');
+        console.error("Error fetching packages:", err);
+        setError("Failed to load packages. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -115,7 +115,9 @@ const TravelBookingSite: React.FC = () => {
             <div className="grid md:grid-cols-3 gap-8 w-full">
               {displayPackages.length === 0 ? (
                 <div className="col-span-3 text-center py-12">
-                  <p className="text-gray-500">No packages available at the moment.</p>
+                  <p className="text-gray-500">
+                    No packages available at the moment.
+                  </p>
                 </div>
               ) : (
                 displayPackages.map((pkg, idx) => (
@@ -140,25 +142,25 @@ const TravelBookingSite: React.FC = () => {
                         className="absolute -top-6 left-1/2 -translate-x-1/2 w-10 h-10"
                       />
                     )}
-                    
+
                     <div className="flex justify-center mb-4">
                       <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                        <img 
-                          src={pkg.packageIcon || beachIcon} 
-                          alt={pkg.name} 
-                          className="w-12 h-12 rounded-full object-cover" 
+                        <img
+                          src={pkg.packageIcon || beachIcon}
+                          alt={pkg.name}
+                          className="w-12 h-12 rounded-full object-cover"
                         />
                       </div>
                     </div>
-                    
+
                     <h3 className="font-semibold text-gray-800 text-center mb-1">
                       {pkg.name}
                     </h3>
-                    
+
                     <p className="text-sm text-gray-600 text-center mb-4">
                       {pkg.theme}
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-2 justify-center mb-4">
                       {pkg.idealFor?.map((tag, tagIdx) => (
                         <span
@@ -169,7 +171,7 @@ const TravelBookingSite: React.FC = () => {
                         </span>
                       ))}
                     </div>
-                    
+
                     <div className="flex items-center justify-center gap-2 mt-auto">
                       <span className="text-sm text-gray-600">From</span>
                       <span className="text-lg font-bold text-gray-800">
