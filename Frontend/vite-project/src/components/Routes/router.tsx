@@ -121,12 +121,12 @@ const router = () => {
         <Route
           path="/owner/hotels/:id"
           element={
-            <ProtectedRoute>
+            <>
               <MainNav />
               <Decore />
               <HotelOwnerDetailsPage />
               <UpdatedFooter />
-            </ProtectedRoute>
+            </>
           }
         />
         <Route
