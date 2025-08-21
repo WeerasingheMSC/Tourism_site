@@ -125,7 +125,7 @@ const AdminDashboardPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <a
-                          href={`/owner/hotels/${hotel._id}/details`}
+                          href={`/owner/hotels/${hotel._id}`}
                           className="text-blue-600 hover:underline"
                         >
                           View

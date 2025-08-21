@@ -119,7 +119,7 @@ const router = () => {
           }
         />
         <Route
-          path="/owner/hotels/:id/details"
+          path="/owner/hotels/:id"
           element={
             <ProtectedRoute>
               <MainNav />
