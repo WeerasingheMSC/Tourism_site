@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:seo": "npm run build",
+    "build:seo": "npm run generate-sitemap && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "analyze": "npx vite-bundle-analyzer dist"
+    "analyze": "npx vite-bundle-analyzer dist",
+    "generate-sitemap": "node scripts/generateSitemap.cjs"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",

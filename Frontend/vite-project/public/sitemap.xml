@@ -4,7 +4,7 @@
     <loc>https://travelbookingsrilanka.com/</loc>
     <lastmod>2025-08-22</lastmod>
     <changefreq>daily</changefreq>
-    <priority>1.0</priority>
+    <priority>1</priority>
   </url>
   <url>
     <loc>https://travelbookingsrilanka.com/packages</loc>
@@ -35,6 +35,18 @@
     <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://travelbookingsrilanka.com/login</loc>
+    <lastmod>2025-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://travelbookingsrilanka.com/register</loc>
+    <lastmod>2025-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://travelbookingsrilanka.com/destinations/sigiriya</loc>
@@ -68,30 +80,6 @@
   </url>
   <url>
     <loc>https://travelbookingsrilanka.com/destinations/yala</loc>
-    <lastmod>2025-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://travelbookingsrilanka.com/destinations/nuwara-eliya</loc>
-    <lastmod>2025-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://travelbookingsrilanka.com/destinations/mirissa</loc>
-    <lastmod>2025-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://travelbookingsrilanka.com/destinations/anuradhapura</loc>
-    <lastmod>2025-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://travelbookingsrilanka.com/destinations/polonnaruwa</loc>
     <lastmod>2025-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

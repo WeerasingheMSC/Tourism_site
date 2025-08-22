@@ -10,7 +10,6 @@ Disallow: /dashboard/
 Disallow: /api/
 Disallow: /login
 Disallow: /register
-Disallow: /signup/
 
 # Allow social media bots
 User-agent: facebookexternalhit
@@ -18,16 +17,3 @@ Allow: /
 
 User-agent: twitterbot
 Allow: /
-
-User-agent: linkedinbot
-Allow: /
-
-# Allow search engine crawlers
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-# Crawl delay to be respectful of server resources
-Crawl-delay: 1
