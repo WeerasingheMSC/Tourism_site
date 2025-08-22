@@ -12,6 +12,13 @@ import { useNavigate } from "react-router-dom";
 // Import the API function
 import { getPackages } from "../../api/packages";
 
+// Import SEO hooks and structured data
+import { useSEO, seoConfigs } from "../../hooks/useSEO";
+import StructuredData, { structuredDataTemplates } from "../SEO/StructuredData";
+
+// Import analytics for tracking
+import { trackingEvents } from "../../utils/analytics";
+
 interface PackageType {
   _id: string;
   name: string; // maps to title
@@ -43,11 +50,20 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
     if (onClick) {
       onClick();
     } else if (link) {
+      // Track navigation based on link
+      if (link === "/vehicles") {
+        trackingEvents.viewVehicles();
+      } else if (link === "/hotels") {
+        trackingEvents.viewHotels();
+      } else if (link === "/packages") {
+        trackingEvents.viewPackages();
+      }
+
       // Handle different types of links
-      if (link.startsWith('/')) {
+      if (link.startsWith("/")) {
         // Internal route - use navigate
         navigate(link);
-      } else if (link.startsWith('http')) {
+      } else if (link.startsWith("http")) {
         // External link - open in same tab but use window.location for SPA compatibility
         window.location.href = link;
       } else {
@@ -58,18 +74,28 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   };
 
   const CardContent = () => (
-    <div 
+    <div
       className="text-center bg-white shadow-lg rounded-xl p-6 sm:p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl group cursor-pointer border border-gray-100 hover:border-blue-200"
       onClick={handleClick}
     >
       <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300 shadow-md group-hover:shadow-lg">
-        <img src={icon} alt={title} className="w-8 h-8 sm:w-10 sm:h-10 transition-transform duration-300 group-hover:scale-110" />
+        <img
+          src={icon}
+          alt={title}
+          className="w-8 h-8 sm:w-10 sm:h-10 transition-transform duration-300 group-hover:scale-110"
+        />
       </div>
-      <h3 className="font-bold text-gray-800 mb-3 text-base sm:text-lg group-hover:text-blue-600 transition-colors duration-300">{title}</h3>
-      <p className="text-sm sm:text-base text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">{description}</p>
+      <h3 className="font-bold text-gray-800 mb-3 text-base sm:text-lg group-hover:text-blue-600 transition-colors duration-300">
+        {title}
+      </h3>
+      <p className="text-sm sm:text-base text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+        {description}
+      </p>
       {(link || onClick) && (
         <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <span className="text-blue-500 text-sm font-medium">Learn More →</span>
+          <span className="text-blue-500 text-sm font-medium">
+            Learn More →
+          </span>
         </div>
       )}
     </div>
@@ -84,8 +110,14 @@ const TravelBookingSite: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize SEO for homepage
+  useSEO(seoConfigs.home);
+
   // 👇 guard for Customize Package: if not logged in, go to /login
   const handleCustomizeClick = () => {
+    // Track custom tour start event
+    trackingEvents.startCustomTour();
+
     const token = localStorage.getItem("authToken");
     if (token) {
       navigate("/CustomPackageForm");
@@ -103,8 +135,8 @@ const TravelBookingSite: React.FC = () => {
         const response = await getPackages();
         setPackages(response.data);
       } catch (err) {
-        console.error('Error fetching packages:', err);
-        setError('Failed to load packages. Please try again later.');
+        console.error("Error fetching packages:", err);
+        setError("Failed to load packages. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -116,13 +148,92 @@ const TravelBookingSite: React.FC = () => {
   // Get top 3 packages for display (you can modify this logic)
   const displayPackages = packages.slice(0, 3);
 
+  // FAQ data for structured data
+  const faqData = [
+    {
+      question: "What destinations are covered in Sri Lanka tour packages?",
+      answer:
+        "Our tour packages cover major attractions including Sigiriya Lion Rock, Temple of Sacred Tooth in Kandy, Ella Nine Arches Bridge, Dambulla Cave Temple, Yala National Park, Galle Fort, and beautiful beaches in Mirissa and Weligama.",
+    },
+    {
+      question: "Can I customize my Sri Lanka tour package?",
+      answer:
+        "Yes! We offer fully customizable tour packages where you can choose your destinations, duration, activities, and accommodation preferences to create your perfect Sri Lankan adventure.",
+    },
+    {
+      question: "What types of vehicles are available for booking?",
+      answer:
+        "We offer a wide range of vehicles including cars, vans, and buses with experienced drivers for comfortable travel across Sri Lanka.",
+    },
+    {
+      question: "How do I book hotels through your platform?",
+      answer:
+        "You can easily browse and book hotels across Sri Lanka through our platform, with options in major tourist destinations like Kandy, Colombo, Galle, Ella, and Sigiriya.",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Add structured data for homepage */}
+      <StructuredData
+        data={structuredDataTemplates.faq(faqData)}
+        id="homepage-faq-schema"
+      />
+
+      {/* Tourist attractions structured data */}
+      <StructuredData
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Top Sri Lanka Tourist Destinations",
+          description:
+            "Popular tourist attractions and destinations in Sri Lanka",
+          numberOfItems: 10,
+          itemListElement: [
+            {
+              "@type": "Place",
+              name: "Sigiriya Lion Rock",
+              description:
+                "Ancient rock fortress and UNESCO World Heritage Site with royal gardens and frescoes",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "LK",
+                addressRegion: "Central Province",
+              },
+            },
+            {
+              "@type": "Place",
+              name: "Temple of Sacred Tooth - Kandy",
+              description:
+                "Sacred Buddhist temple housing the tooth relic of Buddha",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "LK",
+                addressRegion: "Central Province",
+              },
+            },
+            {
+              "@type": "Place",
+              name: "Ella Nine Arches Bridge",
+              description:
+                "Iconic railway bridge surrounded by tea plantations and scenic mountain views",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "LK",
+                addressRegion: "Uva Province",
+              },
+            },
+          ],
+        }}
+        id="tourist-attractions-schema"
+      />
       {/* Best Packages */}
       <section className="py-12 sm:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
-            <p className="text-gray-500 mb-2 text-sm sm:text-base">Our package</p>
+            <p className="text-gray-500 mb-2 text-sm sm:text-base">
+              Our package
+            </p>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               Our Best Packages
             </h2>
@@ -132,7 +243,9 @@ const TravelBookingSite: React.FC = () => {
           {loading && (
             <div className="flex flex-col sm:flex-row justify-center items-center py-8 sm:py-12">
               <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500"></div>
-              <span className="mt-2 sm:mt-0 sm:ml-3 text-gray-600 text-sm sm:text-base">Loading packages...</span>
+              <span className="mt-2 sm:mt-0 sm:ml-3 text-gray-600 text-sm sm:text-base">
+                Loading packages...
+              </span>
             </div>
           )}
 
@@ -150,7 +263,9 @@ const TravelBookingSite: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full">
               {displayPackages.length === 0 ? (
                 <div className="col-span-full text-center py-8 sm:py-12">
-                  <p className="text-gray-500 text-sm sm:text-base">No packages available at the moment.</p>
+                  <p className="text-gray-500 text-sm sm:text-base">
+                    No packages available at the moment.
+                  </p>
                 </div>
               ) : (
                 displayPackages.map((pkg, idx) => (
@@ -165,7 +280,7 @@ const TravelBookingSite: React.FC = () => {
                       }
                       rounded-2xl p-4 sm:p-6 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-xl
                     `}
-                    style={{ minHeight: 'auto' }}
+                    style={{ minHeight: "auto" }}
                   >
                     {/* Badge for the middle card */}
                     {idx === 1 && (
@@ -175,25 +290,25 @@ const TravelBookingSite: React.FC = () => {
                         className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 w-8 h-8 sm:w-10 sm:h-10"
                       />
                     )}
-                    
+
                     <div className="flex justify-center mb-3 sm:mb-4">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                        <img 
-                          src={pkg.packageIcon || beachIcon} 
-                          alt={pkg.name} 
-                          className="w-8 h-8 sm:w-12 sm:h-12 rounded-full object-cover" 
+                        <img
+                          src={pkg.packageIcon || beachIcon}
+                          alt={pkg.name}
+                          className="w-8 h-8 sm:w-12 sm:h-12 rounded-full object-cover"
                         />
                       </div>
                     </div>
-                    
+
                     <h3 className="font-semibold text-gray-800 text-center mb-1 text-sm sm:text-base lg:text-lg">
                       {pkg.name}
                     </h3>
-                    
+
                     <p className="text-xs sm:text-sm text-gray-600 text-center mb-3 sm:mb-4 px-2">
                       {pkg.theme}
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-1 sm:gap-2 justify-center mb-3 sm:mb-4 px-2">
                       {pkg.idealFor?.slice(0, 3).map((tag, tagIdx) => (
                         <span
@@ -209,9 +324,11 @@ const TravelBookingSite: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 mt-auto">
-                      <span className="text-xs sm:text-sm text-gray-600">From</span>
+                      <span className="text-xs sm:text-sm text-gray-600">
+                        From
+                      </span>
                       <span className="text-lg sm:text-xl font-bold text-gray-800">
                         ${pkg.startingPrice}
                       </span>
@@ -231,7 +348,9 @@ const TravelBookingSite: React.FC = () => {
       <section className="py-12 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
-            <p className="text-gray-500 mb-2 text-sm sm:text-base">customize plan</p>
+            <p className="text-gray-500 mb-2 text-sm sm:text-base">
+              customize plan
+            </p>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               Customize your package
             </h2>
@@ -260,7 +379,10 @@ const TravelBookingSite: React.FC = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                   <button
-                    onClick={() => navigate("/packages")}
+                    onClick={() => {
+                      trackingEvents.viewPackages();
+                      navigate("/packages");
+                    }}
                     className="bg-blue-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors duration-300 text-sm sm:text-base"
                   >
                     All packages
@@ -305,6 +427,7 @@ const TravelBookingSite: React.FC = () => {
               title="Customization"
               description="Create your perfect Sri Lankan adventure. Customize every detail of your trip to match your preferences and dreams."
               onClick={() => {
+                trackingEvents.startCustomTour();
                 const token = localStorage.getItem("authToken");
                 if (token) {
                   navigate("/CustomPackageForm");

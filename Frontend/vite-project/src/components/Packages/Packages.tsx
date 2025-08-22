@@ -4,6 +4,10 @@ import PackageCard from "../../components/Packages/PackageCard.tsx";
 import Decore from "../../components/Packages/Decore.tsx";
 import { getPackages } from "../../api/packages.ts";
 
+// Import SEO hooks
+import { useSEO, seoConfigs } from "../../hooks/useSEO";
+import StructuredData from "../SEO/StructuredData";
+
 interface PackageType {
   _id: string;
   name: string; // maps to title
@@ -18,6 +22,9 @@ const TravelPackagesPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [packages, setPackages] = useState<PackageType[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize SEO for packages page
+  useSEO(seoConfigs.packages);
 
   // Fetch packages from backend once on mount
   useEffect(() => {
@@ -75,6 +82,44 @@ const TravelPackagesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
+      {/* Add structured data for packages */}
+      <StructuredData
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Sri Lanka Tour Packages",
+          description:
+            "Comprehensive tour packages covering major attractions in Sri Lanka including Sigiriya, Kandy, Ella, Dambulla, and more",
+          numberOfItems: packages.length,
+          itemListElement: packages.slice(0, 10).map((pkg, index) => ({
+            "@type": "Product",
+            position: index + 1,
+            name: pkg.name,
+            description: pkg.theme,
+            category: "Travel Package",
+            offers: {
+              "@type": "Offer",
+              price: pkg.startingPrice.replace(/[^0-9]/g, ""),
+              priceCurrency: "USD",
+              availability: "https://schema.org/InStock",
+            },
+            additionalProperty: [
+              {
+                "@type": "PropertyValue",
+                name: "Duration",
+                value: `${pkg.dailyPlans.length} Days`,
+              },
+              {
+                "@type": "PropertyValue",
+                name: "Ideal For",
+                value: pkg.idealFor.join(", "),
+              },
+            ],
+          })),
+        }}
+        id="packages-list-schema"
+      />
+
       {/* Decorative Background */}
       <Decore />
 
