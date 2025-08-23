@@ -421,7 +421,7 @@ const VehicleDetailsPage = () => {
 
                 {/* Contact Information */}
                 <div className="border-t pt-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Contact Owner</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Owner</h4>
                   <div className="space-y-2">
                     {vehicle.ownerDetails ? (
                       <>
