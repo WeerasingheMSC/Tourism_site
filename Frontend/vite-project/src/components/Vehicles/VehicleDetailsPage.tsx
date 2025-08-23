@@ -433,14 +433,6 @@ const VehicleDetailsPage = () => {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Phone className="w-4 h-4" />
-                          <span>{vehicle.ownerDetails.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Mail className="w-4 h-4" />
-                          <span>{vehicle.ownerDetails.email}</span>
-                        </div>
                       </>
                     ) : (
                       <>
