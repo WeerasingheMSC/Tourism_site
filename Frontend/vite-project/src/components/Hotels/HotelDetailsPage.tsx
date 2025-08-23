@@ -10,8 +10,10 @@ import {
   Baby,
   PawPrint,
   Bed,
+
 //  Mail,
 //  Phone,
+
 } from "lucide-react";
 import HotelMap from "../Map/location";
 import { getApprovedHotelById, addReviewToHotel } from "../../api/hotel";
@@ -213,7 +215,9 @@ const HotelDetailsPage = () => {
     images,
     amenities,
     address,
+
 //    contact,
+
     policies,
     reviews,
     faqs,
@@ -471,7 +475,7 @@ const HotelDetailsPage = () => {
               Address
             </h2>
             <div className="flex flex-col space-y-3 text-gray-700 text-sm sm:text-base">
-              
+
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <span className="break-words">
