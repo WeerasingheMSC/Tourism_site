@@ -421,7 +421,7 @@ const VehicleDetailsPage = () => {
 
                 {/* Contact Information */}
                 <div className="border-t pt-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Contact Owner</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Owner</h4>
                   <div className="space-y-2">
                     {vehicle.ownerDetails ? (
                       <>
@@ -432,14 +432,6 @@ const VehicleDetailsPage = () => {
                               ({vehicle.ownerDetails.businessName})
                             </span>
                           )}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Phone className="w-4 h-4" />
-                          <span>{vehicle.ownerDetails.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Mail className="w-4 h-4" />
-                          <span>{vehicle.ownerDetails.email}</span>
                         </div>
                       </>
                     ) : (
