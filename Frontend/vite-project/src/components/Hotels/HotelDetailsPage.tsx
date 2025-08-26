@@ -10,8 +10,10 @@ import {
   Baby,
   PawPrint,
   Bed,
-  //  Mail,
-  //  Phone,
+
+//  Mail,
+//  Phone,
+
 } from "lucide-react";
 import HotelMap from "../Map/location";
 import { getApprovedHotelById, addReviewToHotel } from "../../api/hotel";
@@ -218,7 +220,9 @@ const HotelDetailsPage = () => {
     images,
     amenities,
     address,
-    //    contact,
+
+//    contact,
+
     policies,
     reviews,
     faqs,
