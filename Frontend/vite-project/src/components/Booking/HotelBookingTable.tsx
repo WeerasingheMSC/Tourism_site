@@ -39,6 +39,11 @@ export default function HotelBookingTable(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Calculate price with 10% commission
+  const calculatePriceWithCommission = (originalPrice: number) => {
+    return originalPrice * 1.1; // Add 10% commission
+  };
+
   useEffect(() => {
     getMyBookings()
       .then((data) => setBookings(data))
@@ -81,7 +86,6 @@ export default function HotelBookingTable(): JSX.Element {
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Status
                 </th>
-                
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -106,7 +110,10 @@ export default function HotelBookingTable(): JSX.Element {
                     {b.numRooms}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {b.currency} {b.totalPrice?.toFixed(2) || "0.00"}
+                    {b.currency}{" "}
+                    {b.totalPrice
+                      ? calculatePriceWithCommission(b.totalPrice).toFixed(2)
+                      : "0.00"}
                   </td>
                   <td className="px-6 py-4">
                     <span
@@ -117,7 +124,6 @@ export default function HotelBookingTable(): JSX.Element {
                       {b.status}
                     </span>
                   </td>
-                  
                 </tr>
               ))}
             </tbody>
