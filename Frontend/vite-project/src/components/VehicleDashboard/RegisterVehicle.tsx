@@ -140,6 +140,28 @@ const RegisterVehicle = () => {
     try {
       setLoading(true);
 
+      // Frontend validation before submitting
+      const requiredFields = {
+        'Vehicle Name': formData.name,
+        'Vehicle Type': formData.category,
+        'Brand': formData.brand,
+        'Model': formData.model,
+        'Year': formData.year,
+        'License Plate': formData.licensePlate,
+        'Seating Capacity': formData.seatingCapacity,
+        'Price Per Day': formData.pricing.pricePerDay
+      };
+
+      const emptyFields = Object.entries(requiredFields)
+        .filter(([_, value]) => !value || value.toString().trim() === '')
+        .map(([field, _]) => field);
+
+      if (emptyFields.length > 0) {
+        message.error(`Please fill in required fields: ${emptyFields.join(', ')}`);
+        setLoading(false);
+        return;
+      }
+
       // Upload images to Firebase first
       let imageUrls: string[] = [];
       if (formData.images.length > 0) {
@@ -194,6 +216,15 @@ const RegisterVehicle = () => {
       };
 
       console.log('🚗 Registering vehicle with data:', vehicleData);
+      console.log('🔍 Vehicle data validation check:');
+      console.log('- title:', vehicleData.title);
+      console.log('- vehicleType:', vehicleData.vehicleType);
+      console.log('- make:', vehicleData.make);
+      console.log('- model:', vehicleData.model);
+      console.log('- year:', vehicleData.year);
+      console.log('- registrationNumber:', vehicleData.registrationNumber);
+      console.log('- seatCapacity:', vehicleData.seatCapacity);
+      console.log('- price.perDay:', vehicleData.price.perDay);
 
       // Submit to backend
       const response = await vehicleService.createVehicle(vehicleData);
@@ -206,16 +237,50 @@ const RegisterVehicle = () => {
       
     } catch (error: any) {
       console.error('❌ Vehicle registration error:', error);
+      console.error('❌ Error details:', {
+        message: error?.message,
+        response: error?.response?.data,
+        errors: error?.errors,
+        status: error?.response?.status,
+        fullError: error
+      });
+      
+      // Log the specific validation errors if they exist
+      if (error?.errors && Array.isArray(error.errors)) {
+        console.error('❌ Validation errors breakdown:');
+        error.errors.forEach((err: any, index: number) => {
+          console.error(`Error ${index + 1}:`, {
+            field: err.path || err.param,
+            message: err.msg || err.message,
+            value: err.value,
+            location: err.location
+          });
+        });
+      }
       
       if (error?.message?.includes('403') || error?.message?.includes('Access denied')) {
         message.error('Access denied. Please ensure you are logged in as a vehicle owner.');
         navigate('/login');
       } else if (error?.errors && Array.isArray(error.errors)) {
-        // Handle validation errors
-        const errorMessages = error.errors.map((err: any) => err.msg).join(', ');
-        message.error(`Validation errors: ${errorMessages}`);
+        // Handle validation errors from any source
+        const errorMessages = error.errors.map((err: any) => {
+          const field = err.path || err.param || 'Unknown field';
+          const msg = err.msg || err.message || 'Invalid value';
+          return `${field}: ${msg}`;
+        }).join('\n');
+        console.error('❌ Formatted validation errors:', errorMessages);
+        message.error(`Validation errors:\n${errorMessages}`);
+      } else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        // Handle validation errors from backend response
+        const errorMessages = error.response.data.errors.map((err: any) => {
+          const field = err.path || err.param || 'Unknown field';
+          const msg = err.msg || err.message || 'Invalid value';
+          return `${field}: ${msg}`;
+        }).join('\n');
+        console.error('❌ Backend validation errors:', errorMessages);
+        message.error(`Validation errors:\n${errorMessages}`);
       } else {
-        message.error(error?.message || 'Failed to register vehicle. Please try again.');
+        message.error(error?.response?.data?.message || error?.message || 'Failed to register vehicle. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -300,6 +365,7 @@ const RegisterVehicle = () => {
                   <option value="suv">SUV</option>
                   <option value="motorcycle">Motorcycle</option>
                   <option value="truck">Truck</option>
+                  <option value="tuk tuk">Tuk Tuk</option>
                 </select>
               </div>
 

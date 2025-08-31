@@ -42,6 +42,10 @@ export interface VehicleBooking {
     tax?: number;
     discount?: number;
     totalAmount: number; // Required by backend validation
+    rentalType?: string;
+    unit?: string;
+    estimatedHours?: number;
+    estimatedKilometers?: number;
   };
   payment: {
     method: "cash" | "card" | "bank_transfer" | "online";
@@ -372,10 +376,19 @@ export const vehicleService = {
   // Create new vehicle
   createVehicle: async (vehicleData: Partial<Vehicle>) => {
     try {
+      console.log('🚀 Creating vehicle with data:', vehicleData);
       const response = await vehicleAPI.post("/", vehicleData);
+      console.log('✅ Vehicle creation response:', response.data);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
+      console.error('🔥 API Error Details:', {
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
+        headers: axiosError.response?.headers,
+        config: axiosError.config
+      });
       throw axiosError.response?.data || axiosError.message;
     }
   },

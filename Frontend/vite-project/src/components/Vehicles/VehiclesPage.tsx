@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import VehicleCard from "./VehicleCard";
 import { FilterSection, type Filters } from "./FilterSection";
 import vehicleBg from "../../assets/vehiclebg.png";
+import { getVehiclePriceWithMarkup } from "../../utils/priceHelper";
 
 // Import SEO hooks
 import { useSEO, seoConfigs } from "../../hooks/useSEO";
@@ -29,6 +30,12 @@ interface Vehicle {
     perDay?: number;
     perHour?: number;
     perKilometer?: number;
+  };
+  pricing?: {
+    pricePerDay?: number;
+    pricePerHour?: number;
+    pricePerKilometer?: number;
+    driverFee?: number;
   };
   images?: string[];
   features?: string[];
@@ -87,6 +94,7 @@ const filterButtons: string[] = [
   "suv",
   "motorcycle",
   "truck",
+  "tuk tuk",
 ];
 
 const VehiclesPage: React.FC = () => {
@@ -134,14 +142,7 @@ const VehiclesPage: React.FC = () => {
   };
 
   const getVehiclePrice = (vehicle: Vehicle) => {
-    if (vehicle.price?.perDay) {
-      return `${vehicle.price.perDay}$/day`;
-    } else if (vehicle.price?.perHour) {
-      return `${vehicle.price.perHour}$/hour`;
-    } else if (vehicle.price?.perKilometer) {
-      return `${vehicle.price.perKilometer}$/km`;
-    }
-    return "Price on request";
+    return getVehiclePriceWithMarkup(vehicle);
   };
 
   const getVehicleImage = (vehicle: Vehicle) => {
@@ -248,8 +249,8 @@ const VehiclesPage: React.FC = () => {
             filters.location.toLowerCase();
       }
 
-      if (filters.priceRange && vehicle.price?.perDay) {
-        const price = vehicle.price.perDay;
+      if (filters.priceRange && (vehicle.price?.perDay || vehicle.pricing?.pricePerDay)) {
+        const price = vehicle.pricing?.pricePerDay || vehicle.price?.perDay || 0;
         const [min, max] = filters.priceRange
           .split(" - ")
           .map((p: string) => parseFloat(p.replace("$", "").replace("+", "")));
@@ -283,16 +284,16 @@ const VehiclesPage: React.FC = () => {
 
       // Rental Type filter
       if (filters.rentalType) {
-        if (filters.rentalType === "Per Day" && !vehicle.price?.perDay) {
+        if (filters.rentalType === "Per Day" && !(vehicle.price?.perDay || vehicle.pricing?.pricePerDay)) {
           matches = false;
         } else if (
           filters.rentalType === "Per Hour" &&
-          !vehicle.price?.perHour
+          !(vehicle.price?.perHour || vehicle.pricing?.pricePerHour)
         ) {
           matches = false;
         } else if (
           filters.rentalType === "Per Kilometer" &&
-          !vehicle.price?.perKilometer
+          !(vehicle.price?.perKilometer || vehicle.pricing?.pricePerKilometer)
         ) {
           matches = false;
         }
@@ -313,11 +314,11 @@ const VehiclesPage: React.FC = () => {
         } else if (filters.drivingPurpose === "Short distance touring") {
           matches =
             matches &&
-            ["car", "suv", "van"].includes(vehicle.vehicleType.toLowerCase());
+            ["car", "suv", "van", "tuk tuk"].includes(vehicle.vehicleType.toLowerCase());
         } else if (filters.drivingPurpose === "Local taxi") {
           matches =
             matches &&
-            ["car", "van"].includes(vehicle.vehicleType.toLowerCase());
+            ["car", "van", "tuk tuk"].includes(vehicle.vehicleType.toLowerCase());
         }
       }
 
