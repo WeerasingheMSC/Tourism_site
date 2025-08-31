@@ -27,7 +27,7 @@ const vehicleValidation = [
   body("title").notEmpty().withMessage("Vehicle title is required"),
   body("registrationNumber").notEmpty().withMessage("Registration number is required"),
   body("vehicleType")
-    .isIn(["car", "van", "bus", "suv", "motorcycle", "truck"])
+    .isIn(["car", "van", "bus", "suv", "motorcycle", "truck", "tuk tuk"])
     .withMessage("Invalid vehicle type"),
   body("make").notEmpty().withMessage("Make is required"),
   body("model").notEmpty().withMessage("Model is required"),
@@ -45,7 +45,7 @@ const vehicleValidation = [
 const legacyVehicleValidation = [
   body("title").notEmpty().withMessage("Title is required"),
   body("vehicleType")
-    .isIn(["car", "van", "bus", "suv", "motorcycle", "truck"])
+    .isIn(["car", "van", "bus", "suv", "motorcycle", "truck", "tuk tuk"])
     .withMessage("Invalid vehicle type"),
 ];
 
