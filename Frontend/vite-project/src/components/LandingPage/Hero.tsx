@@ -120,33 +120,34 @@ const Hero: React.FC = () => {
                         font-extrabold font-popins text-center lg:text-start 
                         mb-4 sm:mb-6 md:mb-8"
           >
-            BEST DESTINATION AROUND SRI LANKA
+            EXPLORE SRI LANKS WITH EASY
           </p>
 
           {/* Main Title */}
           <h1
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl 
-                         font-extrabold mt-4 sm:mt-6 md:mt-8 text-center lg:text-start 
-                         leading-tight sm:leading-tight md:leading-tight lg:leading-tight
-                         max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:w-110
-                         mx-auto lg:mx-0"
+            className="text-3xl xs:text-4xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl
+                         font-extrabold mt-4 sm:mt-6 md:mt-8 
+                         text-center lg:text-start 
+                         leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight
+                         max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-2xl xl:max-w-2xl 2xl:max-w-3xl
+                         mx-auto lg:mx-0
+                         px-2 sm:px-0
+                         text-gray-800"
             style={{ fontFamily: "sans-serif" }}
           >
-            Travel, enjoy and live a new and full life
+            Discover stunning beaches, wildlife safaris, ancient cities, and hidden gems with our carefully designed tour packages
           </h1>
 
           {/* Description */}
           <p
-            className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:w-110 
+            className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-3xl xl:w-150 
                         text-sm sm:text-base md:text-lg 
                         text-center lg:text-start 
                         font-sans mt-4 sm:mt-6 md:mt-8 
                         mx-auto lg:mx-0 
                         leading-relaxed text-gray-700"
           >
-            Built Wicket longer admire do barton vanity itself do in it.
-            Preferred to sportsmen it engrossed listening. Park gate sell they
-            west hard for the.
+            Whether you dream of relaxing on golden sands, spotting leopards on safari, or exploring misty mountains, we make your Sri Lanka adventure simple and unforgettable. Customize your travel plan or choose from our best-selling packages
           </p>
 
           {/* Buttons */}
@@ -169,7 +170,7 @@ const Hero: React.FC = () => {
               }}
               size="large"
             >
-              Find Out More
+              View Our Tours
             </Button>
             {/* 🔄 2) Redirect to home (/) on click */}
             <Button
@@ -183,7 +184,7 @@ const Hero: React.FC = () => {
               }}
               size="large"
             >
-              Customize your plan
+              Build Your Custom Tour
             </Button>
           </div>
         </div>

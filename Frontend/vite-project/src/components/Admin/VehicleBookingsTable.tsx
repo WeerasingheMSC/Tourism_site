@@ -164,6 +164,38 @@ const VehicleBookingsTable: React.FC = () => {
           <div className="text-sm text-gray-500">
             to {formatDate(record.booking.endDate.toString())}
           </div>
+          {/* Rental Type and Quantity Display */}
+          <div className="text-xs font-medium mt-1">
+            {record.pricing.rentalType === 'hourly' ? (
+              <div className="bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                <span className="text-blue-800 font-semibold">
+                  ⏱️ Hourly: {record.pricing.estimatedHours ? `${record.pricing.estimatedHours} hours` : 'Hours not specified'}
+                </span>
+              </div>
+            ) : record.pricing.rentalType === 'kilometer' ? (
+              <div className="bg-green-50 px-2 py-1 rounded border border-green-200">
+                <span className="text-green-800 font-semibold">
+                  📏 Per KM: {record.pricing.estimatedKilometers ? `${record.pricing.estimatedKilometers} km` : 'Distance not specified'}
+                </span>
+              </div>
+            ) : record.pricing.rentalType === 'daily' ? (
+              <div className="bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                <span className="text-gray-700 font-semibold">📅 Daily rental</span>
+              </div>
+            ) : record.pricing.unit === 'hour' ? (
+              <div className="bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
+                <span className="text-yellow-700 font-semibold">⏱️ Hourly (legacy)</span>
+              </div>
+            ) : record.pricing.unit === 'km' ? (
+              <div className="bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
+                <span className="text-yellow-700 font-semibold">📏 Per KM (legacy)</span>
+              </div>
+            ) : (
+              <div className="bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                <span className="text-gray-700 font-semibold">📅 Daily (default)</span>
+              </div>
+            )}
+          </div>
         </div>
       ),
     },
@@ -332,6 +364,41 @@ const VehicleBookingsTable: React.FC = () => {
                 </Descriptions.Item>
                 <Descriptions.Item label="Duration">
                   {selectedBooking.booking.duration} days
+                </Descriptions.Item>
+                <Descriptions.Item label="Rental Type">
+                  <div className="flex items-center">
+                    <div className="inline-block">
+                      {selectedBooking.pricing.rentalType === 'hourly' ? (
+                        <div className="bg-blue-50 px-3 py-2 rounded border border-blue-200">
+                          <span className="text-blue-800 font-bold text-sm">
+                            ⏱️ HOURLY BOOKING: {selectedBooking.pricing.estimatedHours ? `${selectedBooking.pricing.estimatedHours} HOURS` : 'HOURS NOT SPECIFIED'}
+                          </span>
+                        </div>
+                      ) : selectedBooking.pricing.rentalType === 'kilometer' ? (
+                        <div className="bg-green-50 px-3 py-2 rounded border border-green-200">
+                          <span className="text-green-800 font-bold text-sm">
+                            📏 PER KILOMETER BOOKING: {selectedBooking.pricing.estimatedKilometers ? `${selectedBooking.pricing.estimatedKilometers} KM` : 'DISTANCE NOT SPECIFIED'}
+                          </span>
+                        </div>
+                      ) : selectedBooking.pricing.rentalType === 'daily' ? (
+                        <div className="bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                          <span className="text-gray-700 font-bold text-sm">📅 DAILY RENTAL</span>
+                        </div>
+                      ) : selectedBooking.pricing.unit === 'hour' ? (
+                        <div className="bg-yellow-50 px-3 py-2 rounded border border-yellow-200">
+                          <span className="text-yellow-700 font-bold text-sm">⏱️ HOURLY (LEGACY)</span>
+                        </div>
+                      ) : selectedBooking.pricing.unit === 'km' ? (
+                        <div className="bg-yellow-50 px-3 py-2 rounded border border-yellow-200">
+                          <span className="text-yellow-700 font-bold text-sm">📏 PER KM (LEGACY)</span>
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                          <span className="text-gray-700 font-bold text-sm">📅 DAILY (DEFAULT)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Pickup Location">
                   <div className="flex items-center">

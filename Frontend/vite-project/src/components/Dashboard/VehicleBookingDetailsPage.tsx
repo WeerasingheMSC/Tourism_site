@@ -201,7 +201,7 @@ const VehicleBookingDetailsPage: React.FC = () => {
                 <p className="text-blue-100 mt-1">Booking created on {formatDate(booking.createdAt)}</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold">${booking.pricing.totalAmount}</p>
+                <p className="text-3xl font-bold">{booking.pricing.totalAmount}$</p>
                 <p className="text-blue-100">Total Amount</p>
               </div>
             </div>
@@ -266,6 +266,73 @@ const VehicleBookingDetailsPage: React.FC = () => {
                   <div className="bg-gray-50 p-4 rounded-xl text-center">
                     <div className="text-2xl font-bold text-gray-900">{booking.booking.driverRequired ? 'Yes' : 'No'}</div>
                     <div className="text-sm text-gray-600">Driver Required</div>
+                  </div>
+                </div>
+
+                {/* Rental Type Information */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Rental Type Information
+                  </h3>
+                  <div className="space-y-3">
+                    {/* Check for hourly rentals */}
+                    {((booking.pricing as any)?.rentalType === 'hourly' || 
+                      (booking.pricing as any)?.rentalType === 'hour' || 
+                      (booking.pricing as any)?.unit === 'hour' ||
+                      (booking.pricing as any)?.unit === 'hours') ? (
+                      <div className="bg-blue-100 px-4 py-3 rounded-lg border border-blue-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-blue-800 font-bold text-lg">⏱️ HOURLY RENTAL</span>
+                          <span className="text-blue-700 font-bold text-xl">
+                            {(booking.pricing as any)?.estimatedHours ? `${(booking.pricing as any).estimatedHours} HOURS` : 
+                             (booking.pricing as any)?.totalHours ? `${(booking.pricing as any).totalHours} HOURS` :
+                             'HOURS NOT SPECIFIED'}
+                          </span>
+                        </div>
+                      </div>
+                    ) : /* Check for per kilometer rentals */
+                    ((booking.pricing as any)?.rentalType === 'kilometer' || 
+                     (booking.pricing as any)?.rentalType === 'per-kilometer' ||
+                     (booking.pricing as any)?.rentalType === 'km' ||
+                     (booking.pricing as any)?.unit === 'km' ||
+                     (booking.pricing as any)?.unit === 'kilometer') ? (
+                      <div className="bg-green-100 px-4 py-3 rounded-lg border border-green-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-green-800 font-bold text-lg">📏 PER KILOMETER RENTAL</span>
+                          <span className="text-green-700 font-bold text-xl">
+                            {(booking.pricing as any)?.estimatedKilometers ? `${(booking.pricing as any).estimatedKilometers} KM` : 
+                             (booking.pricing as any)?.totalKilometers ? `${(booking.pricing as any).totalKilometers} KM` :
+                             (booking.pricing as any)?.distance ? `${(booking.pricing as any).distance} KM` :
+                             'DISTANCE NOT SPECIFIED'}
+                          </span>
+                        </div>
+                      </div>
+                    ) : /* Check for daily rentals */
+                    ((booking.pricing as any)?.rentalType === 'daily' || 
+                     (booking.pricing as any)?.rentalType === 'day' ||
+                     (booking.pricing as any)?.unit === 'day' ||
+                     (booking.pricing as any)?.unit === 'daily' ||
+                     !(booking.pricing as any)?.rentalType) ? (
+                      <div className="bg-gray-100 px-4 py-3 rounded-lg border border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-800 font-bold text-lg">� DAILY RENTAL</span>
+                          <span className="text-gray-700 font-bold text-xl">STANDARD DAILY RATE</span>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Fallback - show the actual values for debugging */
+                      <div className="bg-yellow-100 px-4 py-3 rounded-lg border border-yellow-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-yellow-800 font-bold text-lg">� UNKNOWN RENTAL TYPE</span>
+                          <span className="text-yellow-700 font-bold text-xl">
+                            {(booking.pricing as any)?.rentalType || (booking.pricing as any)?.unit || 'NO TYPE SPECIFIED'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -339,30 +406,30 @@ const VehicleBookingDetailsPage: React.FC = () => {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Base Price</span>
-                <span className="font-medium">${booking.pricing.basePrice}</span>
+                <span className="font-medium">{booking.pricing.basePrice}$</span>
               </div>
               {booking.pricing.driverCharge && booking.pricing.driverCharge > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Driver Charge</span>
-                  <span className="font-medium">${booking.pricing.driverCharge}</span>
+                  <span className="font-medium">{booking.pricing.driverCharge}$</span>
                 </div>
               )}
               {booking.pricing.insurance && booking.pricing.insurance > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Insurance</span>
-                  <span className="font-medium">${booking.pricing.insurance}</span>
+                  <span className="font-medium">{booking.pricing.insurance}$</span>
                 </div>
               )}
               {booking.pricing.discount && booking.pricing.discount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Discount</span>
-                  <span className="font-medium text-green-600">-${booking.pricing.discount}</span>
+                  <span className="font-medium text-green-600">{booking.pricing.discount}$</span>
                 </div>
               )}
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                  <span className="text-2xl font-bold text-blue-600">${booking.pricing.totalAmount}</span>
+                  <span className="text-2xl font-bold text-blue-600">{booking.pricing.totalAmount}$</span>
                 </div>
               </div>
             </div>

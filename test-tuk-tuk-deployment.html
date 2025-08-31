@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Tuk Tuk Deployment</title>
+</head>
+<body>
+    <h1>Test Tuk Tuk Vehicle Type Support</h1>
+    <button onclick="testTukTukSupport()">Test Backend Deployment</button>
+    <div id="result"></div>
+
+    <script>
+        async function testTukTukSupport() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // Test data with tuk tuk vehicle type
+                const testData = {
+                    title: "Test Tuk Tuk",
+                    vehicleType: "tuk tuk",
+                    make: "Bajaj",
+                    model: "Test",
+                    year: 2020,
+                    registrationNumber: "TEST-123",
+                    seatCapacity: 3,
+                    price: { perDay: 50 }
+                };
+
+                const response = await fetch('https://tourism-site-be.onrender.com/api/vehicles/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 401 || response.status === 403) {
+                    resultDiv.innerHTML = `
+                        <div style="color: orange;">
+                            <h3>✅ Backend is updated!</h3>
+                            <p>Authentication error (expected), but no validation error for "tuk tuk" vehicle type.</p>
+                            <p>The backend now accepts "tuk tuk" as a valid vehicle type.</p>
+                        </div>
+                    `;
+                } else if (response.status === 400 && data.errors) {
+                    const hasVehicleTypeError = data.errors.some(err => 
+                        err.path === 'vehicleType' && err.msg === 'Invalid vehicle type'
+                    );
+                    
+                    if (hasVehicleTypeError) {
+                        resultDiv.innerHTML = `
+                            <div style="color: red;">
+                                <h3>❌ Backend not yet updated</h3>
+                                <p>Still getting "Invalid vehicle type" error for "tuk tuk".</p>
+                                <p>Deployment may still be in progress. Wait a few more minutes and try again.</p>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div style="color: orange;">
+                                <h3>✅ Backend is updated!</h3>
+                                <p>No vehicle type validation error. Other validation errors are expected.</p>
+                                <p>The backend now accepts "tuk tuk" as a valid vehicle type.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <h3>✅ Backend is fully updated!</h3>
+                            <p>Response: ${JSON.stringify(data)}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <h3>❌ Connection Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

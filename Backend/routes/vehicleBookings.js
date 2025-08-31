@@ -10,6 +10,10 @@ import {
   deleteVehicleBooking,
   getBookingStatistics
 } from '../controllers/vehicleBookingController.js';
+import {
+  updateBookingsWithRentalType,
+  getBookingDataStructure
+} from '../controllers/migrationController.js';
 import auth from '../middleware/auth.js';
 
 const router = express.Router();
@@ -51,6 +55,13 @@ router.get('/customer-bookings', auth, getCustomerVehicleBookings);
 
 // GET /api/vehicle-bookings/statistics - Get booking statistics
 router.get('/statistics', auth, getBookingStatistics);
+
+// DEBUG/MIGRATION ROUTES
+// GET /api/vehicle-bookings/debug/data-structure - Get sample booking data structure
+router.get('/debug/data-structure', getBookingDataStructure);
+
+// POST /api/vehicle-bookings/migrate/rental-types - Update existing bookings with rental type data
+router.post('/migrate/rental-types', auth, updateBookingsWithRentalType);
 
 // GET /api/vehicle-bookings/:id - Get single vehicle booking (public access for viewing)
 router.get('/:id', getVehicleBookingById);
