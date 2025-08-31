@@ -43,6 +43,8 @@ interface VehicleBooking {
     totalAmount: number;
     rentalType?: string;
     unit?: string;
+    estimatedHours?: number;
+    estimatedKilometers?: number;
   };
   payment: {
     method: 'cash' | 'card' | 'bank_transfer' | 'online';
@@ -128,6 +130,16 @@ const Bookings = () => {
     
     try {
       const data = await vehicleBookingAPI.getOwnerBookings();
+      
+      // Debug: Log the booking data to see the actual structure
+      console.log('🔍 DEBUG - Vehicle Bookings Data:', data);
+      data.forEach((booking, index) => {
+        console.log(`🔍 Booking ${index + 1} pricing:`, booking.pricing);
+        console.log(`🔍 Booking ${index + 1} rentalType:`, booking.pricing?.rentalType);
+        console.log(`🔍 Booking ${index + 1} unit:`, booking.pricing?.unit);
+        console.log('---');
+      });
+      
       setBookings(data);
     } catch (err: any) {
       console.error('Failed to fetch owner bookings:', err);
@@ -319,6 +331,7 @@ const Bookings = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking Info</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rental Type</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -350,6 +363,80 @@ const Bookings = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      {/* Rental Type and Quantity Display */}
+                      <div className="text-xs font-medium">
+                        {/* Enhanced logic to handle missing rental type data */}
+                        {(() => {
+                          const rentalType = (booking.pricing as any).rentalType;
+                          const unit = booking.pricing.unit;
+                          const hasHours = booking.pricing.estimatedHours || (booking.pricing as any).totalHours;
+                          const hasKilometers = booking.pricing.estimatedKilometers || (booking.pricing as any).totalKilometers || (booking.pricing as any).distance;
+                          
+                          // Debug logging for each booking
+                          console.log('Booking analysis:', {
+                            rentalType,
+                            unit,
+                            hasHours,
+                            hasKilometers,
+                            fullPricing: booking.pricing
+                          });
+
+                          // Check for hourly rentals (explicit or inferred)
+                          if (rentalType === 'hourly' || rentalType === 'hour' || unit === 'hour' || unit === 'hours' || hasHours) {
+                            return (
+                              <div className="bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                                <span className="text-blue-800 font-bold">⏱️ HOURLY</span>
+                                <div className="text-blue-700 mt-1 font-semibold">
+                                  {hasHours ? `${hasHours} hours` : 'Hours not specified'}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // Check for per kilometer rentals (explicit or inferred)
+                          if (rentalType === 'kilometer' || rentalType === 'per-kilometer' || rentalType === 'km' || 
+                              unit === 'km' || unit === 'kilometer' || hasKilometers) {
+                            return (
+                              <div className="bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                                <span className="text-green-800 font-bold">📏 PER KM</span>
+                                <div className="text-green-700 mt-1 font-semibold">
+                                  {hasKilometers ? `${hasKilometers} km` : 'Distance not specified'}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // Check for daily rentals (explicit or default)
+                          if (rentalType === 'daily' || rentalType === 'day' || unit === 'day' || unit === 'daily' || !rentalType) {
+                            return (
+                              <div className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                                <span className="text-gray-700 font-bold">📅 DAILY</span>
+                                {!rentalType && (
+                                  <div className="text-gray-600 mt-1 text-xs">(default - no type specified)</div>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          // Fallback - show debug info for unknown types
+                          return (
+                            <div className="bg-yellow-50 px-3 py-2 rounded-lg border border-yellow-200">
+                              <span className="text-yellow-700 font-bold">🔍 UNKNOWN TYPE</span>
+                              <div className="text-yellow-600 mt-1 text-xs">
+                                <div><strong>Type:</strong> "{rentalType || 'not set'}"</div>
+                                <div><strong>Unit:</strong> "{unit || 'not set'}"</div>
+                                {booking.pricing.estimatedHours && <div><strong>Hours:</strong> {booking.pricing.estimatedHours}</div>}
+                                {booking.pricing.estimatedKilometers && <div><strong>KM:</strong> {booking.pricing.estimatedKilometers}</div>}
+                                <div className="text-yellow-500 mt-1 text-xs italic">
+                                  💡 This booking needs rental type migration
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm text-gray-900">{formatDate(booking.booking.startDate)}</div>
                         <div className="text-sm text-gray-500">to {formatDate(booking.booking.endDate)}</div>
@@ -363,12 +450,12 @@ const Bookings = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-green-600">Rs. {booking.pricing.totalAmount.toLocaleString()}</div>
+                      <div className="text-sm font-medium text-green-600"> {booking.pricing.totalAmount.toLocaleString()}$</div>
                       <div className="text-sm text-gray-500">
                         {booking.pricing.rentalType && booking.pricing.basePrice ? (
-                          <span>Rs. {booking.pricing.basePrice}/{booking.pricing.unit || 'day'}</span>
+                          <span>{booking.pricing.basePrice}$/{booking.pricing.unit || 'day'}$</span>
                         ) : (
-                          <span>Rs. {booking.pricing.basePrice}/day</span>
+                          <span>{booking.pricing.basePrice}$/day</span>
                         )}
                       </div>
                       <div className="text-xs text-gray-400">{booking.payment.method}</div>
@@ -453,7 +540,7 @@ const Bookings = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">Rs. {bookings.reduce((sum, booking) => sum + booking.pricing.totalAmount, 0).toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900"> {bookings.reduce((sum, booking) => sum + booking.pricing.totalAmount, 0).toLocaleString()}$</p>
             </div>
           </div>
         </div>

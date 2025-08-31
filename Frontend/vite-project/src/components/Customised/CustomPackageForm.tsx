@@ -524,6 +524,7 @@ const StepOtherDetails: React.FC<{
             </option>
             <option value="Private Car">Private Car</option>
             <option value="Van">Van</option>
+            <option value="Tuk Tuk">Tuk Tuk</option>
             <option value="Luxury Vehicle">Luxury Vehicle</option>
             <option value="Train">Train</option>
             <option value="Domestic Flights">Domestic Flights</option>

@@ -269,6 +269,26 @@ const CustomerVehicleBookingTable: React.FC = () => {
                           to {new Date(booking.booking.endDate).toLocaleDateString()}
                         </div>
                         <div className="text-sm text-gray-500">({booking.booking.duration})</div>
+                        {/* Rental Type and Quantity Display */}
+                        <div className="text-xs font-medium text-blue-600 mt-1">
+                          {booking.pricing.rentalType === 'hourly' ? (
+                            <span>
+                              Hourly: {booking.pricing.estimatedHours ? `${booking.pricing.estimatedHours} hours` : 'Not specified'}
+                            </span>
+                          ) : booking.pricing.rentalType === 'kilometer' ? (
+                            <span>
+                              Per KM: {booking.pricing.estimatedKilometers ? `${booking.pricing.estimatedKilometers} km` : 'Not specified'}
+                            </span>
+                          ) : booking.pricing.rentalType === 'daily' ? (
+                            <span>Daily rental</span>
+                          ) : booking.pricing.unit === 'hour' ? (
+                            <span>Hourly rental (legacy)</span>
+                          ) : booking.pricing.unit === 'km' ? (
+                            <span>Per KM rental (legacy)</span>
+                          ) : (
+                            <span>Daily rental</span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -279,14 +299,14 @@ const CustomerVehicleBookingTable: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        Rs. {booking.pricing.totalAmount.toLocaleString()}
+                         {booking.pricing.totalAmount.toLocaleString()}$
                       </div>
                       <div className="text-sm text-gray-500">
                         {booking.pricing.basePrice ? (
                           <span>
-                            Rs. {booking.pricing.basePrice}/day
+                             {booking.pricing.basePrice}$/day
                             {booking.pricing.dailyRate && booking.pricing.dailyRate !== booking.pricing.basePrice && (
-                              ` (Daily: Rs. ${booking.pricing.dailyRate})`
+                              ` (Daily: ${booking.pricing.dailyRate}$)`
                             )}
                           </span>
                         ) : (

@@ -105,9 +105,9 @@ export const seoConfigs = {
   vehicles: {
     title: "Vehicle Rental Sri Lanka | Car Hire & Transport Services",
     description:
-      "Rent vehicles in Sri Lanka for your perfect tour. Cars, vans, buses with experienced drivers. Explore Sigiriya, Kandy, Ella and all attractions safely and comfortably.",
+      "Rent vehicles in Sri Lanka for your perfect tour. Cars, vans, buses, tuk tuks with experienced drivers. Explore Sigiriya, Kandy, Ella and all attractions safely and comfortably.",
     keywords:
-      "vehicle rental Sri Lanka, car hire Sri Lanka, transport services, Sri Lanka taxi, tour vehicles",
+      "vehicle rental Sri Lanka, car hire Sri Lanka, tuk tuk rental Sri Lanka, transport services, Sri Lanka taxi, tour vehicles",
     url: "https://travelbookingsrilanka.com/vehicles",
   },
   customTour: {

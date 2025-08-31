@@ -54,6 +54,8 @@ interface VehicleBooking {
     totalAmount: number;
     rentalType?: string;
     unit?: string;
+    estimatedHours?: number;
+    estimatedKilometers?: number;
   };
   payment: {
     method: "cash" | "card" | "bank_transfer" | "online";
@@ -554,6 +556,52 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({
                     <div className="text-sm text-gray-500">
                       {booking.booking.duration} days
                     </div>
+                    {/* Rental Type and Quantity Display */}
+                    <div className="text-xs font-medium text-blue-600 mt-1">
+                      {/* Check for hourly rentals */}
+                      {((booking.pricing as any).rentalType === 'hourly' || 
+                        (booking.pricing as any).rentalType === 'hour' || 
+                        (booking.pricing as any).unit === 'hour' ||
+                        (booking.pricing as any).unit === 'hours') ? (
+                        <div className="bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                          <span className="text-blue-800 font-semibold">
+                            ⏱️ Hourly: {(booking.pricing as any).estimatedHours ? `${(booking.pricing as any).estimatedHours} hours` : 
+                                       (booking.pricing as any).totalHours ? `${(booking.pricing as any).totalHours} hours` :
+                                       'Hours not specified'}
+                          </span>
+                        </div>
+                      ) : /* Check for per kilometer rentals */
+                      ((booking.pricing as any).rentalType === 'kilometer' || 
+                       (booking.pricing as any).rentalType === 'per-kilometer' ||
+                       (booking.pricing as any).rentalType === 'km' ||
+                       (booking.pricing as any).unit === 'km' ||
+                       (booking.pricing as any).unit === 'kilometer') ? (
+                        <div className="bg-green-50 px-2 py-1 rounded border border-green-200">
+                          <span className="text-green-800 font-semibold">
+                            📏 Per KM: {(booking.pricing as any).estimatedKilometers ? `${(booking.pricing as any).estimatedKilometers} km` : 
+                                       (booking.pricing as any).totalKilometers ? `${(booking.pricing as any).totalKilometers} km` :
+                                       (booking.pricing as any).distance ? `${(booking.pricing as any).distance} km` :
+                                       'Distance not specified'}
+                          </span>
+                        </div>
+                      ) : /* Check for daily rentals */
+                      ((booking.pricing as any).rentalType === 'daily' || 
+                       (booking.pricing as any).rentalType === 'day' ||
+                       (booking.pricing as any).unit === 'day' ||
+                       (booking.pricing as any).unit === 'daily' ||
+                       !(booking.pricing as any).rentalType) ? (
+                        <div className="bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                          <span className="text-gray-700 font-semibold">� Daily rental</span>
+                        </div>
+                      ) : (
+                        /* Fallback - show the actual values for debugging */
+                        <div className="bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
+                          <span className="text-yellow-700 font-semibold">
+                            🔍 Unknown: {(booking.pricing as any).rentalType || (booking.pricing as any).unit || 'Need migration'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -835,6 +883,54 @@ const AdminVehicleBookingTable: React.FC<AdminVehicleBookingTableProps> = ({
                       <p>
                         <span className="font-medium">Duration:</span>{" "}
                         {selectedBooking.booking.duration} days
+                      </p>
+                      <p>
+                        <span className="font-medium">Rental Type:</span>{" "}
+                        <div className="mt-1 inline-block">
+                          {/* Check for hourly rentals */}
+                          {((selectedBooking.pricing as any).rentalType === 'hourly' || 
+                            (selectedBooking.pricing as any).rentalType === 'hour' || 
+                            (selectedBooking.pricing as any).unit === 'hour' ||
+                            (selectedBooking.pricing as any).unit === 'hours') ? (
+                            <div className="bg-blue-50 px-3 py-2 rounded border border-blue-200 inline-block">
+                              <span className="text-blue-800 font-bold text-sm">
+                                ⏱️ HOURLY BOOKING: {(selectedBooking.pricing as any).estimatedHours ? `${(selectedBooking.pricing as any).estimatedHours} HOURS` : 
+                                                   (selectedBooking.pricing as any).totalHours ? `${(selectedBooking.pricing as any).totalHours} HOURS` :
+                                                   'HOURS NOT SPECIFIED'}
+                              </span>
+                            </div>
+                          ) : /* Check for per kilometer rentals */
+                          ((selectedBooking.pricing as any).rentalType === 'kilometer' || 
+                           (selectedBooking.pricing as any).rentalType === 'per-kilometer' ||
+                           (selectedBooking.pricing as any).rentalType === 'km' ||
+                           (selectedBooking.pricing as any).unit === 'km' ||
+                           (selectedBooking.pricing as any).unit === 'kilometer') ? (
+                            <div className="bg-green-50 px-3 py-2 rounded border border-green-200 inline-block">
+                              <span className="text-green-800 font-bold text-sm">
+                                📏 PER KILOMETER BOOKING: {(selectedBooking.pricing as any).estimatedKilometers ? `${(selectedBooking.pricing as any).estimatedKilometers} KM` : 
+                                                          (selectedBooking.pricing as any).totalKilometers ? `${(selectedBooking.pricing as any).totalKilometers} KM` :
+                                                          (selectedBooking.pricing as any).distance ? `${(selectedBooking.pricing as any).distance} KM` :
+                                                          'DISTANCE NOT SPECIFIED'}
+                              </span>
+                            </div>
+                          ) : /* Check for daily rentals */
+                          ((selectedBooking.pricing as any).rentalType === 'daily' || 
+                           (selectedBooking.pricing as any).rentalType === 'day' ||
+                           (selectedBooking.pricing as any).unit === 'day' ||
+                           (selectedBooking.pricing as any).unit === 'daily' ||
+                           !(selectedBooking.pricing as any).rentalType) ? (
+                            <div className="bg-gray-50 px-3 py-2 rounded border border-gray-200 inline-block">
+                              <span className="text-gray-700 font-bold text-sm">� DAILY RENTAL</span>
+                            </div>
+                          ) : (
+                            /* Fallback - show the actual values for debugging */
+                            <div className="bg-yellow-50 px-3 py-2 rounded border border-yellow-200 inline-block">
+                              <span className="text-yellow-700 font-bold text-sm">
+                                🔍 UNKNOWN: {(selectedBooking.pricing as any).rentalType || (selectedBooking.pricing as any).unit || 'NEEDS MIGRATION'} 
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </p>
                       <p>
                         <span className="font-medium">Pickup:</span>{" "}

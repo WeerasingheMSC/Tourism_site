@@ -3,6 +3,7 @@ import { Modal, Form, Input, DatePicker, Switch, message, Button } from 'antd';
 import { CalendarOutlined, UserOutlined, PhoneOutlined, EnvironmentOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { vehicleBookingService } from '../../api/vehicleBookings';
 import { getCurrentUser, ensureAuthForTesting } from '../../utils/authHelper';
+import { getMarkedUpPriceForRentalType } from '../../utils/priceHelper';
 import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
@@ -26,6 +27,11 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
   const [withDriver, setWithDriver] = useState(false);
   const [rentalType, setRentalType] = useState('daily'); // 'daily', 'hourly', 'kilometer'
 
+  // Watch form values for real-time calculation updates
+  const estimatedHours = Form.useWatch('estimatedHours', form);
+  const estimatedKilometers = Form.useWatch('estimatedKilometers', form);
+  const dateRange = Form.useWatch('dateRange', form);
+
     // Enhanced user data retrieval
   const getUserDetails = () => {
     // Try localStorage first since it has more complete user info
@@ -46,19 +52,65 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
     return tokenUser;
   };
 
+  // Function to calculate estimated total cost
+  const calculateEstimatedTotal = () => {
+    if (!dateRange || dateRange.length !== 2) {
+      return { subtotal: 0, total: 0, details: null };
+    }
+
+    const startDate = dayjs(dateRange[0]);
+    const endDate = dayjs(dateRange[1]);
+    const totalDays = endDate.diff(startDate, 'day') + 1;
+    
+    let customerRate = 0;
+    let subtotal = 0;
+    let quantity = 0;
+    let unitType = '';
+
+    if (rentalType === 'daily') {
+      customerRate = getMarkedUpPriceForRentalType(vehicle, 'daily');
+      quantity = totalDays;
+      subtotal = customerRate * quantity;
+      unitType = 'day(s)';
+    } else if (rentalType === 'hourly') {
+      customerRate = getMarkedUpPriceForRentalType(vehicle, 'hourly');
+      quantity = parseFloat(estimatedHours) || 0; // Use watched value directly
+      subtotal = customerRate * quantity;
+      unitType = 'hour(s)';
+    } else if (rentalType === 'kilometer') {
+      customerRate = getMarkedUpPriceForRentalType(vehicle, 'kilometer');
+      quantity = parseFloat(estimatedKilometers) || 0; // Use watched value directly
+      subtotal = customerRate * quantity;
+      unitType = 'km';
+    }
+
+    // Driver charge is NOT included in total - it's negotiable with vehicle owner
+    // Insurance cost removed per user request
+    const total = subtotal; // Only vehicle cost, no insurance or driver cost
+
+    return {
+      subtotal,
+      total,
+      quantity,
+      unitType,
+      customerRate,
+      totalDays
+    };
+  };
+
   const currentUser = getUserDetails();
 
   // Helper function to get available rental types for the vehicle
   const getAvailableRentalTypes = () => {
     const types = [];
     if (vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay) {
-      types.push({ value: 'daily', label: 'Daily Rental', rate: vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay });
+      types.push({ value: 'daily', label: 'Daily Rental', rate: getMarkedUpPriceForRentalType(vehicle, 'daily') });
     }
     if (vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour) {
-      types.push({ value: 'hourly', label: 'Hourly Rental', rate: vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour });
+      types.push({ value: 'hourly', label: 'Hourly Rental', rate: getMarkedUpPriceForRentalType(vehicle, 'hourly') });
     }
     if (vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer) {
-      types.push({ value: 'kilometer', label: 'Per Kilometer', rate: vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer });
+      types.push({ value: 'kilometer', label: 'Per Kilometer', rate: getMarkedUpPriceForRentalType(vehicle, 'kilometer') });
     }
     return types;
   };
@@ -94,29 +146,33 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
       const endDate = dayjs(values.dateRange[1]);
       const totalDays = endDate.diff(startDate, 'day') + 1;
       
-      let baseRate = 0;
+      let customerRate = 0; // Price with 10% markup for customer
       let subtotal = 0;
       let unit = '';
 
       if (rentalType === 'daily') {
-        baseRate = vehicle.pricing?.pricePerDay || vehicle.price?.perDay || 0;
-        subtotal = baseRate * totalDays;
+        customerRate = getMarkedUpPriceForRentalType(vehicle, 'daily');
+        subtotal = customerRate * totalDays;
         unit = 'day';
       } else if (rentalType === 'hourly') {
-        baseRate = vehicle.pricing?.pricePerHour || vehicle.price?.perHour || 0;
-        const estimatedHours = values.estimatedHours || totalDays * 8; // Default 8 hours per day
-        subtotal = baseRate * estimatedHours;
+        customerRate = getMarkedUpPriceForRentalType(vehicle, 'hourly');
+        const estimatedHours = parseFloat(values.estimatedHours) || 0; // Use 0 as fallback to match preview
+        subtotal = customerRate * estimatedHours;
         unit = 'hour';
       } else if (rentalType === 'kilometer') {
-        baseRate = vehicle.pricing?.pricePerKilometer || vehicle.price?.perKilometer || 0;
-        const estimatedKm = values.estimatedKilometers || 100; // Default 100 km
-        subtotal = baseRate * estimatedKm;
+        customerRate = getMarkedUpPriceForRentalType(vehicle, 'kilometer');
+        const estimatedKm = parseFloat(values.estimatedKilometers) || 0; // Use 0 as fallback to match preview
+        subtotal = customerRate * estimatedKm;
         unit = 'km';
       }
 
-      const driverCharge = withDriver ? (vehicle.pricing?.driverFee || 20) * totalDays : 0;
-      const insurance = subtotal * 0.05; // 5% insurance
-      const totalAmount = subtotal + driverCharge + insurance;
+      // Driver charge is NOT included in total - it's negotiable with vehicle owner
+      // Insurance cost removed per user request
+      const totalAmount = subtotal; // Only vehicle cost, no insurance or driver cost
+
+      // Store estimated values for record keeping
+      const estimatedHours = rentalType === 'hourly' ? (parseFloat(values.estimatedHours) || 0) : undefined;
+      const estimatedKilometers = rentalType === 'kilometer' ? (parseFloat(values.estimatedKilometers) || 0) : undefined;
 
       const bookingData = {
         customer: {
@@ -135,10 +191,12 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
           driverRequired: withDriver,
         },
         pricing: {
-          basePrice: baseRate,  // Backend expects basePrice
-          totalAmount: totalAmount,  // Backend expects totalAmount
+          basePrice: customerRate,  // Use marked-up rate for customer billing
+          totalAmount: totalAmount,  // Total with marked-up prices
           rentalType: rentalType,
           unit: unit,
+          ...(estimatedHours !== undefined && { estimatedHours }),
+          ...(estimatedKilometers !== undefined && { estimatedKilometers }),
         },
         payment: {
           method: 'cash' as const,  // Valid payment method type
@@ -541,11 +599,7 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-blue-600">
-                   {
-                    rentalType === 'daily' ? (vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay || 0) :
-                    rentalType === 'hourly' ? (vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour || 0) :
-                    (vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer || 0)
-                  }$
+                   {getMarkedUpPriceForRentalType(vehicle, rentalType as 'daily' | 'hourly' | 'kilometer')}$
                 </span>
                 <div className="text-xs text-gray-500">
                   /{rentalType === 'daily' ? 'day' : rentalType === 'hourly' ? 'hour' : 'km'}
@@ -558,13 +612,13 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
               <div className="text-sm font-medium text-gray-700 mb-2">Available Pricing Options:</div>
               <div className="space-y-1">
                 {(vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay) && (
-                  <div className="text-xs text-gray-600">Daily: {vehicle?.pricing?.pricePerDay || vehicle?.price?.perDay}$/day</div>
+                  <div className="text-xs text-gray-600">Daily: {getMarkedUpPriceForRentalType(vehicle, 'daily')}$/day</div>
                 )}
                 {(vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour) && (
-                  <div className="text-xs text-gray-600">Hourly: {vehicle?.pricing?.pricePerHour || vehicle?.price?.perHour}$/hour</div>
+                  <div className="text-xs text-gray-600">Hourly: {getMarkedUpPriceForRentalType(vehicle, 'hourly')}$/hour</div>
                 )}
                 {(vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer) && (
-                  <div className="text-xs text-gray-600">Per Km: {vehicle?.pricing?.pricePerKilometer || vehicle?.price?.perKilometer}$/km</div>
+                  <div className="text-xs text-gray-600">Per Km: {getMarkedUpPriceForRentalType(vehicle, 'kilometer')}$/km</div>
                 )}
               </div>
             </div>
@@ -624,6 +678,34 @@ const VehicleBookingModal: React.FC<VehicleBookingModalProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Estimated Total Cost Preview */}
+        {(() => {
+          const estimatedTotal = calculateEstimatedTotal();
+          return estimatedTotal.total > 0 ? (
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <h4 className="text-lg font-medium text-blue-800">Estimated Total Cost</h4>
+                  <div className="text-sm text-blue-600">Based on your inputs</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-700">${estimatedTotal.total.toFixed(1)}</div>
+                  <div className="text-xs text-blue-500">Includes 10% markup</div>
+                </div>
+              </div>
+              {/* Cost Breakdown */}
+              {estimatedTotal.quantity && estimatedTotal.quantity > 0 && estimatedTotal.customerRate && (
+                <div className="text-xs text-blue-600 space-y-1 pt-2 border-t border-blue-200">
+                  <div className="flex justify-between">
+                    <span>Vehicle cost ({estimatedTotal.quantity} {estimatedTotal.unitType} × ${estimatedTotal.customerRate.toFixed(1)}):</span>
+                    <span>${estimatedTotal.subtotal.toFixed(1)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null;
+        })()}
 
         {/* Submit Buttons */}
         <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">

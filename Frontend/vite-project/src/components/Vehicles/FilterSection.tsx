@@ -99,7 +99,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         </div>
         {expandedSections.vehicleType && (
           <div className="space-y-1 ml-2">
-            {['car', 'van', 'bus', 'suv', 'motorcycle', 'truck'].map((type) => (
+            {['car', 'van', 'bus', 'suv', 'motorcycle', 'truck', 'tuk tuk'].map((type) => (
               <label key={type} className="flex items-center text-xs">
                 <input
                   type="checkbox"

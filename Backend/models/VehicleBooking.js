@@ -52,7 +52,18 @@ const vehicleBookingSchema = new mongoose.Schema({
     insurance: { type: Number, default: 0 },
     tax: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
-    totalAmount: { type: Number, required: true }
+    totalAmount: { type: Number, required: true },
+    // Rental type information
+    rentalType: { 
+      type: String, 
+      enum: ['daily', 'hourly', 'kilometer'],
+      default: 'daily'
+    },
+    unit: { type: String }, // Legacy support for old bookings
+    estimatedHours: { type: Number }, // For hourly rentals
+    estimatedKilometers: { type: Number }, // For per-kilometer rentals
+    pricePerHour: { type: Number }, // Rate per hour
+    pricePerKilometer: { type: Number } // Rate per kilometer
   },
   payment: {
     method: { 

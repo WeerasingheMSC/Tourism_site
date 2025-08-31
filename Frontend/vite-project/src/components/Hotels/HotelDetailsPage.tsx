@@ -81,6 +81,11 @@ const HotelDetailsPage = () => {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
+  // Calculate price with 10% commission
+  const calculatePriceWithCommission = (originalPrice: number) => {
+    return originalPrice * 1.1; // Add 10% commission
+  };
+
   // Review form state
   const [newRating, setNewRating] = useState<number>(5);
   const [newComment, setNewComment] = useState<string>("");
@@ -239,7 +244,9 @@ const HotelDetailsPage = () => {
           <div className="flex items-center text-sm text-gray-500">
             <span className="hover:text-blue-600 cursor-pointer">Home</span>
             <span className="mx-2">{">"}</span>
-            <span className="hover:text-blue-600 cursor-pointer truncate">{name}</span>
+            <span className="hover:text-blue-600 cursor-pointer truncate">
+              {name}
+            </span>
           </div>
         </div>
       </div>
@@ -475,7 +482,6 @@ const HotelDetailsPage = () => {
               Address
             </h2>
             <div className="flex flex-col space-y-3 text-gray-700 text-sm sm:text-base">
-
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <span className="break-words">
@@ -523,7 +529,9 @@ const HotelDetailsPage = () => {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-6">Hotel Rules</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-6">
+              Hotel Rules
+            </h2>
             <div className="space-y-6">
               {/* Repeat rules using policies object */}
               {policies.checkInTime && (
@@ -531,7 +539,9 @@ const HotelDetailsPage = () => {
                   <Calendar className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="font-medium text-sm sm:text-base">Check in</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Check in
+                      </span>
                       <span className="text-gray-600 text-sm sm:text-base">
                         {policies.checkInTime}
                       </span>
@@ -544,7 +554,9 @@ const HotelDetailsPage = () => {
                   <Calendar className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="font-medium text-sm sm:text-base">Check out</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Check out
+                      </span>
                       <span className="text-gray-600 text-sm sm:text-base">
                         {policies.checkOutTime}
                       </span>
@@ -558,7 +570,9 @@ const HotelDetailsPage = () => {
                   <CreditCard className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="font-medium text-sm sm:text-base">Cancellation Policy</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Cancellation Policy
+                      </span>
                       <span className="text-gray-600 text-sm sm:text-base">
                         {policies.cancellationPolicy}
                       </span>
@@ -571,7 +585,9 @@ const HotelDetailsPage = () => {
                   <Baby className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="font-medium text-sm sm:text-base">Children & Beds</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Children & Beds
+                      </span>
                       <span className="text-gray-600 text-sm sm:text-base">
                         {policies.childrenAndBeds}
                       </span>
@@ -584,7 +600,9 @@ const HotelDetailsPage = () => {
                   <Users className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="font-medium text-sm sm:text-base">Age Restriction</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Age Restriction
+                      </span>
                       <span className="text-gray-600 text-sm sm:text-base">
                         {policies.ageRestriction}
                       </span>
@@ -597,7 +615,9 @@ const HotelDetailsPage = () => {
                   <PawPrint className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="font-medium text-sm sm:text-base">Pets Allowed</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Pets Allowed
+                      </span>
                       <span className="text-gray-600 text-sm sm:text-base">
                         {policies.petsAllowed ? "Yes" : "No"}
                       </span>
@@ -609,7 +629,9 @@ const HotelDetailsPage = () => {
           </div>
           {/* Room Types Section */}
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-6">Room Types</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-6">
+              Room Types
+            </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {roomTypes.map((rt, idx) => (
                 <div
@@ -622,7 +644,9 @@ const HotelDetailsPage = () => {
                     </h3>
                     <span className="text-base sm:text-lg font-bold text-blue-500">
                       {rt.pricePerNight != null
-                        ? `$${rt.pricePerNight.toFixed(2)}/night`
+                        ? `$${calculatePriceWithCommission(
+                            rt.pricePerNight
+                          ).toFixed(2)}/night`
                         : "N/A"}
                     </span>
                   </div>
@@ -728,8 +752,12 @@ const HotelDetailsPage = () => {
 
           {/* Review submission form */}
           <div className="mb-6 bg-white rounded-lg shadow-sm p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-medium mb-4">Add Your Review</h3>
-            {reviewError && <p className="text-red-500 mb-2 text-sm">{reviewError}</p>}
+            <h3 className="text-base sm:text-lg font-medium mb-4">
+              Add Your Review
+            </h3>
+            {reviewError && (
+              <p className="text-red-500 mb-2 text-sm">{reviewError}</p>
+            )}
             <div className="flex flex-col sm:flex-row sm:items-center mb-4 gap-2">
               <label className="text-sm font-medium">Rating:</label>
               <div className="flex">

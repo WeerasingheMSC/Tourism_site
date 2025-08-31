@@ -394,11 +394,11 @@ const VehicleOwner: React.FC = () => {
                       <td className="px-6 py-4 text-sm text-gray-900">
                         <div>
                           {vehicle.price?.perDay || vehicle.pricing?.pricePerDay ? (
-                            <span>Rs. {vehicle.price?.perDay || vehicle.pricing?.pricePerDay}/day</span>
+                            <span> {vehicle.price?.perDay || vehicle.pricing?.pricePerDay}$/day</span>
                           ) : vehicle.price?.perHour || vehicle.pricing?.pricePerHour ? (
-                            <span>Rs. {vehicle.price?.perHour || vehicle.pricing?.pricePerHour}/hour</span>
+                            <span> {vehicle.price?.perHour || vehicle.pricing?.pricePerHour}$/hour</span>
                           ) : vehicle.price?.perKilometer || vehicle.pricing?.pricePerKilometer ? (
-                            <span>Rs. {vehicle.price?.perKilometer || vehicle.pricing?.pricePerKilometer}/km</span>
+                            <span> {vehicle.price?.perKilometer || vehicle.pricing?.pricePerKilometer}$/km</span>
                           ) : (
                             <span>Price on request</span>
                           )}
@@ -509,6 +509,9 @@ const VehicleOwner: React.FC = () => {
                         Vehicle
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                        Rental Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                         Start Date
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
@@ -540,6 +543,60 @@ const VehicleOwner: React.FC = () => {
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {booking.vehicle?.name || "-"}
                         </td>
+                        <td className="px-6 py-4 text-sm">
+                          {/* Rental Type and Quantity Display */}
+                          <div className="text-xs font-medium">
+                            {/* Check for hourly rentals */}
+                            {((booking.pricing as any)?.rentalType === 'hourly' || 
+                              (booking.pricing as any)?.rentalType === 'hour' || 
+                              (booking.pricing as any)?.unit === 'hour' ||
+                              (booking.pricing as any)?.unit === 'hours') ? (
+                              <div className="bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                                <span className="text-blue-800 font-bold">
+                                  ⏱️ HOURLY
+                                </span>
+                                <div className="text-blue-700 mt-1 font-semibold">
+                                  {(booking.pricing as any)?.estimatedHours ? `${(booking.pricing as any).estimatedHours} hours` : 
+                                   (booking.pricing as any)?.totalHours ? `${(booking.pricing as any).totalHours} hours` :
+                                   'Hours not specified'}
+                                </div>
+                              </div>
+                            ) : /* Check for per kilometer rentals */
+                            ((booking.pricing as any)?.rentalType === 'kilometer' || 
+                             (booking.pricing as any)?.rentalType === 'per-kilometer' ||
+                             (booking.pricing as any)?.rentalType === 'km' ||
+                             (booking.pricing as any)?.unit === 'km' ||
+                             (booking.pricing as any)?.unit === 'kilometer') ? (
+                              <div className="bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                                <span className="text-green-800 font-bold">
+                                  📏 PER KM
+                                </span>
+                                <div className="text-green-700 mt-1 font-semibold">
+                                  {(booking.pricing as any)?.estimatedKilometers ? `${(booking.pricing as any).estimatedKilometers} km` : 
+                                   (booking.pricing as any)?.totalKilometers ? `${(booking.pricing as any).totalKilometers} km` :
+                                   (booking.pricing as any)?.distance ? `${(booking.pricing as any).distance} km` :
+                                   'Distance not specified'}
+                                </div>
+                              </div>
+                            ) : /* Check for daily rentals */
+                            ((booking.pricing as any)?.rentalType === 'daily' || 
+                             (booking.pricing as any)?.rentalType === 'day' ||
+                             (booking.pricing as any)?.unit === 'day' ||
+                             (booking.pricing as any)?.unit === 'daily' ||
+                             !(booking.pricing as any)?.rentalType) ? (
+                              <div className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                                <span className="text-gray-700 font-bold">� DAILY</span>
+                              </div>
+                            ) : (
+                              /* Fallback - show the actual values for debugging */
+                              <div className="bg-yellow-50 px-3 py-2 rounded-lg border border-yellow-200">
+                                <span className="text-yellow-700 font-bold">
+                                  🔍 Unknown: {(booking.pricing as any)?.rentalType || (booking.pricing as any)?.unit || 'No type'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {booking.booking?.startDate ? new Date(booking.booking.startDate).toLocaleDateString() : "-"}
                         </td>
@@ -547,15 +604,7 @@ const VehicleOwner: React.FC = () => {
                           {booking.booking?.endDate ? new Date(booking.booking.endDate).toLocaleDateString() : "-"}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
-                          <div>
-                            <div className="font-medium">Rs. {booking.pricing?.totalAmount || 0}</div>
-                            {(booking.pricing as any)?.rentalType && (booking.pricing as any)?.basePrice && (
-                              <div className="text-xs text-gray-500">
-                                {(booking.pricing as any).basePrice}$/{(booking.pricing as any).unit || 'day'}
-                                {(booking.pricing as any).rentalType !== 'daily' && ` (${(booking.pricing as any).rentalType})`}
-                              </div>
-                            )}
-                          </div>
+                          <div className="font-medium">{booking.pricing?.totalAmount || 0}$</div>
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <span

@@ -433,13 +433,13 @@ const EditVehicle = () => {
                   onChange={(e) => handleInputChange('vehicleType', e.target.value)}
                 >
                   <option value="">Select vehicle type</option>
-                  <option value="Car">Car</option>
-                  <option value="SUV">SUV</option>
-                  <option value="Van">Van</option>
-                  <option value="Bus">Bus</option>
-                  <option value="Motorcycle">Motorcycle</option>
-                  <option value="Bicycle">Bicycle</option>
-                  <option value="Truck">Truck</option>
+                  <option value="car">Car</option>
+                  <option value="suv">SUV</option>
+                  <option value="van">Van</option>
+                  <option value="bus">Bus</option>
+                  <option value="motorcycle">Motorcycle</option>
+                  <option value="truck">Truck</option>
+                  <option value="tuk tuk">Tuk Tuk</option>
                 </select>
               </div>
 
@@ -751,7 +751,7 @@ const EditVehicle = () => {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price per Day (Rs.) *
+                  Price per Day ($) *
                 </label>
                 <input
                   type="number"
@@ -767,7 +767,7 @@ const EditVehicle = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price per Hour (Rs.)
+                  Price per Hour ($)
                 </label>
                 <input
                   type="number"
@@ -782,7 +782,7 @@ const EditVehicle = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rental Per Kilometer (Rs.)
+                  Rental Per Kilometer ($)
                 </label>
                 <input
                   type="number"
@@ -886,12 +886,12 @@ const EditVehicle = () => {
                 <div><strong>Location:</strong> {formData.location.city}, {formData.location.area}</div>
                 <div><strong>Features:</strong> {formData.features.length} selected</div>
                 <div><strong>FAQs:</strong> {formData.faqs.filter(faq => faq.question && faq.answer).length} added</div>
-                <div><strong>Price Per Day:</strong> Rs. {formData.pricing.pricePerDay}</div>
+                <div><strong>Price Per Day:</strong>  {formData.pricing.pricePerDay}$</div>
                 {formData.pricing.pricePerHour && (
-                  <div><strong>Price Per Hour:</strong> Rs. {formData.pricing.pricePerHour}</div>
+                  <div><strong>Price Per Hour:</strong> {formData.pricing.pricePerHour}$</div>
                 )}
                 {formData.pricing.pricePerKilometer && (
-                  <div><strong>Rental Per Kilometer:</strong> Rs. {formData.pricing.pricePerKilometer}</div>
+                  <div><strong>Rental Per Kilometer:</strong> {formData.pricing.pricePerKilometer}$</div>
                 )}
                 <div><strong>Air Conditioning:</strong> {formData.airConditioning ? 'Yes' : 'No'}</div>
                 <div><strong>Images:</strong> {formData.images.length} uploaded</div>
