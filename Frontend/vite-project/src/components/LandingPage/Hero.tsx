@@ -118,9 +118,9 @@ const Hero: React.FC = () => {
           <p
             className="text-orange-600 text-xs sm:text-sm md:text-base lg:text-lg 
                         font-extrabold font-popins text-center lg:text-start 
-                        mb-4 sm:mb-6 md:mb-8"
+                        mb-4 sm:mb-6 md:mb-6"
           >
-            EXPLORE SRI LANKS WITH EASY
+            EXPLORE SRI LANKA WITH EASE
           </p>
 
           {/* Main Title */}
